@@ -1,0 +1,24 @@
+import { createClient } from "@supabase/supabase-js"
+import type { Database } from "@/types/database.types"
+
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error(
+    "Missing Supabase env vars. Copy .env.example to .env and fill in " +
+      "VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY from your Supabase project settings."
+  )
+}
+
+/**
+ * Typed Supabase client, shared across the whole app.
+ * Auth session is persisted to localStorage and auto-refreshed.
+ */
+export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true,
+    detectSessionInUrl: true,
+  },
+})
