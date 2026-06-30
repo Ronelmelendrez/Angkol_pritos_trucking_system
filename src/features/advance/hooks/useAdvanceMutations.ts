@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
 import { supabase } from "@/lib/supabaseClient"
 import type { AdvanceFormSchemaOutput } from "@/utils/validators"
-import { advancesKeys } from "@/features/advances/hooks/useAdvances"
+import { advancesKeys } from "@/features/advance/hooks/useAdvances"
 
 async function insertAdvance(values: AdvanceFormSchemaOutput) {
   const { data, error } = await supabase

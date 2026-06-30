@@ -7,10 +7,10 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
-import { Badge } from "@/components/ui/badge"
+} from "@/components/ui/Table"
+import { Badge } from "@/components/ui/Badge"
 import { Button } from "@/components/ui/button"
-import { Skeleton } from "@/components/ui/skeleton"
+import { Skeleton } from "@/components/ui/Skeleton"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -20,7 +20,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
+} from "@/components/ui/AlertDialog"
 import { ExpenseForm } from "@/features/expenses/components/ExpenseForm"
 import { useDeleteExpense } from "@/features/expenses/hooks/useDeleteExpense"
 import { formatPHP } from "@/utils/currency"

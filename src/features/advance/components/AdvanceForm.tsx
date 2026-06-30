@@ -28,8 +28,8 @@ import {
 } from "@/components/ui/form"
 import { advanceSchema, type AdvanceFormSchemaOutput } from "@/utils/validators"
 import { todayISO } from "@/utils/date"
-import { useActiveEmployees } from "@/features/employees"
-import { useAddAdvance } from "@/features/advances/hooks/useAdvanceMutations"
+import { useEmployees } from "@/features/employee/hooks/useEmployees"
+import { useAddAdvance } from "@/features/advance/hooks/useAdvanceMutations"
 
 interface AdvanceFormProps {
   open: boolean
@@ -37,7 +37,7 @@ interface AdvanceFormProps {
 }
 
 export function AdvanceForm({ open, onOpenChange }: AdvanceFormProps) {
-  const { data: employees = [] } = useActiveEmployees()
+  const { data: employees = [] } = useEmployees()
   const addAdvance = useAddAdvance()
 
   const form = useForm({

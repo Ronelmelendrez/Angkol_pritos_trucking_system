@@ -35,7 +35,7 @@ function ExpensesPageContent() {
   )
 }
 
-export default function ExpensesPage() {
+export function ExpensesPage() {
   return (
     <ErrorBoundary section="Expenses">
       <ExpensesPageContent />

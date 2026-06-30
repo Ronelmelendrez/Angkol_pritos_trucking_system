@@ -7,8 +7,8 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+} from "@/components/ui/DropdownMenu"
+import { Avatar, AvatarFallback } from "@/components/ui/Avatar"
 import { useAuth, useLogout } from "@/features/auth"
 
 export function Header() {

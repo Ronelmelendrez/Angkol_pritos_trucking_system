@@ -28,8 +28,8 @@ import {
 } from "@/components/ui/form"
 import { loanSchema, type LoanFormSchemaOutput } from "@/utils/validators"
 import { todayISO } from "@/utils/date"
-import { useActiveEmployees } from "@/features/employees"
-import { useAddLoan } from "@/features/loans/hooks/useAddLoan"
+import { useEmployees } from "@/features/employee/hooks/useEmployees"
+import { useAddLoan } from "@/features/loans/hooks/useAddLoans"
 
 interface LoanFormProps {
   open: boolean
@@ -37,7 +37,7 @@ interface LoanFormProps {
 }
 
 export function LoanForm({ open, onOpenChange }: LoanFormProps) {
-  const { data: employees = [] } = useActiveEmployees()
+  const { data: employees = [] } = useEmployees()
   const addLoan = useAddLoan()
 
   const form = useForm({

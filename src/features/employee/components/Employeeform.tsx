@@ -22,8 +22,8 @@ import {
 } from "@/components/ui/form"
 import { employeeSchema, type EmployeeFormSchema, type EmployeeFormSchemaOutput } from "@/utils/validators"
 import { todayISO } from "@/utils/date"
-import { useAddEmployee } from "@/features/employees/hooks/useAddEmployee"
-import { useUpdateEmployee } from "@/features/employees/hooks/useUpdateEmployee"
+import { useAddEmployee } from "@/features/employee/hooks/useAddEmployee"
+import { useUpdateEmployee } from "@/features/employee/hooks/useUpdateEmployee"
 import type { Employee } from "@/types"
 
 interface EmployeeFormProps {
