@@ -1,22 +1,31 @@
-import type { Session, User } from "@supabase/supabase-js"
+import type { UserRole } from "@/lib/constants";
 
-export type { Session, User }
-
-export interface Profile {
-  id: string
-  full_name: string | null
-  role: "manager" | "staff"
-  created_at: string
+export interface AuthUser {
+  id: string;
+  name: string;
+  email: string;
+  role: UserRole;
 }
 
-export interface LoginFormValues {
-  email: string
-  password: string
+export interface AuthState {
+  user: AuthUser | null;
+  isAuthenticated: boolean;
+  isLoading: boolean;
 }
 
-export interface AuthContextValue {
-  session: Session | null
-  user: User | null
-  profile: Profile | null
-  isLoading: boolean
+export interface LoginCredentials {
+  email: string;
+  password: string;
+}
+
+/**
+ * Contract every auth provider (mock or Supabase) must satisfy.
+ * Swapping to Supabase Auth later means implementing this interface
+ * against `supabase.auth.*` instead of localStorage — nothing that
+ * consumes `useAuth()` needs to change.
+ */
+export interface AuthProvider {
+  getSession(): Promise<AuthUser | null>;
+  login(credentials: LoginCredentials): Promise<AuthUser>;
+  logout(): Promise<void>;
 }
