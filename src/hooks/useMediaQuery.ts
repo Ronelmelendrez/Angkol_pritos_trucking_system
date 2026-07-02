@@ -1,27 +1,24 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState } from "react";
 
-/**
- * Subscribes to a CSS media query and returns whether it currently matches.
- * Used to switch between mobile bottom-tab nav and desktop sidebar nav.
- */
+/** Returns true when the viewport matches the given media query. */
 export function useMediaQuery(query: string): boolean {
-  const [matches, setMatches] = useState<boolean>(() =>
-    typeof window !== "undefined" ? window.matchMedia(query).matches : false
-  )
+  const [matches, setMatches] = useState(
+    () => typeof window !== "undefined" && window.matchMedia(query).matches
+  );
 
   useEffect(() => {
-    const mediaQueryList = window.matchMedia(query)
-    const listener = (event: MediaQueryListEvent) => setMatches(event.matches)
+    const mql = window.matchMedia(query);
+    const listener = (e: MediaQueryListEvent) => setMatches(e.matches);
+    mql.addEventListener("change", listener);
+    setMatches(mql.matches);
+    return () => mql.removeEventListener("change", listener);
+  }, [query]);
 
-    setMatches(mediaQueryList.matches)
-    mediaQueryList.addEventListener("change", listener)
-    return () => mediaQueryList.removeEventListener("change", listener)
-  }, [query])
-
-  return matches
+  return matches;
 }
 
-/** Convenience hook: true at tablet width (768px) and above. */
-export function useIsDesktop(): boolean {
-  return useMediaQuery("(min-width: 768px)")
-}
+export const BREAKPOINTS = {
+  sm: "(min-width: 640px)",
+  md: "(min-width: 768px)",
+  lg: "(min-width: 1024px)",
+} as const;
