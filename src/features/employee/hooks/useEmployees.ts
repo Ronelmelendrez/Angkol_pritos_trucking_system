@@ -1,25 +1,43 @@
-import { useQuery } from "@tanstack/react-query"
-import { supabase } from "@/lib/supabaseClient"
-import type { Employee } from "@/types"
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { employeesTable } from "@/lib/mockData";
+import type { Employee, NewEmployee, UpdateEmployee } from "../types";
 
-export const employeesKeys = {
-  all: ["employees"] as const,
-  active: ["employees", "active"] as const,
-}
-
-async function fetchEmployees(): Promise<Employee[]> {
-  const { data, error } = await supabase
-    .from("employees")
-    .select("*")
-    .order("name", { ascending: true })
-
-  if (error) throw error
-  return (data ?? []) as Employee[]
-}
+const EMPLOYEES_KEY = ["employees"] as const;
+const AVATAR_COLORS = ["#E67E22", "#C0392B", "#F1C40F", "#8D6E63", "#D35400", "#6D4C41"];
 
 export function useEmployees() {
   return useQuery({
-    queryKey: employeesKeys.all,
-    queryFn: fetchEmployees,
-  })
+    queryKey: EMPLOYEES_KEY,
+    queryFn: () => employeesTable.list(),
+  });
 }
+
+export function useAddEmployee() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (input: NewEmployee) =>
+      employeesTable.create({
+        ...input,
+        avatarColor: AVATAR_COLORS[Math.floor(Math.random() * AVATAR_COLORS.length)],
+      }),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: EMPLOYEES_KEY }),
+  });
+}
+
+export function useUpdateEmployee() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, ...patch }: UpdateEmployee) => employeesTable.update(id, patch),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: EMPLOYEES_KEY }),
+  });
+}
+
+export function useDeleteEmployee() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => employeesTable.remove(id),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: EMPLOYEES_KEY }),
+  });
+}
+
+export type { Employee };
