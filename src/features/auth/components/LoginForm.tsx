@@ -1,93 +1,73 @@
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { z } from "zod"
-import { Loader2, Drumstick } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { useLogin } from "@/features/auth/hooks/useLogin"
-
-const loginSchema = z.object({
-  email: z.string().min(1, "Email is required").email("Enter a valid email"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
-})
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Drumstick, Loader2 } from "lucide-react";
+import { useAuth } from "../hooks/useAuth";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/components/ui/useToast";
 
 export function LoginForm() {
-  const { login, isLoading } = useLogin()
+  const [email, setEmail] = useState("manager@manongsgrill.ph");
+  const [password, setPassword] = useState("");
+  const { login, isLoggingIn } = useAuth();
+  const { toast } = useToast();
+  const navigate = useNavigate();
 
-  const form = useForm<z.infer<typeof loginSchema>>({
-    resolver: zodResolver(loginSchema),
-    defaultValues: { email: "", password: "" },
-  })
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    try {
+      await login({ email, password: password || "demo" });
+      toast({ title: "Welcome back!", description: "Logged in as manager.", variant: "success" });
+      navigate("/", { replace: true });
+    } catch {
+      toast({ title: "Login failed", description: "Check your details and try again.", variant: "error" });
+    }
+  }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
-      <Card className="w-full max-w-sm">
-        <CardHeader className="items-center pb-2 text-center">
-          <div className="mb-2 flex size-12 items-center justify-center rounded-full bg-primary text-primary-foreground">
-            <Drumstick className="size-6" />
+    <div className="flex min-h-screen items-center justify-center px-4">
+      <div className="w-full max-w-sm">
+        <div className="mb-6 flex flex-col items-center text-center">
+          <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary text-white shadow-ticket">
+            <Drumstick className="h-7 w-7" />
           </div>
-          <CardTitle className="text-xl">Lechon &amp; Manok Truck</CardTitle>
-          <CardDescription>Manager sign in</CardDescription>
-        </CardHeader>
-        <CardContent className="pb-6">
-          <Form {...form}>
-            <form
-              onSubmit={form.handleSubmit((values) => login(values))}
-              className="flex flex-col gap-4"
-            >
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="email"
-                        placeholder="manager@truck.com"
-                        autoComplete="email"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Password</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="password"
-                        placeholder="••••••••"
-                        autoComplete="current-password"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button type="submit" size="lg" disabled={isLoading} className="mt-2">
-                {isLoading && <Loader2 className="size-4 animate-spin" />}
-                Sign in
-              </Button>
-            </form>
-          </Form>
-        </CardContent>
-      </Card>
+          <h1 className="stamp text-2xl font-semibold text-ink">Manong's Grill &amp; Lechon</h1>
+          <p className="mt-1 text-sm text-ink-soft">Sign in to manage today's operations</p>
+        </div>
+
+        <form onSubmit={handleSubmit} className="ticket p-6">
+          <div className="mb-4">
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="manager@manongsgrill.ph"
+              required
+            />
+          </div>
+          <div className="mb-5">
+            <Label htmlFor="password">Password</Label>
+            <Input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Any password works in demo mode"
+              required
+            />
+          </div>
+          <Button type="submit" className="w-full" size="lg" disabled={isLoggingIn}>
+            {isLoggingIn && <Loader2 className="h-4 w-4 animate-spin" />}
+            {isLoggingIn ? "Signing in..." : "Sign in"}
+          </Button>
+          <p className="mt-4 text-center text-xs text-ink-faint">
+            Demo mode — this is a stub login. Real authentication arrives with Supabase.
+          </p>
+        </form>
+      </div>
     </div>
-  )
+  );
 }
