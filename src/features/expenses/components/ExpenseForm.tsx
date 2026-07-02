@@ -1,231 +1,125 @@
-import { useEffect } from "react"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { Loader2 } from "lucide-react"
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form"
-import { expenseSchema, type ExpenseFormSchema, type ExpenseFormSchemaOutput } from "@/utils/validators"
-import { EXPENSE_CATEGORIES, PAYMENT_METHODS } from "@/lib/constants"
-import { todayISO } from "@/utils/date"
-import { useAddExpense } from "@/features/expenses/hooks/useAddExpense"
-import { useUpdateExpense } from "@/features/expenses/hooks/useUpdateExpense"
-import type { Expense } from "@/types"
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2 } from "lucide-react";
+import { expenseSchema, type ExpenseFormValues } from "@/utils/validators";
+import { EXPENSE_CATEGORIES, PAYMENT_METHODS } from "@/lib/constants";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
+import { useAddExpense } from "../hooks/useExpenses";
+import { useToast } from "@/components/ui/useToast";
+import { todayISO } from "@/utils/date";
 
-interface ExpenseFormProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  /** Pass an existing expense to edit; omit to create a new one */
-  expense?: Expense
-}
+export function ExpenseForm({ onDone }: { onDone?: () => void }) {
+  const { toast } = useToast();
+  const addExpense = useAddExpense();
 
-const emptyDefaults: ExpenseFormSchema = {
-  expense_date: todayISO(),
-  category: EXPENSE_CATEGORIES[0],
-  description: "",
-  amount: 0,
-  supplier: "",
-  payment_method: PAYMENT_METHODS[0],
-}
-
-export function ExpenseForm({ open, onOpenChange, expense }: ExpenseFormProps) {
-  const isEditing = Boolean(expense)
-  const addExpense = useAddExpense()
-  const updateExpense = useUpdateExpense()
-  const isSubmitting = addExpense.isPending || updateExpense.isPending
-
-  const form = useForm({
+  const {
+    register,
+    handleSubmit,
+    control,
+    reset,
+    formState: { errors },
+  } = useForm<ExpenseFormValues>({
     resolver: zodResolver(expenseSchema),
-    defaultValues: emptyDefaults,
-  })
+    defaultValues: {
+      date: todayISO(),
+      category: "Raw Chicken",
+      description: "",
+      amount: 0,
+      supplier: "",
+      paymentMethod: "Cash",
+    },
+  });
 
-  useEffect(() => {
-    if (open) {
-      form.reset(
-        expense
-          ? {
-              expense_date: expense.expense_date,
-              category: expense.category as ExpenseFormSchema["category"],
-              description: expense.description ?? "",
-              amount: expense.amount,
-              supplier: expense.supplier ?? "",
-              payment_method: expense.payment_method as ExpenseFormSchema["payment_method"],
-            }
-          : emptyDefaults
-      )
-    }
-  }, [open, expense, form])
-
-  function onSubmit(values: ExpenseFormSchemaOutput) {
-    if (isEditing && expense) {
-      updateExpense.mutate(
-        { id: expense.id, values },
-        { onSuccess: () => onOpenChange(false) }
-      )
-    } else {
-      addExpense.mutate(values, { onSuccess: () => onOpenChange(false) })
+  async function onSubmit(values: ExpenseFormValues) {
+    try {
+      await addExpense.mutateAsync(values);
+      toast({ title: "Expense recorded", description: `${values.description} — added.`, variant: "success" });
+      reset({ ...values, description: "", amount: 0, supplier: "" });
+      onDone?.();
+    } catch {
+      toast({ title: "Couldn't save expense", description: "Please try again.", variant: "error" });
     }
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>{isEditing ? "Edit expense" : "Record an expense"}</DialogTitle>
-        </DialogHeader>
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <Label htmlFor="date">Date</Label>
+          <Input id="date" type="date" {...register("date")} />
+          {errors.date && <p className="mt-1 text-xs text-danger">{errors.date.message}</p>}
+        </div>
+        <div>
+          <Label htmlFor="category">Category</Label>
+          <Controller
+            control={control}
+            name="category"
+            render={({ field }) => (
+              <Select value={field.value} onValueChange={field.onChange}>
+                <SelectTrigger id="category">
+                  <SelectValue placeholder="Choose category" />
+                </SelectTrigger>
+                <SelectContent>
+                  {EXPENSE_CATEGORIES.map((c) => (
+                    <SelectItem key={c} value={c}>
+                      {c}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+          />
+          {errors.category && <p className="mt-1 text-xs text-danger">{errors.category.message}</p>}
+        </div>
+      </div>
 
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4">
-            <div className="grid grid-cols-2 gap-3">
-              <FormField
-                control={form.control}
-                name="expense_date"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Date</FormLabel>
-                    <FormControl>
-                      <Input type="date" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="amount"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Amount (₱)</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        step="0.01"
-                        min="0"
-                        inputMode="decimal"
-                        placeholder="0.00"
-                        {...field}
-                        value={field.value as number | string}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+      <div>
+        <Label htmlFor="description">Description</Label>
+        <Input id="description" placeholder="e.g. 10kg dressed chicken" {...register("description")} />
+        {errors.description && <p className="mt-1 text-xs text-danger">{errors.description.message}</p>}
+      </div>
 
-            <FormField
-              control={form.control}
-              name="category"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Category</FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select category" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {EXPENSE_CATEGORIES.map((category) => (
-                        <SelectItem key={category} value={category}>
-                          {category}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <Label htmlFor="amount">Amount (₱)</Label>
+          <Input id="amount" type="number" step="0.01" min="0" {...register("amount")} />
+          {errors.amount && <p className="mt-1 text-xs text-danger">{errors.amount.message}</p>}
+        </div>
+        <div>
+          <Label htmlFor="paymentMethod">Payment method</Label>
+          <Controller
+            control={control}
+            name="paymentMethod"
+            render={({ field }) => (
+              <Select value={field.value} onValueChange={field.onChange}>
+                <SelectTrigger id="paymentMethod">
+                  <SelectValue placeholder="Choose method" />
+                </SelectTrigger>
+                <SelectContent>
+                  {PAYMENT_METHODS.map((m) => (
+                    <SelectItem key={m} value={m}>
+                      {m}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+          />
+        </div>
+      </div>
 
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Description</FormLabel>
-                  <FormControl>
-                    <Textarea placeholder="e.g. Whole chicken, 40 pcs" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+      <div>
+        <Label htmlFor="supplier">Supplier (optional)</Label>
+        <Input id="supplier" placeholder="e.g. San Pedro Poultry" {...register("supplier")} />
+      </div>
 
-            <div className="grid grid-cols-2 gap-3">
-              <FormField
-                control={form.control}
-                name="supplier"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Supplier</FormLabel>
-                    <FormControl>
-                      <Input placeholder="e.g. Aling Nena's" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="payment_method"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Payment method</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {PAYMENT_METHODS.map((method) => (
-                          <SelectItem key={method} value={method}>
-                            {method}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <DialogFooter className="mt-2">
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-                Cancel
-              </Button>
-              <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting && <Loader2 className="size-4 animate-spin" />}
-                {isEditing ? "Save changes" : "Add expense"}
-              </Button>
-            </DialogFooter>
-          </form>
-        </Form>
-      </DialogContent>
-    </Dialog>
-  )
+      <Button type="submit" className="w-full" size="lg" disabled={addExpense.isPending}>
+        {addExpense.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
+        {addExpense.isPending ? "Saving..." : "Save expense"}
+      </Button>
+    </form>
+  );
 }
