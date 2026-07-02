@@ -1,20 +1,15 @@
-import { create } from "zustand"
-import { persist } from "zustand/middleware"
+import { create } from "zustand";
 
-interface UIState {
-  /** Desktop sidebar collapsed (icon-only) vs expanded */
-  sidebarCollapsed: boolean
-  toggleSidebar: () => void
-  setSidebarCollapsed: (collapsed: boolean) => void
+interface UiState {
+  isSidebarOpen: boolean;
+  toggleSidebar: () => void;
+  closeSidebar: () => void;
+  openSidebar: () => void;
 }
 
-export const useUIStore = create<UIState>()(
-  persist(
-    (set, get) => ({
-      sidebarCollapsed: false,
-      toggleSidebar: () => set({ sidebarCollapsed: !get().sidebarCollapsed }),
-      setSidebarCollapsed: (collapsed) => set({ sidebarCollapsed: collapsed }),
-    }),
-    { name: "ui-store" }
-  )
-)
+export const useUiStore = create<UiState>((set) => ({
+  isSidebarOpen: false,
+  toggleSidebar: () => set((s) => ({ isSidebarOpen: !s.isSidebarOpen })),
+  closeSidebar: () => set({ isSidebarOpen: false }),
+  openSidebar: () => set({ isSidebarOpen: true }),
+}));
