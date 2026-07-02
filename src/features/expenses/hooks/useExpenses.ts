@@ -1,39 +1,69 @@
-import { useQuery } from "@tanstack/react-query"
-import { supabase } from "@/lib/supabaseClient"
-import type { Expense } from "@/types"
-import type { ExpenseFilters } from "@/features/expenses/types"
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { expensesTable } from "@/lib/mockData";
+import type { Expense, NewExpense, UpdateExpense } from "../types";
 
-export const expensesKeys = {
-  all: ["expenses"] as const,
-  filtered: (filters: ExpenseFilters) => ["expenses", filters] as const,
-}
+/**
+ * All expense data access lives here. When Supabase is added, only the
+ * bodies of the `queryFn`/`mutationFn` callbacks change (to
+ * `supabase.from("expenses")...`) — every component using these hooks
+ * keeps working unmodified.
+ */
+const EXPENSES_KEY = ["expenses"] as const;
 
-async function fetchExpenses(filters: ExpenseFilters): Promise<Expense[]> {
-  let query = supabase
-    .from("expenses")
-    .select("*")
-    .order("expense_date", { ascending: false })
-    .order("created_at", { ascending: false })
-
-  if (filters.startDate) {
-    query = query.gte("expense_date", filters.startDate)
-  }
-  if (filters.endDate) {
-    query = query.lte("expense_date", filters.endDate)
-  }
-  if (filters.category) {
-    query = query.eq("category", filters.category)
-  }
-
-  const { data, error } = await query
-
-  if (error) throw error
-  return (data ?? []) as Expense[]
-}
-
-export function useExpenses(filters: ExpenseFilters = {}) {
+export function useExpenses() {
   return useQuery({
-    queryKey: expensesKeys.filtered(filters),
-    queryFn: () => fetchExpenses(filters),
-  })
+    queryKey: EXPENSES_KEY,
+    queryFn: () => expensesTable.list(),
+  });
+}
+
+export function useAddExpense() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (input: NewExpense) => expensesTable.create(input),
+    onMutate: async (input) => {
+      await queryClient.cancelQueries({ queryKey: EXPENSES_KEY });
+      const previous = queryClient.getQueryData<Expense[]>(EXPENSES_KEY) ?? [];
+      const optimistic: Expense = {
+        ...input,
+        id: `temp_${Date.now()}`,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+      queryClient.setQueryData<Expense[]>(EXPENSES_KEY, [optimistic, ...previous]);
+      return { previous };
+    },
+    onError: (_err, _input, context) => {
+      if (context?.previous) queryClient.setQueryData(EXPENSES_KEY, context.previous);
+    },
+    onSettled: () => queryClient.invalidateQueries({ queryKey: EXPENSES_KEY }),
+  });
+}
+
+export function useUpdateExpense() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, ...patch }: UpdateExpense) => expensesTable.update(id, patch),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: EXPENSES_KEY }),
+  });
+}
+
+export function useDeleteExpense() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => expensesTable.remove(id),
+    onMutate: async (id) => {
+      await queryClient.cancelQueries({ queryKey: EXPENSES_KEY });
+      const previous = queryClient.getQueryData<Expense[]>(EXPENSES_KEY) ?? [];
+      queryClient.setQueryData<Expense[]>(
+        EXPENSES_KEY,
+        previous.filter((e) => e.id !== id)
+      );
+      return { previous };
+    },
+    onError: (_err, _id, context) => {
+      if (context?.previous) queryClient.setQueryData(EXPENSES_KEY, context.previous);
+    },
+    onSettled: () => queryClient.invalidateQueries({ queryKey: EXPENSES_KEY }),
+  });
 }
