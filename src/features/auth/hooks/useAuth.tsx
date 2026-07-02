@@ -1,76 +1,39 @@
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-  type ReactNode,
-} from "react"
-import type { Session, User } from "@supabase/supabase-js"
-import { supabase } from "@/lib/supabaseClient"
-import type { AuthContextValue, Profile } from "@/features/auth/types"
+import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
+import { mockAuthProvider as authProvider } from "./authProvider.mock";
+import type { LoginCredentials } from "../types";
 
-const AuthContext = createContext<AuthContextValue | undefined>(undefined)
+const SESSION_QUERY_KEY = ["auth", "session"] as const;
 
-export function AuthProvider({ children }: { children: ReactNode }) {
-  const [session, setSession] = useState<Session | null>(null)
-  const [user, setUser] = useState<User | null>(null)
-  const [profile, setProfile] = useState<Profile | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
+export function useAuth() {
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    let mounted = true
+  const sessionQuery = useQuery({
+    queryKey: SESSION_QUERY_KEY,
+    queryFn: () => authProvider.getSession(),
+    staleTime: Infinity,
+  });
 
-    async function loadProfile(currentUser: User | null) {
-      if (!currentUser) {
-        setProfile(null)
-        return
-      }
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("id, full_name, role, created_at")
-        .eq("id", currentUser.id)
-        .single()
+  const loginMutation = useMutation({
+    mutationFn: (credentials: LoginCredentials) => authProvider.login(credentials),
+    onSuccess: (user) => {
+      queryClient.setQueryData(SESSION_QUERY_KEY, user);
+    },
+  });
 
-      if (!error && mounted) {
-        setProfile(data as Profile)
-      }
-    }
+  const logoutMutation = useMutation({
+    mutationFn: () => authProvider.logout(),
+    onSuccess: () => {
+      queryClient.setQueryData(SESSION_QUERY_KEY, null);
+    },
+  });
 
-    supabase.auth.getSession().then(async ({ data }) => {
-      if (!mounted) return
-      setSession(data.session)
-      setUser(data.session?.user ?? null)
-      await loadProfile(data.session?.user ?? null)
-      setIsLoading(false)
-    })
-
-    const { data: subscription } = supabase.auth.onAuthStateChange(
-      async (_event, newSession) => {
-        if (!mounted) return
-        setSession(newSession)
-        setUser(newSession?.user ?? null)
-        await loadProfile(newSession?.user ?? null)
-        setIsLoading(false)
-      }
-    )
-
-    return () => {
-      mounted = false
-      subscription.subscription.unsubscribe()
-    }
-  }, [])
-
-  return (
-    <AuthContext.Provider value={{ session, user, profile, isLoading }}>
-      {children}
-    </AuthContext.Provider>
-  )
-}
-
-export function useAuth(): AuthContextValue {
-  const ctx = useContext(AuthContext)
-  if (!ctx) {
-    throw new Error("useAuth must be used within an AuthProvider")
-  }
-  return ctx
+  return {
+    user: sessionQuery.data ?? null,
+    isAuthenticated: !!sessionQuery.data,
+    isLoading: sessionQuery.isLoading,
+    login: loginMutation.mutateAsync,
+    isLoggingIn: loginMutation.isPending,
+    loginError: loginMutation.error as Error | null,
+    logout: logoutMutation.mutateAsync,
+  };
 }
