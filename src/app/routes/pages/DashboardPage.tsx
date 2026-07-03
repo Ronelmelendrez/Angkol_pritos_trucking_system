@@ -1,179 +1,201 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Skeleton } from "@/components/ui/Skeleton"
-import { ErrorBoundary } from "@/components/layout/ErrorBoundary"
-import { DailyExpenseSummary, useExpenses } from "@/features/expenses"
-import {
-  TrendingUp,
-  TrendingDown,
-  Receipt,
-  Clock,
-  Users,
-  AlertCircle,
-} from "lucide-react"
-import { formatPHP } from "@/utils/currency"
-import { useEmployees } from "@/features/employee/hooks/useEmployees"
-import type { ReactNode } from "react"
-import type { Expense } from "@/types"
+import { TrendingUp, TrendingDown, Users, Receipt, ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Badge } from "@/components/ui/badge";
+import { useExpenses } from "@/features/expenses/hooks/useExpenses";
+import { useEmployees } from "@/features/employees/hooks/useEmployees";
+import { useAttendance } from "@/features/attendance/hooks/useAttendance";
+import { formatCurrency } from "@/utils/currency";
+import { formatDate, isDateToday } from "@/utils/date";
+import { CATEGORY_COLORS, DEFAULT_DAILY_SALES } from "@/lib/constants";
 
-function cn(...classes: (string | boolean | undefined | null)[]) {
-  return classes.filter(Boolean).join(" ")
-}
+export function DashboardPage() {
+  const { data: expenses = [], isLoading: expensesLoading } = useExpenses();
+  const { data: employees = [], isLoading: employeesLoading } = useEmployees();
+  const { data: attendance = [], isLoading: attendanceLoading } = useAttendance();
 
-function StatCard({
-  icon,
-  label,
-  value,
-  trend = "neutral",
-  loading = false,
-}: {
-  icon: ReactNode
-  label: string
-  value: string
-  trend?: "up" | "down" | "neutral"
-  loading?: boolean
-}) {
-  const trendColors: Record<string, string> = {
-    up: "text-success-500",
-    down: "text-annatto-500",
-    neutral: "text-char-500",
-  }
+  const todaysExpenses = expenses.filter((e) => isDateToday(e.date));
+  const totalToday = todaysExpenses.reduce((sum, e) => sum + e.amount, 0);
+  const netProfitToday = DEFAULT_DAILY_SALES - totalToday;
+  const activeEmployees = employees.filter((e) => e.isActive);
+  const clockedInNow = attendance.filter((a) => isDateToday(a.date) && !a.clockOut);
+  const recentExpenses = [...expenses]
+    .sort((a, b) => (a.date < b.date ? 1 : -1))
+    .slice(0, 5);
 
-  const TrendIcon = trend === "up" ? TrendingUp : trend === "down" ? TrendingDown : null
+  const isLoading = expensesLoading || employeesLoading || attendanceLoading;
 
   return (
-    <Card className="shadow-ticket">
-      <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle className="text-sm font-medium text-muted-foreground">
-          {label}
-        </CardTitle>
-        <div className="text-muted-foreground">{icon}</div>
-      </CardHeader>
-      <CardContent>
-        {loading ? (
-          <Skeleton className="h-8 w-24" />
-        ) : (
-          <div className="flex items-baseline gap-2">
-            <span className="text-2xl font-bold font-figures text-char-900">
-              {value}
-            </span>
-            {TrendIcon && (
-              <TrendIcon className={cn("size-4", trendColors[trend])} />
-            )}
-          </div>
-        )}
-      </CardContent>
-    </Card>
-  )
-}
-
-function DashboardContent() {
-  const today = new Date().toISOString().slice(0, 10)
-  const { data: expenses = [], isLoading: expLoading } = useExpenses({
-    startDate: today,
-    endDate: today,
-  })
-  const { data: employees = [], isLoading: empLoading } = useEmployees()
-
-  const todayTotal = expenses.reduce((sum: number, e: Expense) => sum + Number(e.amount), 0)
-  const activeEmployees = employees.filter((e) => e.is_active).length
-
-  return (
-    <div className="flex flex-col gap-5">
-      <h2 className="font-display text-lg font-semibold text-char-900 md:text-xl">
-        Today's Overview
-      </h2>
-
-      {/* Stat cards - 2 columns on mobile, 4 on desktop */}
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
-          icon={<Receipt className="size-4" />}
-          label="Today's Expenses"
-          value={formatPHP(todayTotal)}
-          trend="up"
-          loading={expLoading}
+          label="Today's sales"
+          value={formatCurrency(DEFAULT_DAILY_SALES)}
+          icon={TrendingUp}
+          tone="accent"
+          hint="Manual entry"
+          isLoading={isLoading}
         />
         <StatCard
-          icon={<TrendingUp className="size-4" />}
-          label="Today's Sales"
-          value={formatPHP(0)}
-          loading={false}
+          label="Today's expenses"
+          value={formatCurrency(totalToday)}
+          icon={Receipt}
+          tone="secondary"
+          hint={`${todaysExpenses.length} transactions`}
+          isLoading={isLoading}
         />
         <StatCard
-          icon={<Users className="size-4" />}
-          label="Active Employees"
-          value={String(activeEmployees)}
-          loading={empLoading}
+          label="Net profit today"
+          value={formatCurrency(netProfitToday)}
+          icon={netProfitToday >= 0 ? TrendingUp : TrendingDown}
+          tone={netProfitToday >= 0 ? "success" : "danger"}
+          hint="Sales minus expenses"
+          isLoading={isLoading}
         />
         <StatCard
-          icon={<Clock className="size-4" />}
-          label="Clocked In"
-          value="--"
+          label="On shift now"
+          value={`${clockedInNow.length} / ${activeEmployees.length}`}
+          icon={Users}
+          tone="primary"
+          hint="Active employees"
+          isLoading={isLoading}
         />
       </div>
 
-      {/* Daily expense summary */}
-      <Card className="shadow-ticket">
-        <CardHeader>
-          <CardTitle className="text-base font-semibold">
-            Daily Expense Breakdown
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <DailyExpenseSummary expenses={expenses} />
-        </CardContent>
-      </Card>
-
-      {/* Recent expenses - mobile: list, desktop: table */}
-      <Card className="shadow-ticket">
-        <CardHeader>
-          <CardTitle className="text-base font-semibold">
-            Recent Transactions
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          {expLoading ? (
-            <div className="space-y-3">
-              {Array.from({ length: 3 }).map((_, i) => (
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <Card className="lg:col-span-2">
+          <CardHeader>
+            <div>
+              <CardTitle>Recent expenses</CardTitle>
+              <CardDescription>Latest transactions logged</CardDescription>
+            </div>
+            <Link
+              to="/expenses"
+              className="flex items-center gap-1 text-sm font-medium text-primary hover:underline"
+            >
+              View all <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+          </CardHeader>
+          {isLoading ? (
+            <div className="space-y-2">
+              {Array.from({ length: 4 }).map((_, i) => (
                 <Skeleton key={i} className="h-12 w-full" />
               ))}
             </div>
-          ) : expenses.length === 0 ? (
-            <div className="flex flex-col items-center gap-2 py-8 text-muted-foreground">
-              <AlertCircle className="size-8" />
-              <p className="text-sm">No expenses recorded today</p>
+          ) : recentExpenses.length === 0 ? (
+            <p className="py-8 text-center text-sm text-ink-faint">No expenses logged yet.</p>
+          ) : (
+            <div className="divide-y divide-line">
+              {recentExpenses.map((exp) => (
+                <div key={exp.id} className="flex items-center justify-between gap-3 py-2.5">
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-medium text-ink">{exp.description}</p>
+                    <p className="text-xs text-ink-faint">{formatDate(exp.date)}</p>
+                  </div>
+                  <div className="flex shrink-0 items-center gap-2">
+                    <Badge
+                      className="border-0"
+                      style={{
+                        backgroundColor: `${CATEGORY_COLORS[exp.category]}1a`,
+                        color: CATEGORY_COLORS[exp.category],
+                      }}
+                    >
+                      {exp.category}
+                    </Badge>
+                    <span className="text-sm font-semibold text-ink">{formatCurrency(exp.amount)}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <div>
+              <CardTitle>Active crew</CardTitle>
+              <CardDescription>Currently employed</CardDescription>
+            </div>
+            <Link
+              to="/employees"
+              className="flex items-center gap-1 text-sm font-medium text-primary hover:underline"
+            >
+              View all <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+          </CardHeader>
+          {isLoading ? (
+            <div className="space-y-2">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <Skeleton key={i} className="h-10 w-full" />
+              ))}
             </div>
           ) : (
-            <ul className="divide-y divide-border">
-              {expenses.slice(0, 5).map((expense: Expense) => (
-                <li
-                  key={expense.id}
-                  className="flex items-center justify-between py-3 text-sm"
-                >
-                  <div className="flex flex-col gap-0.5">
-                    <span className="font-medium text-char-900">
-                      {expense.description ?? expense.category}
-                    </span>
-                    <span className="text-xs text-muted-foreground">
-                      {expense.category}
-                    </span>
+            <div className="space-y-3">
+              {activeEmployees.slice(0, 5).map((emp) => {
+                const clockedIn = clockedInNow.some((a) => a.employeeId === emp.id);
+                return (
+                  <div key={emp.id} className="flex items-center gap-3">
+                    <div
+                      className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white"
+                      style={{ backgroundColor: emp.avatarColor }}
+                    >
+                      {emp.name.split(" ").map((p) => p[0]).slice(0, 2).join("")}
+                    </div>
+                    <span className="flex-1 truncate text-sm text-ink">{emp.name}</span>
+                    <Badge variant={clockedIn ? "success" : "neutral"}>
+                      {clockedIn ? "On shift" : "Off"}
+                    </Badge>
                   </div>
-                  <span className="font-figures font-semibold text-char-900">
-                    {formatPHP(expense.amount)}
-                  </span>
-                </li>
-              ))}
-            </ul>
+                );
+              })}
+            </div>
           )}
-        </CardContent>
-      </Card>
+        </Card>
+      </div>
     </div>
-  )
+  );
 }
 
-export function DashboardPage() {
+function StatCard({
+  label,
+  value,
+  icon: Icon,
+  tone,
+  hint,
+  isLoading,
+}: {
+  label: string;
+  value: string;
+  icon: React.ComponentType<{ className?: string }>;
+  tone: "primary" | "secondary" | "accent" | "success" | "danger";
+  hint: string;
+  isLoading: boolean;
+}) {
+  const toneClasses: Record<typeof tone, string> = {
+    primary: "bg-primary/10 text-primary-dark",
+    secondary: "bg-secondary/10 text-secondary-dark",
+    accent: "bg-accent/20 text-accent-dark",
+    success: "bg-success-bg text-success",
+    danger: "bg-danger-bg text-danger",
+  };
+
   return (
-    <ErrorBoundary section="Dashboard">
-      <DashboardContent />
-    </ErrorBoundary>
-  )
+    <Card className="ticket-hover ticket-perf">
+      <div className="flex items-start justify-between">
+        <div>
+          <p className="text-xs font-medium uppercase tracking-wide text-ink-faint">{label}</p>
+          {isLoading ? (
+            <Skeleton className="mt-2 h-7 w-24" />
+          ) : (
+            <p className="stamp mt-1 text-2xl font-semibold text-ink">{value}</p>
+          )}
+          <p className="mt-1 text-xs text-ink-faint">{hint}</p>
+        </div>
+        <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${toneClasses[tone]}`}>
+          <Icon className="h-5 w-5" />
+        </div>
+      </div>
+    </Card>
+  );
 }
