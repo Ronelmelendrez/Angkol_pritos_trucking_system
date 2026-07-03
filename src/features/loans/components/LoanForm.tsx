@@ -1,188 +1,91 @@
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { Loader2 } from "lucide-react"
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form"
-import { loanSchema, type LoanFormSchemaOutput } from "@/utils/validators"
-import { todayISO } from "@/utils/date"
-import { useEmployees } from "@/features/employee/hooks/useEmployees"
-import { useAddLoan } from "@/features/loans/hooks/useAddLoans"
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2 } from "lucide-react";
+import { loanSchema, type LoanFormValues } from "@/utils/validators";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
+import { useAddLoan } from "../hooks/useLoans";
+import { useEmployees } from "@/features/employees/hooks/useEmployees";
+import { useToast } from "@/components/ui/use-toast";
+import { todayISO } from "@/utils/date";
 
-interface LoanFormProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-}
+export function LoanForm({ onDone }: { onDone?: () => void }) {
+  const { toast } = useToast();
+  const addLoan = useAddLoan();
+  const { data: employees = [] } = useEmployees();
 
-export function LoanForm({ open, onOpenChange }: LoanFormProps) {
-  const { data: employees = [] } = useEmployees()
-  const addLoan = useAddLoan()
-
-  const form = useForm({
+  const {
+    register,
+    handleSubmit,
+    control,
+    reset,
+    formState: { errors },
+  } = useForm<LoanFormValues>({
     resolver: zodResolver(loanSchema),
-    defaultValues: {
-      employee_id: "",
-      principal_amount: 0,
-      interest_rate: 0,
-      loan_date: todayISO(),
-      notes: "",
-    },
-  })
+    defaultValues: { employeeId: "", principal: 0, interestRate: 0, dateIssued: todayISO(), notes: "" },
+  });
 
-  function onSubmit(values: LoanFormSchemaOutput) {
-    addLoan.mutate(values, {
-      onSuccess: () => {
-        onOpenChange(false)
-        form.reset({
-          employee_id: "",
-          principal_amount: 0,
-          interest_rate: 0,
-          loan_date: todayISO(),
-          notes: "",
-        })
-      },
-    })
+  async function onSubmit(values: LoanFormValues) {
+    try {
+      await addLoan.mutateAsync(values);
+      toast({ title: "Loan recorded", variant: "success" });
+      reset({ employeeId: "", principal: 0, interestRate: 0, dateIssued: todayISO(), notes: "" });
+      onDone?.();
+    } catch {
+      toast({ title: "Couldn't save loan", variant: "error" });
+    }
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Record a loan (utang)</DialogTitle>
-        </DialogHeader>
-
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4">
-            <FormField
-              control={form.control}
-              name="employee_id"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Employee</FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select employee" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {employees.map((employee) => (
-                        <SelectItem key={employee.id} value={employee.id}>
-                          {employee.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <div className="grid grid-cols-2 gap-3">
-              <FormField
-                control={form.control}
-                name="principal_amount"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Principal (₱)</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        step="0.01"
-                        min="0"
-                        inputMode="decimal"
-                        {...field}
-                        value={field.value as number | string}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="interest_rate"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Interest (%)</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        step="0.1"
-                        min="0"
-                        inputMode="decimal"
-                        {...field}
-                        value={field.value as number | string}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <FormField
-              control={form.control}
-              name="loan_date"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Date</FormLabel>
-                  <FormControl>
-                    <Input type="date" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="notes"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Notes (optional)</FormLabel>
-                  <FormControl>
-                    <Textarea placeholder="e.g. emergency loan for hospital bill" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <DialogFooter className="mt-2">
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-                Cancel
-              </Button>
-              <Button type="submit" disabled={addLoan.isPending}>
-                {addLoan.isPending && <Loader2 className="size-4 animate-spin" />}
-                Record loan
-              </Button>
-            </DialogFooter>
-          </form>
-        </Form>
-      </DialogContent>
-    </Dialog>
-  )
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      <div>
+        <Label htmlFor="employeeId">Employee</Label>
+        <Controller
+          control={control}
+          name="employeeId"
+          render={({ field }) => (
+            <Select value={field.value} onValueChange={field.onChange}>
+              <SelectTrigger id="employeeId">
+                <SelectValue placeholder="Choose employee" />
+              </SelectTrigger>
+              <SelectContent>
+                {employees.map((e) => (
+                  <SelectItem key={e.id} value={e.id}>
+                    {e.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
+        />
+        {errors.employeeId && <p className="mt-1 text-xs text-danger">{errors.employeeId.message}</p>}
+      </div>
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <Label htmlFor="principal">Loan amount (₱)</Label>
+          <Input id="principal" type="number" step="0.01" min="0" {...register("principal")} />
+          {errors.principal && <p className="mt-1 text-xs text-danger">{errors.principal.message}</p>}
+        </div>
+        <div>
+          <Label htmlFor="interestRate">Interest (%)</Label>
+          <Input id="interestRate" type="number" step="0.1" min="0" {...register("interestRate")} />
+        </div>
+      </div>
+      <div>
+        <Label htmlFor="dateIssued">Date issued</Label>
+        <Input id="dateIssued" type="date" {...register("dateIssued")} />
+      </div>
+      <div>
+        <Label htmlFor="notes">Notes (optional)</Label>
+        <Textarea id="notes" placeholder="e.g. Motorcycle repair" {...register("notes")} />
+      </div>
+      <Button type="submit" className="w-full" size="lg" disabled={addLoan.isPending}>
+        {addLoan.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
+        {addLoan.isPending ? "Saving..." : "Record loan"}
+      </Button>
+    </form>
+  );
 }
