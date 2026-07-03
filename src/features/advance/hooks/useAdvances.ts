@@ -1,24 +1,36 @@
-import { useQuery } from "@tanstack/react-query"
-import { supabase } from "@/lib/supabaseClient"
-import type { CashAdvance } from "@/types"
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { advancesTable } from "@/lib/mockData";
+import type { NewCashAdvance } from "../types";
 
-export const advancesKeys = {
-  all: ["cash_advances"] as const,
-}
-
-async function fetchAdvances(): Promise<CashAdvance[]> {
-  const { data, error } = await supabase
-    .from("cash_advances")
-    .select("*, employee:employee_id(id, name)")
-    .order("advance_date", { ascending: false })
-
-  if (error) throw error
-  return (data ?? []) as CashAdvance[]
-}
+const ADVANCES_KEY = ["advances"] as const;
 
 export function useAdvances() {
   return useQuery({
-    queryKey: advancesKeys.all,
-    queryFn: fetchAdvances,
-  })
+    queryKey: ADVANCES_KEY,
+    queryFn: () => advancesTable.list(),
+  });
+}
+
+export function useAddAdvance() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (input: NewCashAdvance) => advancesTable.create({ ...input, status: "pending" }),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ADVANCES_KEY }),
+  });
+}
+
+export function useMarkAdvanceDeducted() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => advancesTable.update(id, { status: "deducted" }),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ADVANCES_KEY }),
+  });
+}
+
+export function useDeleteAdvance() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => advancesTable.remove(id),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ADVANCES_KEY }),
+  });
 }
