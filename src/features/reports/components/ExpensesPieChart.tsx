@@ -1,73 +1,61 @@
-import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from "recharts"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Skeleton } from "@/components/ui/skeleton"
-import { useExpenseCategoryBreakdown } from "@/features/reports/hooks/useReports"
-import { CATEGORY_COLORS } from "@/lib/constants"
-import { formatPHP } from "@/utils/currency"
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from "recharts";
+import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { formatCurrency } from "@/utils/currency";
+import type { CategoryBreakdown } from "../types";
 
-export function ExpensePieChart() {
-  const { data: breakdown = [], isLoading } = useExpenseCategoryBreakdown()
-  const total = breakdown.reduce((sum, b) => sum + b.total, 0)
+export function ExpensePieChart({ data }: { data: CategoryBreakdown[] }) {
+  const total = data.reduce((sum, d) => sum + d.total, 0);
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Expenses by category</CardTitle>
-        <p className="text-xs text-muted-foreground">This month</p>
+        <div>
+          <CardTitle>Expense breakdown</CardTitle>
+          <CardDescription>By category, all-time</CardDescription>
+        </div>
       </CardHeader>
-      <CardContent className="pb-5">
-        {isLoading ? (
-          <Skeleton className="h-64 w-full" />
-        ) : breakdown.length === 0 ? (
-          <p className="py-12 text-center text-sm text-muted-foreground">
-            No expenses recorded this month yet.
-          </p>
-        ) : (
-          <div className="h-64 w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={breakdown}
-                  dataKey="total"
-                  nameKey="category"
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={50}
-                  outerRadius={85}
-                  paddingAngle={2}
-                >
-                  {breakdown.map((entry) => (
-                    <Cell
-                      key={entry.category}
-                      fill={CATEGORY_COLORS[entry.category] ?? "#C8B8AE"}
-                    />
-                  ))}
-                </Pie>
-                <Tooltip
-                  formatter={(value, name) => [
-                    formatPHP(typeof value === "number" ? value : Number(value) || 0),
-                    String(name),
-                  ]}
-                  contentStyle={{
-                    borderRadius: 8,
-                    borderColor: "#E8D9C3",
-                    fontSize: 13,
-                  }}
-                />
-                <Legend
-                  wrapperStyle={{ fontSize: 12 }}
-                  formatter={(value: string) => value}
-                />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-        )}
-        {!isLoading && breakdown.length > 0 && (
-          <p className="mt-2 text-center text-sm text-muted-foreground">
-            Total: <span className="font-figures font-semibold text-char-900">{formatPHP(total)}</span>
-          </p>
-        )}
-      </CardContent>
+      {data.length === 0 ? (
+        <p className="py-10 text-center text-sm text-ink-faint">No expenses yet.</p>
+      ) : (
+        <div className="h-64">
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
+              <Pie
+                data={data}
+                dataKey="total"
+                nameKey="category"
+                innerRadius={55}
+                outerRadius={85}
+                paddingAngle={2}
+              >
+                {data.map((entry) => (
+                  <Cell key={entry.category} fill={entry.color} stroke="var(--color-surface)" strokeWidth={2} />
+                ))}
+              </Pie>
+              <Tooltip
+                formatter={(value: number) => formatCurrency(value)}
+                contentStyle={{
+                  borderRadius: 12,
+                  border: "1px solid var(--color-line)",
+                  fontSize: 13,
+                }}
+              />
+              <Legend
+                verticalAlign="bottom"
+                height={48}
+                iconType="circle"
+                iconSize={8}
+                formatter={(value) => <span className="text-xs text-ink-soft">{value}</span>}
+              />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
+      )}
+      {total > 0 && (
+        <p className="mt-1 text-center text-sm text-ink-soft">
+          Total: <span className="font-semibold text-ink">{formatCurrency(total)}</span>
+        </p>
+      )}
     </Card>
-  )
+  );
 }
