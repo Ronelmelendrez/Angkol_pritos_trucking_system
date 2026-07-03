@@ -1,36 +1,45 @@
-import { useState } from "react"
-import { Plus } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { ErrorBoundary } from "@/components/layout/ErrorBoundary"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-
-function AdvancesContent() {
-  return (
-    <div className="flex flex-col gap-5">
-      <div className="flex items-center justify-between">
-        <h2 className="font-display text-lg font-semibold text-char-900 md:text-xl">
-          Cash Advances
-        </h2>
-        <Button className="gap-1.5">
-          <Plus className="size-4" />
-          <span className="hidden sm:inline">New advance</span>
-        </Button>
-      </div>
-
-      <Card className="shadow-ticket">
-        <CardContent className="py-8 text-center text-sm text-muted-foreground">
-          No cash advances recorded yet.
-        </CardContent>
-      </Card>
-    </div>
-  )
-}
+import { useState } from "react";
+import { Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { useAdvances } from "@/features/advances/hooks/useAdvances";
+import { useEmployees } from "@/features/employees/hooks/useEmployees";
+import { AdvanceForm } from "@/features/advances/components/AdvanceForm";
+import { AdvancesList } from "@/features/advances/components/AdvancesList";
 
 export function AdvancesPage() {
+  const { data: advances = [], isLoading } = useAdvances();
+  const { data: employees = [] } = useEmployees();
+  const [dialogOpen, setDialogOpen] = useState(false);
+
+  const pendingTotal = advances.filter((a) => a.status === "pending").reduce((s, a) => s + a.amount, 0);
+
   return (
-    <ErrorBoundary section="Advances">
-      <AdvancesContent />
-    </ErrorBoundary>
-  )
+    <Card>
+      <CardHeader>
+        <div>
+          <CardTitle>Cash advances</CardTitle>
+          <CardDescription>
+            {advances.length} on record · ₱{pendingTotal.toLocaleString()} pending deduction
+          </CardDescription>
+        </div>
+        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+          <DialogTrigger asChild>
+            <Button>
+              <Plus className="h-4 w-4" /> New advance
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Record cash advance</DialogTitle>
+            </DialogHeader>
+            <AdvanceForm onDone={() => setDialogOpen(false)} />
+          </DialogContent>
+        </Dialog>
+      </CardHeader>
+
+      <AdvancesList advances={advances} employees={employees} isLoading={isLoading} />
+    </Card>
+  );
 }
