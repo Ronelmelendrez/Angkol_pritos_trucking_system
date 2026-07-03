@@ -1,160 +1,86 @@
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { Loader2 } from "lucide-react"
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form"
-import { advanceSchema, type AdvanceFormSchemaOutput } from "@/utils/validators"
-import { todayISO } from "@/utils/date"
-import { useEmployees } from "@/features/employee/hooks/useEmployees"
-import { useAddAdvance } from "@/features/advance/hooks/useAdvanceMutations"
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2 } from "lucide-react";
+import { advanceSchema, type AdvanceFormValues } from "@/utils/validators";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
+import { useAddAdvance } from "../hooks/useAdvances";
+import { useEmployees } from "@/features/employees/hooks/useEmployees";
+import { useToast } from "@/components/ui/use-toast";
+import { todayISO } from "@/utils/date";
 
-interface AdvanceFormProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-}
+export function AdvanceForm({ onDone }: { onDone?: () => void }) {
+  const { toast } = useToast();
+  const addAdvance = useAddAdvance();
+  const { data: employees = [] } = useEmployees();
 
-export function AdvanceForm({ open, onOpenChange }: AdvanceFormProps) {
-  const { data: employees = [] } = useEmployees()
-  const addAdvance = useAddAdvance()
-
-  const form = useForm({
+  const {
+    register,
+    handleSubmit,
+    control,
+    reset,
+    formState: { errors },
+  } = useForm<AdvanceFormValues>({
     resolver: zodResolver(advanceSchema),
-    defaultValues: {
-      employee_id: "",
-      amount: 0,
-      advance_date: todayISO(),
-      notes: "",
-    },
-  })
+    defaultValues: { employeeId: "", amount: 0, date: todayISO(), reason: "" },
+  });
 
-  function onSubmit(values: AdvanceFormSchemaOutput) {
-    addAdvance.mutate(values, {
-      onSuccess: () => {
-        onOpenChange(false)
-        form.reset({ employee_id: "", amount: 0, advance_date: todayISO(), notes: "" })
-      },
-    })
+  async function onSubmit(values: AdvanceFormValues) {
+    try {
+      await addAdvance.mutateAsync(values);
+      toast({ title: "Cash advance recorded", variant: "success" });
+      reset({ employeeId: "", amount: 0, date: todayISO(), reason: "" });
+      onDone?.();
+    } catch {
+      toast({ title: "Couldn't save advance", variant: "error" });
+    }
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Grant cash advance</DialogTitle>
-        </DialogHeader>
-
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4">
-            <FormField
-              control={form.control}
-              name="employee_id"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Employee</FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select employee" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {employees.map((employee) => (
-                        <SelectItem key={employee.id} value={employee.id}>
-                          {employee.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <div className="grid grid-cols-2 gap-3">
-              <FormField
-                control={form.control}
-                name="amount"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Amount (₱)</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        step="0.01"
-                        min="0"
-                        inputMode="decimal"
-                        {...field}
-                        value={field.value as number | string}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="advance_date"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Date</FormLabel>
-                    <FormControl>
-                      <Input type="date" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <FormField
-              control={form.control}
-              name="notes"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Notes (optional)</FormLabel>
-                  <FormControl>
-                    <Textarea placeholder="e.g. requested for medicine" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <DialogFooter className="mt-2">
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-                Cancel
-              </Button>
-              <Button type="submit" disabled={addAdvance.isPending}>
-                {addAdvance.isPending && <Loader2 className="size-4 animate-spin" />}
-                Grant advance
-              </Button>
-            </DialogFooter>
-          </form>
-        </Form>
-      </DialogContent>
-    </Dialog>
-  )
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      <div>
+        <Label htmlFor="employeeId">Employee</Label>
+        <Controller
+          control={control}
+          name="employeeId"
+          render={({ field }) => (
+            <Select value={field.value} onValueChange={field.onChange}>
+              <SelectTrigger id="employeeId">
+                <SelectValue placeholder="Choose employee" />
+              </SelectTrigger>
+              <SelectContent>
+                {employees.map((e) => (
+                  <SelectItem key={e.id} value={e.id}>
+                    {e.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
+        />
+        {errors.employeeId && <p className="mt-1 text-xs text-danger">{errors.employeeId.message}</p>}
+      </div>
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <Label htmlFor="amount">Amount (₱)</Label>
+          <Input id="amount" type="number" step="0.01" min="0" {...register("amount")} />
+          {errors.amount && <p className="mt-1 text-xs text-danger">{errors.amount.message}</p>}
+        </div>
+        <div>
+          <Label htmlFor="date">Date</Label>
+          <Input id="date" type="date" {...register("date")} />
+        </div>
+      </div>
+      <div>
+        <Label htmlFor="reason">Reason (optional)</Label>
+        <Input id="reason" placeholder="e.g. Emergency, fare, supplies" {...register("reason")} />
+      </div>
+      <Button type="submit" className="w-full" size="lg" disabled={addAdvance.isPending}>
+        {addAdvance.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
+        {addAdvance.isPending ? "Saving..." : "Record advance"}
+      </Button>
+    </form>
+  );
 }
