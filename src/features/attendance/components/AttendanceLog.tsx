@@ -1,6 +1,6 @@
 import { CalendarClock } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/Skeleton";
+import { Badge } from "@/components/ui/Badge";
 import { formatDate, formatTime } from "@/utils/date";
 import type { AttendanceRecord } from "../types";
 import type { Employee } from "@/features/employees/types";
@@ -38,7 +38,7 @@ export function AttendanceLog({ records, employees, isLoading }: Props) {
   return (
     <div className="overflow-hidden rounded-xl border border-line">
       <table className="w-full text-sm">
-        <thead className="bg-ink/[0.03] text-left text-xs uppercase tracking-wide text-ink-soft">
+        <thead className="bg-ink/3 text-left text-xs uppercase tracking-wide text-ink-soft">
           <tr>
             <th className="px-4 py-3 font-medium">Employee</th>
             <th className="px-4 py-3 font-medium">Date</th>

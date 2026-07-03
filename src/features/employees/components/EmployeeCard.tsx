@@ -1,0 +1,1 @@
+export { EmployeeCard } from "../../employee/components/EmployeeCard";

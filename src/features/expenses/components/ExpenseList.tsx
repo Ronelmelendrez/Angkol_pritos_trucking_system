@@ -1,7 +1,7 @@
 import { Trash2, Receipt } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/Badge";
+import { Skeleton } from "@/components/ui/Skeleton";
+import { Button } from "@/components/ui/Button";
 import { formatCurrency } from "@/utils/currency";
 import { formatDate } from "@/utils/date";
 import { CATEGORY_COLORS } from "@/lib/constants";

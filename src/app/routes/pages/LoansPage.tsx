@@ -1,8 +1,7 @@
-import { useState } from "react"
 import { Plus } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/Button"
 import { ErrorBoundary } from "@/components/layout/ErrorBoundary"
-import { Card, CardContent } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/Card"
 
 function LoansContent() {
   return (

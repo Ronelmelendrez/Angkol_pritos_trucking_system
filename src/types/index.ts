@@ -1,4 +1,4 @@
-/**
+export * from "../index";/**
  * Global data-model types, mirroring the Supabase Postgres schema.
  * Feature modules import from here and extend with feature-specific
  * request/response shapes in their own `types/` folders.

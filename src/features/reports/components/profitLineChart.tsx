@@ -1,5 +1,5 @@
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
-import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card";
 import { formatCurrencyCompact, formatCurrency } from "@/utils/currency";
 import type { DailyProfitPoint } from "../types";
 
@@ -31,7 +31,7 @@ export function ProfitLineChart({ data }: { data: DailyProfitPoint[] }) {
               width={64}
             />
             <Tooltip
-              formatter={(value: number, name: string) => [formatCurrency(value), name]}
+              formatter={(value, name) => [formatCurrency(Number(value ?? 0)), name]}
               contentStyle={{ borderRadius: 12, border: "1px solid var(--color-line)", fontSize: 13 }}
             />
             <Line type="monotone" dataKey="sales" name="Sales" stroke="#F1C40F" strokeWidth={2} dot={false} />

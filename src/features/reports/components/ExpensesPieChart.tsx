@@ -1,5 +1,5 @@
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from "recharts";
-import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card";
 import { formatCurrency } from "@/utils/currency";
 import type { CategoryBreakdown } from "../types";
 
@@ -33,7 +33,7 @@ export function ExpensePieChart({ data }: { data: CategoryBreakdown[] }) {
                 ))}
               </Pie>
               <Tooltip
-                formatter={(value: number) => formatCurrency(value)}
+                formatter={(value) => formatCurrency(Number(value ?? 0))}
                 contentStyle={{
                   borderRadius: 12,
                   border: "1px solid var(--color-line)",

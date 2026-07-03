@@ -1,8 +1,8 @@
 import { TrendingUp, TrendingDown, Users, Receipt, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
-import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card";
+import { Skeleton } from "@/components/ui/Skeleton";
+import { Badge } from "@/components/ui/Badge";
 import { useExpenses } from "@/features/expenses/hooks/useExpenses";
 import { useEmployees } from "@/features/employees/hooks/useEmployees";
 import { useAttendance } from "@/features/attendance/hooks/useAttendance";

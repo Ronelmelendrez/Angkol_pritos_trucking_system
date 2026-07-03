@@ -1,5 +1,5 @@
 import { Users } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Skeleton } from "@/components/ui/Skeleton";
 import { EmployeeCard } from "./EmployeeCard";
 import type { Employee } from "../types";
 

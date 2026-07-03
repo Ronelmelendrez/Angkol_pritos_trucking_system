@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Plus } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/Button";
+import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/Dialog";
 import { useAdvances } from "@/features/advances/hooks/useAdvances";
 import { useEmployees } from "@/features/employees/hooks/useEmployees";
 import { AdvanceForm } from "@/features/advances/components/AdvanceForm";

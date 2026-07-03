@@ -1,4 +1,4 @@
-import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card";
 import { formatCurrency } from "@/utils/currency";
 import type { PayrollRow } from "../types";
 

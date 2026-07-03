@@ -1,5 +1,5 @@
 import { Clock, LogIn, LogOut, Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 import { formatTime } from "@/utils/date";
 import { useClockIn, useClockOut } from "../hooks/useAttendance";
 import { useToast } from "@/components/ui/use-toast";

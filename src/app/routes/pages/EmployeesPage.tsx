@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { Plus } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/Button";
+import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/Dialog";
 import { useEmployees, useDeleteEmployee } from "@/features/employees/hooks/useEmployees";
-import { EmployeeForm } from "@/features/employees/components/EmployeeForm";
+import { EmployeeForm } from "@/features/employees/components/Employeeform";
 import { EmployeeList } from "@/features/employees/components/EmployeeList";
 import { useToast } from "@/components/ui/use-toast";
 import type { Employee } from "@/features/employees/types";

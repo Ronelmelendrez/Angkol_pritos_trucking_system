@@ -1,4 +1,4 @@
-import type { AuthProvider, AuthUser, LoginCredentials } from "../types";
+import type { AuthProvider, AuthUser, LoginCredentials } from "@/features/auth/types";
 import { MOCK_LATENCY } from "@/lib/constants";
 
 const SESSION_KEY = "ft_session";

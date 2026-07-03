@@ -46,7 +46,7 @@ export function AttendanceCalendar({ records }: Props) {
               className={cn(
                 "flex aspect-square flex-col items-center justify-center rounded-lg text-xs",
                 !inMonth && "opacity-30",
-                count === 0 && "bg-ink/[0.04] text-ink-faint",
+                count === 0 && "bg-ink/4 text-ink-faint",
                 count > 0 && count < 3 && "bg-primary/15 text-primary-dark font-medium",
                 count >= 3 && "bg-primary text-white font-semibold"
               )}

@@ -1,5 +1,5 @@
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
-import { mockAuthProvider as authProvider } from "./authProvider.mock";
+import { mockAuthProvider as authProvider } from "@/app/providers/AuthProvider.mock";
 import type { LoginCredentials } from "../types";
 
 const SESSION_QUERY_KEY = ["auth", "session"] as const;

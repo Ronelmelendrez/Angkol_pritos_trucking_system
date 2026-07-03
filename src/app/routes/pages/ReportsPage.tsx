@@ -1,5 +1,5 @@
 import { ErrorBoundary } from "@/components/layout/ErrorBoundary"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card"
 
 function ReportsContent() {
   return (

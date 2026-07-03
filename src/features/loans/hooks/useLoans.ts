@@ -4,6 +4,10 @@ import type { NewLoan, NewRepayment, Loan } from "../types";
 
 const LOANS_KEY = ["loans"] as const;
 const REPAYMENTS_KEY = ["repayments"] as const;
+export const loansKeys = {
+  all: LOANS_KEY,
+  repayments: (loanId?: string) => ["repayments", loanId] as const,
+};
 
 export function useLoans() {
   return useQuery({
@@ -14,7 +18,7 @@ export function useLoans() {
 
 export function useRepayments() {
   return useQuery({
-    queryKey: REPAYMENTS_KEY,
+    queryKey: loansKeys.repayments(),
     queryFn: () => repaymentsTable.list(),
   });
 }

@@ -2,7 +2,7 @@ import { Menu, LogOut } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useUiStore } from "@/app/store/useUiStore";
 import { useAuth } from "@/features/auth/hooks/useAuth";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 import { useToast } from "@/components/ui/use-toast";
 
 export function Header({ title }: { title: string }) {

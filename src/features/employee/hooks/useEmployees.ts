@@ -3,6 +3,10 @@ import { employeesTable } from "@/lib/mockData";
 import type { Employee, NewEmployee, UpdateEmployee } from "../types";
 
 const EMPLOYEES_KEY = ["employees"] as const;
+export const employeesKeys = {
+  all: EMPLOYEES_KEY,
+  active: ["employees", "active"] as const,
+};
 const AVATAR_COLORS = ["#E67E22", "#C0392B", "#F1C40F", "#8D6E63", "#D35400", "#6D4C41"];
 
 export function useEmployees() {

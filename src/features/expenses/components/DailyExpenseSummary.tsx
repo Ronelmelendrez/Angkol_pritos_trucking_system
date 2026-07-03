@@ -1,5 +1,5 @@
-import { Card, CardContent } from "@/components/ui/card"
-import { formatPHP } from "@/utils/currency"
+import { Card, CardContent } from "@/components/ui/Card"
+import { formatCurrency } from "@/utils/currency"
 import type { Expense } from "@/types"
 
 interface DailyExpenseSummaryProps {
@@ -19,7 +19,7 @@ export function DailyExpenseSummary({ expenses }: DailyExpenseSummaryProps) {
         <CardContent className="py-4">
           <p className="text-xs font-medium text-muted-foreground">Today's expenses</p>
           <p className="mt-1 font-figures text-2xl font-bold text-annatto-500">
-            {formatPHP(todayTotal)}
+            {formatCurrency(todayTotal)}
           </p>
         </CardContent>
       </Card>
@@ -27,7 +27,7 @@ export function DailyExpenseSummary({ expenses }: DailyExpenseSummaryProps) {
         <CardContent className="py-4">
           <p className="text-xs font-medium text-muted-foreground">Filtered total</p>
           <p className="mt-1 font-figures text-2xl font-bold text-char-900">
-            {formatPHP(total)}
+            {formatCurrency(total)}
           </p>
         </CardContent>
       </Card>

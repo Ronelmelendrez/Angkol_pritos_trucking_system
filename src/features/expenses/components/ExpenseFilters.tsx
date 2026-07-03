@@ -1,7 +1,7 @@
 import { Search } from "lucide-react";
 import { EXPENSE_CATEGORIES, PAYMENT_METHODS } from "@/lib/constants";
-import { Input } from "@/components/ui/input";
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
+import { Input } from "@/components/ui/Input";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/Select";
 import type { ExpenseFilters as ExpenseFiltersType } from "../types";
 
 interface Props {

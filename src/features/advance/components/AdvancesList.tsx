@@ -1,7 +1,7 @@
 import { HandCoins, CheckCircle2 } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/Skeleton";
+import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
 import { formatCurrency } from "@/utils/currency";
 import { formatDate } from "@/utils/date";
 import { useMarkAdvanceDeducted } from "../hooks/useAdvances";

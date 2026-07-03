@@ -9,6 +9,9 @@ import type { Expense, NewExpense, UpdateExpense } from "../types";
  * keeps working unmodified.
  */
 const EXPENSES_KEY = ["expenses"] as const;
+export const expensesKeys = {
+  all: EXPENSES_KEY,
+};
 
 export function useExpenses() {
   return useQuery({

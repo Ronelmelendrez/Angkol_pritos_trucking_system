@@ -4,9 +4,9 @@ import { LoginForm } from "@/features/auth"
 import { Drumstick } from "lucide-react"
 
 export function LoginPage() {
-  const { session } = useAuth()
+  const { user } = useAuth()
 
-  if (session) {
+  if (user) {
     return <Navigate to="/" replace />
   }
 

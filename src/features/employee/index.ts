@@ -1,4 +1,4 @@
-export { EmployeeForm } from "./components/EmployeeForm";
+export { EmployeeForm } from "./components/Employeeform";
 export { EmployeeList } from "./components/EmployeeList";
 export { EmployeeCard } from "./components/EmployeeCard";
 export {

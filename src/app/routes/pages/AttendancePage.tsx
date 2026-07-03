@@ -1,5 +1,5 @@
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/Tabs";
+import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card";
 import { useEmployees } from "@/features/employees/hooks/useEmployees";
 import { useAttendance } from "@/features/attendance/hooks/useAttendance";
 import { ClockInOutButton } from "@/features/attendance/components/ClockInOutButton";

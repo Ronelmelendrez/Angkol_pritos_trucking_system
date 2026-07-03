@@ -17,6 +17,7 @@
 
     /* Path aliases */
     "baseUrl": ".",
+    "ignoreDeprecations": "6.0",
     "paths": {
       "@/*": ["src/*"]
     },
@@ -24,6 +25,7 @@
     /* Linting */
     "noUnusedLocals": false,
     "noUnusedParameters": false,
+    "forceConsistentCasingInFileNames": false,
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true
   },

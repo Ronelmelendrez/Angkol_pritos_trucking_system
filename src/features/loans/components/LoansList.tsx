@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { Landmark, PhilippinePeso } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Skeleton } from "@/components/ui/Skeleton";
+import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/Dialog";
 import { formatCurrency } from "@/utils/currency";
 import { formatDate } from "@/utils/date";
 import { RepaymentForm } from "./RepaymentForm";
@@ -66,7 +66,7 @@ export function LoansList({ loans, employees, isLoading }: Props) {
                 </span>
                 <span className="font-semibold text-ink">{formatCurrency(loan.remainingBalance)} left</span>
               </div>
-              <div className="h-2 w-full overflow-hidden rounded-full bg-ink/[0.06]">
+              <div className="h-2 w-full overflow-hidden rounded-full bg-ink/6">
                 <div
                   className="h-full rounded-full bg-primary transition-all"
                   style={{ width: `${Math.round(progress * 100)}%` }}

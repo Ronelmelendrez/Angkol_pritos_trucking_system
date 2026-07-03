@@ -3,6 +3,9 @@ import { advancesTable } from "@/lib/mockData";
 import type { NewCashAdvance } from "../types";
 
 const ADVANCES_KEY = ["advances"] as const;
+export const advancesKeys = {
+  all: ADVANCES_KEY,
+};
 
 export function useAdvances() {
   return useQuery({
