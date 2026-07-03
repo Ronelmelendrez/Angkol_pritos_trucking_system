@@ -1,85 +1,93 @@
-import { NavLink } from "react-router-dom"
-import { ChevronLeft, ChevronRight, Drumstick, LogOut } from "lucide-react"
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { NAV_ITEMS } from "@/components/layout/navConfig"
-import { useUIStore } from "@/app/store/uiStore"
-import { useLogout } from "@/features/auth"
+import { NavLink } from "react-router-dom";
+import {
+  LayoutDashboard,
+  Receipt,
+  Users,
+  CalendarClock,
+  HandCoins,
+  Landmark,
+  BarChart3,
+  Drumstick,
+  X,
+} from "lucide-react";
+import { cn } from "@/utils/cn";
+import { useUiStore } from "@/app/store/useUiStore";
+
+const NAV_ITEMS = [
+  { to: "/", label: "Dashboard", icon: LayoutDashboard, end: true },
+  { to: "/expenses", label: "Expenses", icon: Receipt },
+  { to: "/employees", label: "Employees", icon: Users },
+  { to: "/attendance", label: "Attendance", icon: CalendarClock },
+  { to: "/advances", label: "Cash Advances", icon: HandCoins },
+  { to: "/loans", label: "Loans (Utang)", icon: Landmark },
+  { to: "/reports", label: "Reports", icon: BarChart3 },
+];
 
 export function Sidebar() {
-  const { sidebarCollapsed, toggleSidebar } = useUIStore()
-  const { logout } = useLogout()
+  const { isSidebarOpen, closeSidebar } = useUiStore();
 
   return (
-    <aside
-      className={cn(
-        "hidden md:flex md:flex-col border-r border-border bg-card shrink-0 transition-[width] duration-200",
-        sidebarCollapsed ? "md:w-[72px]" : "md:w-60"
+    <>
+      {/* Mobile overlay */}
+      {isSidebarOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-ink/40 backdrop-blur-[1px] lg:hidden"
+          onClick={closeSidebar}
+          aria-hidden
+        />
       )}
-    >
-      <div className="flex h-16 items-center gap-2 border-b border-border px-4">
-        <div className="flex size-9 shrink-0 items-center justify-center rounded-md bg-primary text-primary-foreground">
-          <Drumstick className="size-5" />
-        </div>
-        {!sidebarCollapsed && (
-          <span className="truncate font-display text-base font-semibold text-char-900">
-            Lechon &amp; Manok
-          </span>
+
+      <aside
+        className={cn(
+          "fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r border-line bg-surface transition-transform duration-200 lg:sticky lg:top-0 lg:h-screen lg:translate-x-0",
+          isSidebarOpen ? "translate-x-0" : "-translate-x-full"
         )}
-      </div>
+      >
+        <div className="flex items-center justify-between px-5 py-5">
+          <div className="flex items-center gap-2.5">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-white">
+              <Drumstick className="h-5 w-5" />
+            </div>
+            <div>
+              <p className="stamp text-sm font-semibold leading-tight text-ink">Manong's Grill</p>
+              <p className="text-[11px] leading-tight text-ink-faint">&amp; Lechon Manok</p>
+            </div>
+          </div>
+          <button
+            onClick={closeSidebar}
+            className="rounded-full p-1.5 text-ink-soft hover:bg-ink/5 lg:hidden"
+            aria-label="Close menu"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
 
-      <nav className="flex-1 overflow-y-auto px-2 py-3">
-        <ul className="flex flex-col gap-1">
+        <nav className="flex-1 space-y-1 overflow-y-auto px-3 pb-4">
           {NAV_ITEMS.map((item) => (
-            <li key={item.path}>
-              <NavLink
-                to={item.path}
-                end={item.path === "/"}
-                className={({ isActive }) =>
-                  cn(
-                    "flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors",
-                    isActive
-                      ? "bg-ember-100 text-ember-700"
-                      : "text-char-700 hover:bg-muted",
-                    sidebarCollapsed && "justify-center px-2"
-                  )
-                }
-                title={sidebarCollapsed ? item.label : undefined}
-              >
-                <item.icon className="size-5 shrink-0" />
-                {!sidebarCollapsed && <span className="truncate">{item.label}</span>}
-              </NavLink>
-            </li>
+            <NavLink
+              key={item.to}
+              to={item.to}
+              end={item.end}
+              onClick={closeSidebar}
+              className={({ isActive }) =>
+                cn(
+                  "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors",
+                  isActive
+                    ? "bg-primary/10 text-primary-dark"
+                    : "text-ink-soft hover:bg-ink/5 hover:text-ink"
+                )
+              }
+            >
+              <item.icon className="h-4.5 w-4.5 shrink-0" />
+              {item.label}
+            </NavLink>
           ))}
-        </ul>
-      </nav>
+        </nav>
 
-      <div className="border-t border-border p-2">
-        <Button
-          variant="ghost"
-          className={cn(
-            "w-full justify-start gap-3 text-char-700",
-            sidebarCollapsed && "justify-center px-2"
-          )}
-          onClick={() => logout()}
-        >
-          <LogOut className="size-5 shrink-0" />
-          {!sidebarCollapsed && "Log out"}
-        </Button>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="mt-1 w-full"
-          onClick={toggleSidebar}
-          aria-label={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-        >
-          {sidebarCollapsed ? (
-            <ChevronRight className="size-4" />
-          ) : (
-            <ChevronLeft className="size-4" />
-          )}
-        </Button>
-      </div>
-    </aside>
-  )
+        <div className="border-t border-line px-5 py-4">
+          <p className="text-[11px] text-ink-faint">🍗 Fresh daily, served with pride.</p>
+        </div>
+      </aside>
+    </>
+  );
 }
