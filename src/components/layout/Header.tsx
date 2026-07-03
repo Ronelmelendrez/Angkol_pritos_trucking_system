@@ -1,62 +1,44 @@
-import { useLocation } from "react-router-dom"
-import { LogOut, User } from "lucide-react"
-import { NAV_ITEMS } from "@/components/layout/navConfig"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/DropdownMenu"
-import { Avatar, AvatarFallback } from "@/components/ui/Avatar"
-import { useAuth, useLogout } from "@/features/auth"
+import { Menu, LogOut } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useUiStore } from "@/app/store/useUiStore";
+import { useAuth } from "@/features/auth/hooks/useAuth";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/components/ui/use-toast";
 
-export function Header() {
-  const location = useLocation()
-  const { profile } = useAuth()
-  const { logout } = useLogout()
+export function Header({ title }: { title: string }) {
+  const { toggleSidebar } = useUiStore();
+  const { user, logout } = useAuth();
+  const { toast } = useToast();
+  const navigate = useNavigate();
 
-  const currentPage = NAV_ITEMS.find((item) =>
-    item.path === "/" ? location.pathname === "/" : location.pathname.startsWith(item.path)
-  )
-
-  const initials = (profile?.full_name ?? "Manager")
-    .split(" ")
-    .map((part) => part[0])
-    .slice(0, 2)
-    .join("")
-    .toUpperCase()
+  async function handleLogout() {
+    await logout();
+    toast({ title: "Signed out", variant: "default" });
+    navigate("/login", { replace: true });
+  }
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-border bg-background/95 px-4 backdrop-blur-sm md:px-6">
-      <h1 className="font-display text-xl font-semibold text-char-900">
-        {currentPage?.label ?? "Dashboard"}
-      </h1>
+    <header className="sticky top-0 z-30 flex items-center justify-between border-b border-line bg-bg/90 px-4 py-3.5 backdrop-blur sm:px-6">
+      <div className="flex items-center gap-3">
+        <button
+          onClick={toggleSidebar}
+          className="rounded-lg p-2 text-ink-soft hover:bg-ink/5 lg:hidden"
+          aria-label="Open menu"
+        >
+          <Menu className="h-5 w-5" />
+        </button>
+        <h1 className="stamp text-lg font-semibold text-ink sm:text-xl">{title}</h1>
+      </div>
 
-      <DropdownMenu>
-        <DropdownMenuTrigger className="rounded-full outline-none focus-visible:ring-2 focus-visible:ring-ring">
-          <Avatar>
-            <AvatarFallback>{initials}</AvatarFallback>
-          </Avatar>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-48">
-          <div className="px-2 py-1.5">
-            <p className="text-sm font-medium text-char-900">
-              {profile?.full_name ?? "Manager"}
-            </p>
-            <p className="text-xs text-muted-foreground">Manager account</p>
-          </div>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem disabled>
-            <User className="size-4" />
-            Account settings
-          </DropdownMenuItem>
-          <DropdownMenuItem variant="destructive" onSelect={() => logout()}>
-            <LogOut className="size-4" />
-            Log out
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+      <div className="flex items-center gap-3">
+        <div className="hidden text-right sm:block">
+          <p className="text-sm font-medium leading-tight text-ink">{user?.name}</p>
+          <p className="text-[11px] capitalize leading-tight text-ink-faint">{user?.role}</p>
+        </div>
+        <Button variant="ghost" size="icon" onClick={handleLogout} aria-label="Sign out">
+          <LogOut className="h-4 w-4" />
+        </Button>
+      </div>
     </header>
-  )
+  );
 }
