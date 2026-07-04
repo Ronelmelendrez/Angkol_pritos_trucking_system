@@ -40,6 +40,7 @@ export function LoginPage() {
           </div>
           <div className="leading-tight">
             <p className="stamp text-sm font-semibold text-white">Angkol Prito"s</p>
+            <p className="text-[11px] text-white/60">&amp; Lechon Manok</p>
           </div>
         </div>
 

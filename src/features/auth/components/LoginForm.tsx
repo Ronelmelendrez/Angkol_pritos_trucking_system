@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/Label";
 import { useToast } from "@/components/ui/useToast";
 
 export function LoginForm() {
-  const [email, setEmail] = useState("manager@manongsgrill.ph");
+  const [email, setEmail] = useState("manager@angkolprito.ph");
   const [password, setPassword] = useState("");
   const { login, isLoggingIn } = useAuth();
   const { toast } = useToast();

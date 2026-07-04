@@ -49,7 +49,7 @@ export function Sidebar() {
               <Drumstick className="h-5 w-5" />
             </div>
             <div>
-              <p className="stamp text-sm font-semibold leading-tight text-ink">Manong's Grill</p>
+              <p className="stamp text-sm font-semibold leading-tight text-ink">Angkol Prito"s</p>
               <p className="text-[11px] leading-tight text-ink-faint">&amp; Lechon Manok</p>
             </div>
           </div>
