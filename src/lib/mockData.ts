@@ -1,6 +1,6 @@
 import type { AttendanceRecord } from "@/features/attendance/types";
 import type { CashAdvance } from "@/features/advance/types";
-import type { Employee } from "@/features/employee/types";
+import type { Employee } from "@/features/employees/types";
 import type { Expense } from "@/features/expenses/types";
 import type { Loan, Repayment } from "@/features/loans/types";
 import type { BaseRecord } from "@/types";

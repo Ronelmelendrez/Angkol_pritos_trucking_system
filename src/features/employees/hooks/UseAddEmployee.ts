@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
 import { supabase } from "@/lib/supabaseClient"
 import type { EmployeeFormSchemaOutput } from "@/utils/validators"
-import { employeesKeys } from "@/features/employee/hooks/useEmployees"
+import { employeesKeys } from "@/features/employees/hooks/useEmployees"
 
 async function insertEmployee(values: EmployeeFormSchemaOutput) {
   const { data, error } = await supabase
