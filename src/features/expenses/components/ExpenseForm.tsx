@@ -1,4 +1,4 @@
-import { useForm, Controller } from "react-hook-form";
+import { useForm, Controller, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import { expenseSchema, type ExpenseFormValues } from "@/utils/validators";
@@ -22,7 +22,7 @@ export function ExpenseForm({ onDone }: { onDone?: () => void }) {
     reset,
     formState: { errors },
   } = useForm<ExpenseFormValues>({
-    resolver: zodResolver(expenseSchema),
+    resolver: zodResolver(expenseSchema) as unknown as Resolver<ExpenseFormValues>,
     defaultValues: {
       date: todayISO(),
       category: "Raw Chicken",
