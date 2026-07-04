@@ -14,6 +14,7 @@ import type { Employee } from "../types";
 
 interface Props {
   employee: Employee;
+  onSelect: (employee: Employee) => void;
   onEdit: (employee: Employee) => void;
   onDelete: (employee: Employee) => void;
 }
@@ -27,9 +28,12 @@ function initials(name: string) {
     .toUpperCase();
 }
 
-export function EmployeeCard({ employee, onEdit, onDelete }: Props) {
+export function EmployeeCard({ employee, onSelect, onEdit, onDelete }: Props) {
   return (
-    <Card className="ticket-hover ticket-perf">
+    <Card
+      className="ticket-hover ticket-perf cursor-pointer"
+      onClick={() => onSelect(employee)}
+    >
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-3">
           <div
@@ -45,21 +49,23 @@ export function EmployeeCard({ employee, onEdit, onDelete }: Props) {
             </Badge>
           </div>
         </div>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-8 w-8 text-ink-faint">
-              <MoreVertical className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuItem onClick={() => onEdit(employee)}>
-              <Pencil className="h-3.5 w-3.5" /> Edit
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => onDelete(employee)} className="text-danger">
-              <Trash2 className="h-3.5 w-3.5" /> Remove
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div onClick={(e) => e.stopPropagation()}>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-8 w-8 text-ink-faint">
+                <MoreVertical className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem onClick={() => onEdit(employee)}>
+                <Pencil className="h-3.5 w-3.5" /> Edit
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => onDelete(employee)} className="text-danger">
+                <Trash2 className="h-3.5 w-3.5" /> Remove
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
 
       <div className="mt-4 space-y-2 text-sm text-ink-soft">

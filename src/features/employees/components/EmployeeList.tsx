@@ -6,11 +6,12 @@ import type { Employee } from "../types";
 interface Props {
   employees: Employee[];
   isLoading: boolean;
+  onSelect: (employee: Employee) => void;
   onEdit: (employee: Employee) => void;
   onDelete: (employee: Employee) => void;
 }
 
-export function EmployeeList({ employees, isLoading, onEdit, onDelete }: Props) {
+export function EmployeeList({ employees, isLoading, onSelect, onEdit, onDelete }: Props) {
   if (isLoading) {
     return (
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -34,7 +35,7 @@ export function EmployeeList({ employees, isLoading, onEdit, onDelete }: Props) 
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {employees.map((emp) => (
-        <EmployeeCard key={emp.id} employee={emp} onEdit={onEdit} onDelete={onDelete} />
+        <EmployeeCard key={emp.id} employee={emp} onSelect={onSelect} onEdit={onEdit} onDelete={onDelete} />
       ))}
     </div>
   );

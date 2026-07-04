@@ -6,6 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { useEmployees, useDeleteEmployee } from "@/features/employees/hooks/useEmployees";
 import { EmployeeForm } from "@/features/employees/components/Employeeform";
 import { EmployeeList } from "@/features/employees/components/EmployeeList";
+import { EmployeeDetailModal } from "@/features/employees/components/EmployeeDetailModal";
 import { useToast } from "@/components/ui/useToast";
 import type { Employee } from "@/features/employees/types";
 
@@ -14,6 +15,7 @@ export function EmployeesPage() {
   const deleteEmployee = useDeleteEmployee();
   const { toast } = useToast();
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [selected, setSelected] = useState<Employee | null>(null);
   const [editing, setEditing] = useState<Employee | undefined>(undefined);
 
   function openAdd() {
@@ -64,7 +66,13 @@ export function EmployeesPage() {
         </Dialog>
       </CardHeader>
 
-      <EmployeeList employees={employees} isLoading={isLoading} onEdit={openEdit} onDelete={handleDelete} />
+      <EmployeeList employees={employees} isLoading={isLoading} onSelect={setSelected} onEdit={openEdit} onDelete={handleDelete} />
+
+      <EmployeeDetailModal
+        employee={selected}
+        open={!!selected}
+        onOpenChange={(open) => { if (!open) setSelected(null); }}
+      />
     </Card>
   );
 }
