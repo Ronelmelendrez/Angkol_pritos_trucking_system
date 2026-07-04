@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { useEmployees, useDeleteEmployee } from "@/features/employees/hooks/useEmployees";
 import { EmployeeForm } from "@/features/employees/components/Employeeform";
 import { EmployeeList } from "@/features/employees/components/EmployeeList";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/components/ui/useToast";
 import type { Employee } from "@/features/employees/types";
 
 export function EmployeesPage() {

@@ -6,7 +6,7 @@ import { formatCurrency } from "@/utils/currency";
 import { formatDate } from "@/utils/date";
 import { CATEGORY_COLORS } from "@/lib/constants";
 import { useDeleteExpense } from "../hooks/useExpenses";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/components/ui/useToast";
 import type { Expense } from "../types";
 
 interface Props {
