@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/Label";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/Select";
 import { useAddAdvance } from "../hooks/useAdvances";
 import { useEmployees } from "@/features/employees/hooks/useEmployees";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/components/ui/useToast";
 import { todayISO } from "@/utils/date";
 
 export function AdvanceForm({ onDone }: { onDone?: () => void }) {

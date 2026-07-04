@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/Button";
 import { formatCurrency } from "@/utils/currency";
 import { formatDate } from "@/utils/date";
 import { useMarkAdvanceDeducted } from "../hooks/useAdvances";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/components/ui/useToast";
 import type { CashAdvance } from "../types";
 import type { Employee } from "@/features/employees/types";
 
