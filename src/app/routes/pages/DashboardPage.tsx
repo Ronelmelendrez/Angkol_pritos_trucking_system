@@ -159,7 +159,7 @@ export function DashboardPage() {
                   width={68}
                 />
                 <Tooltip
-                  formatter={(value: number, name: string) => [formatCurrency(value), name]}
+                  formatter={(value) => formatCurrency(Number(value ?? 0))}
                   labelFormatter={(label) => label}
                   contentStyle={{
                     borderRadius: 12,
