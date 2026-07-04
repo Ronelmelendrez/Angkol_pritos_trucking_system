@@ -1,4 +1,4 @@
-import { useForm, Controller } from "react-hook-form";
+import { useForm, Controller, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import { advanceSchema, type AdvanceFormValues } from "@/utils/validators";
@@ -23,7 +23,7 @@ export function AdvanceForm({ onDone }: { onDone?: () => void }) {
     reset,
     formState: { errors },
   } = useForm<AdvanceFormValues>({
-    resolver: zodResolver(advanceSchema),
+    resolver: zodResolver(advanceSchema) as unknown as Resolver<AdvanceFormValues>,
     defaultValues: { employeeId: "", amount: 0, date: todayISO(), reason: "" },
   });
 
