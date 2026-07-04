@@ -1,4 +1,4 @@
-import { useForm, Controller } from "react-hook-form";
+import { useForm, Controller, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import { employeeSchema, type EmployeeFormValues } from "@/utils/validators";
@@ -28,7 +28,7 @@ export function EmployeeForm({ employee, onDone }: Props) {
     control,
     formState: { errors },
   } = useForm<EmployeeFormValues>({
-    resolver: zodResolver(employeeSchema),
+    resolver: zodResolver(employeeSchema) as unknown as Resolver<EmployeeFormValues>,
     defaultValues: {
       name: employee?.name ?? "",
       phone: employee?.phone ?? "",
@@ -83,7 +83,7 @@ export function EmployeeForm({ employee, onDone }: Props) {
         name="isActive"
         render={({ field }) => (
           <label className="flex cursor-pointer items-center gap-2">
-            <Checkbox checked={field.value} onCheckedChange={(v) => field.onChange(!!v)} />
+            <Checkbox checked={field.value} onCheckedChange={(v: boolean) => field.onChange(v)} />
             <span className="text-sm text-ink">Currently active on the crew</span>
           </label>
         )}
