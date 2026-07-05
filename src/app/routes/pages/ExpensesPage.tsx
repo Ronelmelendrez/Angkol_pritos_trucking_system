@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { useExpenses } from "@/features/expenses/hooks/useExpenses";
 import { ExpenseForm } from "@/features/expenses/components/ExpenseForm";
 import { ExpenseFilters } from "@/features/expenses/components/ExpenseFilters";
-import { ExpenseList } from "@/features/expenses/components/ExpenseList";
+import { ExpenseDayList } from "@/features/expenses/components/ExpenseDayList";
 import { formatCurrency } from "@/utils/currency";
 import type { ExpenseFilters as ExpenseFiltersType } from "@/features/expenses/types";
 
@@ -62,7 +62,7 @@ export function ExpensesPage() {
           <ExpenseFilters filters={filters} onChange={setFilters} />
         </div>
 
-        <ExpenseList expenses={filtered} isLoading={isLoading} />
+        <ExpenseDayList expenses={filtered} isLoading={isLoading} />
       </Card>
     </div>
   );
