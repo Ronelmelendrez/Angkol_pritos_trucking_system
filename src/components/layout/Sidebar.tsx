@@ -2,6 +2,7 @@ import { NavLink } from "react-router-dom";
 import {
   LayoutDashboard,
   Receipt,
+  ShoppingCart,
   Users,
   CalendarClock,
   HandCoins,
@@ -15,6 +16,7 @@ import { useUiStore } from "@/app/store/useUiStore";
 
 const NAV_ITEMS = [
   { to: "/", label: "Dashboard", icon: LayoutDashboard, end: true },
+  { to: "/sales", label: "Sales", icon: ShoppingCart },
   { to: "/expenses", label: "Expenses", icon: Receipt },
   { to: "/employees", label: "Employees", icon: Users },
   { to: "/attendance", label: "Attendance", icon: CalendarClock },

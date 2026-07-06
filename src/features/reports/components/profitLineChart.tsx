@@ -9,7 +9,7 @@ export function ProfitLineChart({ data }: { data: DailyProfitPoint[] }) {
       <CardHeader>
         <div>
           <CardTitle>Daily profit &amp; loss</CardTitle>
-          <CardDescription>Sales figure is a manual placeholder until POS is connected</CardDescription>
+          <CardDescription>Daily sales vs expenses tracked per batch</CardDescription>
         </div>
       </CardHeader>
       <div className="h-64">

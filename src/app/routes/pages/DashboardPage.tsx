@@ -9,27 +9,31 @@ import { Badge } from "@/components/ui/badge";
 import { useExpenses } from "@/features/expenses/hooks/useExpenses";
 import { useEmployees } from "@/features/employees/hooks/useEmployees";
 import { useAttendance } from "@/features/attendance/hooks/useAttendance";
+import { useSales } from "@/features/sales/hooks/useSales";
 import { useReports } from "@/features/reports/hooks/useReports";
 import { formatCurrency, formatCurrencyCompact } from "@/utils/currency";
 import { formatDate, isDateToday } from "@/utils/date";
-import { CATEGORY_COLORS, DEFAULT_DAILY_SALES } from "@/lib/constants";
+import { CATEGORY_COLORS } from "@/lib/constants";
 
 export function DashboardPage() {
   const { data: expenses = [], isLoading: expensesLoading } = useExpenses();
   const { data: employees = [], isLoading: employeesLoading } = useEmployees();
   const { data: attendance = [], isLoading: attendanceLoading } = useAttendance();
+  const { data: sales = [], isLoading: salesLoading } = useSales();
   const { dailyProfit, isLoading: reportsLoading } = useReports(30);
 
+  const todaysSales = sales.filter((s) => isDateToday(s.date));
+  const todaysSalesTotal = todaysSales.reduce((sum, s) => sum + s.amount, 0);
   const todaysExpenses = expenses.filter((e) => isDateToday(e.date));
   const totalToday = todaysExpenses.reduce((sum, e) => sum + e.amount, 0);
-  const netProfitToday = DEFAULT_DAILY_SALES - totalToday;
+  const netProfitToday = todaysSalesTotal - totalToday;
   const activeEmployees = employees.filter((e) => e.isActive);
   const clockedInNow = attendance.filter((a) => isDateToday(a.date) && !a.clockOut);
   const recentExpenses = [...expenses]
     .sort((a, b) => (a.date < b.date ? 1 : -1))
     .slice(0, 5);
 
-  const isLoading = expensesLoading || employeesLoading || attendanceLoading;
+  const isLoading = expensesLoading || employeesLoading || attendanceLoading || salesLoading;
 
   // 30-day rollups for the sales vs expenses summary strip
   const periodSales = dailyProfit.reduce((sum, d) => sum + d.sales, 0);
@@ -42,10 +46,10 @@ export function DashboardPage() {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
           label="Today's sales"
-          value={formatCurrency(DEFAULT_DAILY_SALES)}
+          value={formatCurrency(todaysSalesTotal)}
           icon={TrendingUp}
           tone="accent"
-          hint="Manual entry"
+          hint={`${todaysSales.length} transaction${todaysSales.length === 1 ? "" : "s"}`}
           isLoading={isLoading}
         />
         <StatCard
@@ -78,7 +82,7 @@ export function DashboardPage() {
         <CardHeader>
           <div>
             <CardTitle>Sales vs expenses</CardTitle>
-            <CardDescription>Last 30 days · sales figure is a manual placeholder until POS is connected</CardDescription>
+            <CardDescription>Last 30 days</CardDescription>
           </div>
         </CardHeader>
 
@@ -122,7 +126,7 @@ export function DashboardPage() {
           <Skeleton className="h-72 w-full" />
         ) : dailyProfit.every((d) => d.sales === 0) ? (
           <p className="py-10 text-center text-sm text-ink-faint">
-            No sales data yet — log an expense to see the trend appear.
+            No sales logged yet — log your first sale to see the trend appear.
           </p>
         ) : (
           <div className="h-72 -mx-2">

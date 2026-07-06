@@ -4,7 +4,8 @@ import { useExpenses } from "@/features/expenses/hooks/useExpenses";
 import { useAttendance } from "@/features/attendance/hooks/useAttendance";
 import { useEmployees } from "@/features/employees/hooks/useEmployees";
 import { useAdvances } from "@/features/advances/hooks/useAdvances";
-import { CATEGORY_COLORS, DEFAULT_DAILY_SALES } from "@/lib/constants";
+import { useSales } from "@/features/sales/hooks/useSales";
+import { CATEGORY_COLORS } from "@/lib/constants";
 import type { CategoryBreakdown, DailyProfitPoint, PayrollRow } from "../types";
 
 /**
@@ -19,8 +20,9 @@ export function useReports(days: number = 30) {
   const { data: attendance = [], isLoading: attendanceLoading } = useAttendance();
   const { data: employees = [], isLoading: employeesLoading } = useEmployees();
   const { data: advances = [], isLoading: advancesLoading } = useAdvances();
+  const { data: sales = [], isLoading: salesLoading } = useSales();
 
-  const isLoading = expensesLoading || attendanceLoading || employeesLoading || advancesLoading;
+  const isLoading = expensesLoading || attendanceLoading || employeesLoading || advancesLoading || salesLoading;
 
   const categoryBreakdown = useMemo<CategoryBreakdown[]>(() => {
     const totals = new Map<string, number>();
@@ -41,18 +43,18 @@ export function useReports(days: number = 30) {
       const dayExpenses = expenses
         .filter((e) => e.date === key)
         .reduce((sum, e) => sum + e.amount, 0);
-      // Manual sales input placeholder — replace with a real daily_summary
-      // table once POS integration or manual sales entry exists.
-      const sales = dayExpenses > 0 ? DEFAULT_DAILY_SALES : 0;
+      const daySales = sales
+        .filter((s) => s.date === key)
+        .reduce((sum, s) => sum + s.amount, 0);
       return {
         date: key,
         label: format(date, "MMM d"),
         expenses: dayExpenses,
-        sales,
-        profit: sales - dayExpenses,
+        sales: daySales,
+        profit: daySales - dayExpenses,
       };
     });
-  }, [expenses, days]);
+  }, [expenses, sales, days]);
 
   const payroll = useMemo<PayrollRow[]>(() => {
     return employees

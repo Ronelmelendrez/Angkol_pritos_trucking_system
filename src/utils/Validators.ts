@@ -49,3 +49,12 @@ export const repaymentSchema = z.object({
   date: z.string().min(1, "Date is required"),
 });
 export type RepaymentFormValues = z.infer<typeof repaymentSchema>;
+
+export const saleSchema = z.object({
+  date: z.string().min(1, "Date is required"),
+  expenseId: z.string().optional(),
+  description: z.string().min(2, "Add a short description"),
+  quantitySold: z.coerce.number().positive("Qty must be positive").optional(),
+  amount: z.coerce.number().positive("Amount must be greater than ₱0"),
+});
+export type SaleFormValues = z.infer<typeof saleSchema>;

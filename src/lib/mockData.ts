@@ -3,6 +3,7 @@ import type { CashAdvance } from "@/features/advances/types";
 import type { Employee } from "@/features/employees/types";
 import type { Expense } from "@/features/expenses/types";
 import type { Loan, Repayment } from "@/features/loans/types";
+import type { Sale } from "@/features/sales/types";
 import type { BaseRecord } from "@/types";
 import { ADVANCE_STATUSES, EXPENSE_CATEGORIES, LOAN_STATUSES, PAYMENT_METHODS } from "@/lib/constants";
 
@@ -225,9 +226,50 @@ const repaymentSeed: Repayment[] = [
   },
 ];
 
+const saleSeed: Sale[] = [
+  {
+    id: "sale_1",
+    date: "2026-07-04",
+    expenseId: "exp_2",
+    description: "Fried chicken",
+    quantitySold: 15,
+    amount: 4500,
+    createdAt: now,
+    updatedAt: now,
+  },
+  {
+    id: "sale_2",
+    date: "2026-07-04",
+    expenseId: "exp_2",
+    description: "Lechon manok",
+    quantitySold: 5,
+    amount: 2500,
+    createdAt: now,
+    updatedAt: now,
+  },
+  {
+    id: "sale_3",
+    date: "2026-07-04",
+    description: "Walk-in cold drinks",
+    amount: 800,
+    createdAt: now,
+    updatedAt: now,
+  },
+  {
+    id: "sale_4",
+    date: "2026-07-03",
+    expenseId: "exp_1",
+    description: "Trucking fee collected",
+    amount: 1200,
+    createdAt: now,
+    updatedAt: now,
+  },
+];
+
 export const employeesTable = createTable(employeeSeed);
 export const attendanceTable = createTable(attendanceSeed);
 export const expensesTable = createTable(expenseSeed);
 export const advancesTable = createTable(advanceSeed);
 export const loansTable = createTable(loanSeed);
 export const repaymentsTable = createTable(repaymentSeed);
+export const salesTable = createTable(saleSeed);
