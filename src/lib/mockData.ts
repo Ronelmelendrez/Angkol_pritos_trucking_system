@@ -3,6 +3,7 @@ import type { CashAdvance } from "@/features/advances/types";
 import type { Employee } from "@/features/employees/types";
 import type { Expense } from "@/features/expenses/types";
 import type { Loan, Repayment } from "@/features/loans/types";
+import type { PayrollRun } from "@/features/payroll/types";
 import type { Product } from "@/features/products/types";
 import type { Sale } from "@/features/sales/types";
 import type { BaseRecord } from "@/types";
@@ -62,6 +63,7 @@ const employeeSeed: Employee[] = [
     hireDate: "2026-01-05",
     isActive: true,
     avatarColor: "#E67E22",
+    payFrequency: "semi_monthly",
     createdAt: now,
     updatedAt: now,
   },
@@ -73,6 +75,7 @@ const employeeSeed: Employee[] = [
     hireDate: "2026-02-12",
     isActive: true,
     avatarColor: "#C0392B",
+    payFrequency: "semi_monthly",
     createdAt: now,
     updatedAt: now,
   },
@@ -84,6 +87,7 @@ const employeeSeed: Employee[] = [
     hireDate: "2025-11-18",
     isActive: false,
     avatarColor: "#F1C40F",
+    payFrequency: "semi_monthly",
     createdAt: now,
     updatedAt: now,
   },
@@ -310,3 +314,6 @@ export const loansTable = createTable(loanSeed);
 export const repaymentsTable = createTable(repaymentSeed);
 export const productsTable = createTable(productSeed);
 export const salesTable = createTable(saleSeed);
+
+const payrollRunSeed: PayrollRun[] = [];
+export const payrollRunsTable = createTable(payrollRunSeed);
