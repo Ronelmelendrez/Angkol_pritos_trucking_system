@@ -6,6 +6,7 @@ import {
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
+import { subDays, format as formatDateFns } from "date-fns";
 import { useExpenses } from "@/features/expenses/hooks/useExpenses";
 import { useEmployees } from "@/features/employees/hooks/useEmployees";
 import { useAttendance } from "@/features/attendance/hooks/useAttendance";
@@ -20,7 +21,9 @@ export function DashboardPage() {
   const { data: employees = [], isLoading: employeesLoading } = useEmployees();
   const { data: attendance = [], isLoading: attendanceLoading } = useAttendance();
   const { data: sales = [], isLoading: salesLoading } = useSales();
-  const { dailyProfit, isLoading: reportsLoading } = useReports(30);
+  const dateTo = formatDateFns(new Date(), "yyyy-MM-dd");
+  const dateFrom = formatDateFns(subDays(new Date(), 29), "yyyy-MM-dd");
+  const { dailyProfit, isLoading: reportsLoading } = useReports(dateFrom, dateTo);
 
   const todaysSales = sales.filter((s) => isDateToday(s.date));
   const todaysSalesTotal = todaysSales.reduce((sum, s) => sum + s.amount, 0);
