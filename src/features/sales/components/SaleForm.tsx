@@ -35,7 +35,7 @@ export function SaleForm({ onDone }: Props) {
     defaultValues: {
       date: todayISO(),
       productId: "",
-      quantitySold: 1,
+      quantitySold: 0,
       unitPrice: 0,
       amount: 0,
       notes: "",
@@ -43,6 +43,7 @@ export function SaleForm({ onDone }: Props) {
   });
 
   const selectedProductId = useWatch({ control, name: "productId" });
+  const amount = useWatch({ control, name: "amount" });
   const quantitySold = useWatch({ control, name: "quantitySold" });
   const unitPrice = useWatch({ control, name: "unitPrice" });
 
@@ -54,25 +55,28 @@ export function SaleForm({ onDone }: Props) {
     }
   }, [selectedProductId, setValue, selectedProduct]);
 
-  useEffect(() => {
-    const qty = Number(quantitySold) || 0;
-    const price = Number(unitPrice) || 0;
-    setValue("amount", qty * price);
-  }, [quantitySold, unitPrice, setValue]);
+  function onAmountChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const val = parseFloat(e.target.value) || 0;
+    setValue("amount", val);
+    const price = unitPrice || 0;
+    if (price > 0) {
+      setValue("quantitySold", Math.round((val / price) * 100) / 100);
+    }
+  }
+
+  function onQtyChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const val = parseFloat(e.target.value) || 0;
+    setValue("quantitySold", val);
+    const price = unitPrice || 0;
+    setValue("amount", Math.round(val * price * 100) / 100);
+  }
 
   async function onSubmit(values: SaleFormValues) {
     try {
-      await addSale.mutateAsync({
-        date: values.date,
-        productId: values.productId,
-        quantitySold: values.quantitySold,
-        unitPrice: values.unitPrice,
-        amount: values.amount,
-        notes: values.notes || undefined,
-      });
+      await addSale.mutateAsync(values);
       const product = activeProducts.find((p) => p.id === values.productId);
       toast({ title: "Sale recorded", description: `${product?.name ?? "Sale"} — ${formatCurrency(values.amount)}`, variant: "success" });
-      reset({ date: todayISO(), productId: "", quantitySold: 1, unitPrice: 0, amount: 0, notes: "" });
+      reset({ date: todayISO(), productId: "", quantitySold: 0, unitPrice: 0, amount: 0, notes: "" });
       onDone?.();
     } catch {
       toast({ title: "Couldn't save sale", description: "Please try again.", variant: "error" });
@@ -113,19 +117,18 @@ export function SaleForm({ onDone }: Props) {
 
       <div className="grid grid-cols-3 gap-4">
         <div>
-          <Label htmlFor="sale-qty">Quantity</Label>
-          <Input id="sale-qty" type="number" step="1" min="1" {...register("quantitySold")} />
-          {errors.quantitySold && <p className="mt-1 text-xs text-danger">{errors.quantitySold.message}</p>}
+          <Label htmlFor="sale-amount">Total sales (₱)</Label>
+          <Input id="sale-amount" type="number" step="0.01" min="0" value={amount} onChange={onAmountChange} />
+          {errors.amount && <p className="mt-1 text-xs text-danger">{errors.amount.message}</p>}
         </div>
         <div>
           <Label htmlFor="sale-price">Unit price (₱)</Label>
-          <Input id="sale-price" type="number" step="0.01" min="0" {...register("unitPrice")} />
-          {errors.unitPrice && <p className="mt-1 text-xs text-danger">{errors.unitPrice.message}</p>}
+          <Input id="sale-price" type="number" disabled value={unitPrice || 0} />
         </div>
         <div>
-          <Label htmlFor="sale-amount">Total (₱)</Label>
-          <Input id="sale-amount" type="number" step="0.01" min="0" {...register("amount")} />
-          {errors.amount && <p className="mt-1 text-xs text-danger">{errors.amount.message}</p>}
+          <Label htmlFor="sale-qty">Quantity</Label>
+          <Input id="sale-qty" type="number" step="0.01" min="0" value={quantitySold} onChange={onQtyChange} />
+          {errors.quantitySold && <p className="mt-1 text-xs text-danger">{errors.quantitySold.message}</p>}
         </div>
       </div>
 
@@ -134,7 +137,7 @@ export function SaleForm({ onDone }: Props) {
         <Input id="sale-notes" placeholder="e.g. Walk-in customer" {...register("notes")} />
       </div>
 
-      <Button type="submit" className="w-full" size="lg" disabled={addSale.isPending}>
+      <Button type="submit" className="w-full" size="lg" disabled={addSale.isPending || !selectedProductId}>
         {addSale.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
         {addSale.isPending ? "Saving..." : "Record sale"}
       </Button>
