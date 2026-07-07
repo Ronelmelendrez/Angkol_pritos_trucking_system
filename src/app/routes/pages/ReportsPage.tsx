@@ -3,6 +3,7 @@ import { ErrorBoundary } from "@/components/layout/ErrorBoundary"
 import { useReports } from "@/features/reports/hooks/useReports"
 import { ExpensePieChart } from "@/features/reports/components/ExpensesPieChart"
 import { ProfitLineChart } from "@/features/reports/components/profitLineChart"
+import { SalesByProductPieChart } from "@/features/reports/components/SalesByProductPieChart"
 import { PayrollSummary } from "@/features/reports/components/PayrollSummary"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card"
 import { Skeleton } from "@/components/ui/Skeleton"
@@ -114,8 +115,14 @@ function ReportsContent() {
       ) : (
         <div className="grid gap-4 md:grid-cols-2">
           <ExpensePieChart data={categoryBreakdown} />
-          <ProfitLineChart data={dailyProfit} />
+          <SalesByProductPieChart sales={filteredSales} />
         </div>
+      )}
+
+      {isLoading ? (
+        <Skeleton className="h-64 w-full" />
+      ) : (
+        <ProfitLineChart data={dailyProfit} />
       )}
 
       <div className="grid gap-4 md:grid-cols-2">
