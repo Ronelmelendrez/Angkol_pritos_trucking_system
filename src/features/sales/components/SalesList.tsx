@@ -7,20 +7,20 @@ import { formatCurrency } from "@/utils/currency";
 import { formatDate } from "@/utils/date";
 import { cn } from "@/utils/cn";
 import { useDeleteSale, useSales } from "../hooks/useSales";
-import { useExpenses } from "@/features/expenses/hooks/useExpenses";
+import { useProducts } from "@/features/products/hooks/useProducts";
 import { useToast } from "@/components/ui/useToast";
 import type { Sale } from "../types";
 
 export function SalesList() {
   const { data: sales = [], isLoading } = useSales();
-  const { data: expenses = [] } = useExpenses();
+  const { data: products = [] } = useProducts();
   const deleteSale = useDeleteSale();
   const { toast } = useToast();
 
-  const expenseMap = useMemo(() => {
-    const map = new Map(expenses.map((e) => [e.id, e]));
+  const productMap = useMemo(() => {
+    const map = new Map(products.map((p) => [p.id, p]));
     return map;
-  }, [expenses]);
+  }, [products]);
 
   const groups = useMemo(() => {
     const map = new Map<string, Sale[]>();
@@ -43,10 +43,10 @@ export function SalesList() {
     });
   }
 
-  async function handleDelete(id: string, description: string) {
+  async function handleDelete(id: string) {
     try {
       await deleteSale.mutateAsync(id);
-      toast({ title: "Sale removed", description, variant: "default" });
+      toast({ title: "Sale removed", variant: "default" });
     } catch {
       toast({ title: "Couldn't remove sale", variant: "error" });
     }
@@ -109,23 +109,23 @@ export function SalesList() {
             {isOpen && (
               <div className="divide-y divide-dashed divide-line border-t border-line">
                 {items.map((sale) => {
-                  const linkedExpense = sale.expenseId ? expenseMap.get(sale.expenseId) : undefined;
+                  const product = sale.productId ? productMap.get(sale.productId) : undefined;
                   return (
                     <div
                       key={sale.id}
                       className="flex items-center justify-between gap-3 px-5 py-2.5 text-sm hover:bg-primary/[0.02]"
                     >
                       <div className="flex min-w-0 flex-1 items-center gap-3">
-                        <span className="truncate text-ink">{sale.description}</span>
-                        {linkedExpense && (
+                        {product && (
                           <Badge variant="neutral" className="shrink-0 text-[10px]">
-                            {linkedExpense.description}
+                            {product.name}
                           </Badge>
                         )}
-                        {sale.quantitySold != null && (
-                          <span className="shrink-0 text-xs text-ink-faint">
-                            {sale.quantitySold} units
-                          </span>
+                        <span className="text-xs text-ink-faint">
+                          {sale.quantitySold} × {formatCurrency(sale.unitPrice)}
+                        </span>
+                        {sale.notes && (
+                          <span className="hidden sm:inline truncate text-ink-faint">· {sale.notes}</span>
                         )}
                       </div>
                       <span className="shrink-0 font-semibold text-ink">{formatCurrency(sale.amount)}</span>
@@ -133,8 +133,8 @@ export function SalesList() {
                         variant="ghost"
                         size="icon"
                         className="h-7 w-7 shrink-0 text-ink-faint hover:text-danger"
-                        onClick={() => handleDelete(sale.id, sale.description)}
-                        aria-label={`Delete ${sale.description}`}
+                        onClick={() => handleDelete(sale.id)}
+                        aria-label="Delete sale"
                       >
                         <Trash2 className="h-3.5 w-3.5" />
                       </Button>

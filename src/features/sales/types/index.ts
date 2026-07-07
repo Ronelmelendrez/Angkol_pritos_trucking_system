@@ -2,10 +2,11 @@ import type { BaseRecord } from "@/types";
 
 export interface Sale extends BaseRecord {
   date: string;
-  expenseId?: string;
-  description: string;
-  quantitySold?: number;
+  productId: string;
+  quantitySold: number;
+  unitPrice: number;
   amount: number;
+  notes?: string;
 }
 
 export type NewSale = Omit<Sale, "id" | "createdAt" | "updatedAt">;

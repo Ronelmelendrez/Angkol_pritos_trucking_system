@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { ErrorBoundary } from "@/components/layout/ErrorBoundary"
 import { useReports } from "@/features/reports/hooks/useReports"
 import { ExpensePieChart } from "@/features/reports/components/ExpensesPieChart"
@@ -7,57 +8,73 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Skeleton } from "@/components/ui/Skeleton"
 import { formatCurrency } from "@/utils/currency"
 import { useSales } from "@/features/sales/hooks/useSales"
-import { useExpenses } from "@/features/expenses/hooks/useExpenses"
+import { useProducts } from "@/features/products/hooks/useProducts"
+import type { RevenueByProduct } from "@/features/reports/types"
 
-function BatchPerformance() {
+function RevenueByProductCard() {
   const { data: sales = [] } = useSales();
-  const { data: expenses = [] } = useExpenses();
+  const { data: products = [] } = useProducts();
 
-  const salesByExpense = new Map<string, number>();
-  for (const sale of sales) {
-    if (!sale.expenseId) continue;
-    salesByExpense.set(sale.expenseId, (salesByExpense.get(sale.expenseId) ?? 0) + sale.amount);
-  }
+  const revenue = useMemo<RevenueByProduct[]>(() => {
+    const map = new Map<string, { total: number; quantity: number }>();
+    for (const sale of sales) {
+      const cur = map.get(sale.productId) ?? { total: 0, quantity: 0 };
+      cur.total += sale.amount;
+      cur.quantity += sale.quantitySold;
+      map.set(sale.productId, cur);
+    }
+    const productMap = new Map(products.map((p) => [p.id, p]));
+    return Array.from(map.entries())
+      .map(([productId, { total, quantity }]) => ({
+        productId,
+        productName: productMap.get(productId)?.name ?? "Unknown",
+        total,
+        quantity,
+      }))
+      .sort((a, b) => b.total - a.total);
+  }, [sales, products]);
 
-  const batches = expenses
-    .map((exp) => {
-      const recovered = salesByExpense.get(exp.id) ?? 0;
-      return { ...exp, recovered, margin: exp.amount > 0 ? (recovered - exp.amount) / exp.amount : 0 };
-    })
-    .filter((b) => b.recovered > 0)
-    .sort((a, b) => b.margin - a.margin);
-
-  if (batches.length === 0) {
+  if (revenue.length === 0) {
     return (
       <Card>
         <CardHeader>
-          <CardTitle className="text-base font-semibold">Batch performance</CardTitle>
-          <CardDescription>No sales linked to expenses yet</CardDescription>
+          <CardTitle className="text-base font-semibold">Revenue by product</CardTitle>
+          <CardDescription>No sales data yet</CardDescription>
         </CardHeader>
       </Card>
     );
   }
 
+  const grandTotal = revenue.reduce((s, r) => s + r.total, 0);
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-base font-semibold">Batch performance</CardTitle>
-        <CardDescription>Best & worst performing batches by margin</CardDescription>
+        <CardTitle className="text-base font-semibold">Revenue by product</CardTitle>
+        <CardDescription>{formatCurrency(grandTotal)} total</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-3">
-        {batches.slice(0, 5).map((b) => (
-          <div key={b.id} className="flex items-center justify-between text-sm">
-            <div className="min-w-0 flex-1 truncate">
-              <span className="text-ink">{b.description}</span>
-              <span className="ml-2 text-xs text-ink-faint">
-                {formatCurrency(b.recovered)} / {formatCurrency(b.amount)}
-              </span>
+      <CardContent className="space-y-4">
+        {revenue.map((r) => {
+          const share = grandTotal > 0 ? (r.total / grandTotal) * 100 : 0;
+          return (
+            <div key={r.productId} className="space-y-1">
+              <div className="flex items-center justify-between text-sm">
+                <span className="font-medium text-ink">{r.productName}</span>
+                <span className="font-semibold text-ink">{formatCurrency(r.total)}</span>
+              </div>
+              <div className="flex items-center gap-2 text-xs text-ink-faint">
+                <div className="h-2 flex-1 overflow-hidden rounded-full bg-ink/5">
+                  <div
+                    className="h-full rounded-full bg-accent transition-all"
+                    style={{ width: `${share}%` }}
+                  />
+                </div>
+                <span className="shrink-0 w-10 text-right">{share.toFixed(0)}%</span>
+              </div>
+              <p className="text-xs text-ink-faint">{r.quantity} units sold</p>
             </div>
-            <span className={`shrink-0 font-semibold ${b.margin >= 0 ? "text-success" : "text-danger"}`}>
-              {(b.margin * 100).toFixed(0)}%
-            </span>
-          </div>
-        ))}
+          );
+        })}
       </CardContent>
     </Card>
   );
@@ -84,13 +101,14 @@ function ReportsContent() {
         </div>
       )}
 
-      <BatchPerformance />
-
-      {isLoading ? (
-        <Skeleton className="h-48 w-full" />
-      ) : (
-        <PayrollSummary rows={payroll} />
-      )}
+      <div className="grid gap-4 md:grid-cols-2">
+        <RevenueByProductCard />
+        {isLoading ? (
+          <Skeleton className="h-48 w-full" />
+        ) : (
+          <PayrollSummary rows={payroll} />
+        )}
+      </div>
     </div>
   );
 }

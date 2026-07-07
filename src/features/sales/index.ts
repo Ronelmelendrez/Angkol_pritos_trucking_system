@@ -1,9 +1,7 @@
 export { SaleForm } from "./components/SaleForm";
 export { SalesList } from "./components/SalesList";
-export { BatchProgress } from "./components/BatchProgress";
 export {
   useSales,
-  useSalesByExpense,
   useAddSale,
   useUpdateSale,
   useDeleteSale,

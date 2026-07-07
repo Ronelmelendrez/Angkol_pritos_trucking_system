@@ -12,6 +12,13 @@ export interface DailyProfitPoint {
   profit: number;
 }
 
+export interface RevenueByProduct {
+  productId: string;
+  productName: string;
+  total: number;
+  quantity: number;
+}
+
 export interface PayrollRow {
   employeeId: string;
   name: string;

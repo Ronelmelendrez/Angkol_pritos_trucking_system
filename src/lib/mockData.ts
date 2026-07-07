@@ -3,6 +3,7 @@ import type { CashAdvance } from "@/features/advances/types";
 import type { Employee } from "@/features/employees/types";
 import type { Expense } from "@/features/expenses/types";
 import type { Loan, Repayment } from "@/features/loans/types";
+import type { Product } from "@/features/products/types";
 import type { Sale } from "@/features/sales/types";
 import type { BaseRecord } from "@/types";
 import { ADVANCE_STATUSES, EXPENSE_CATEGORIES, LOAN_STATUSES, PAYMENT_METHODS } from "@/lib/constants";
@@ -226,41 +227,76 @@ const repaymentSeed: Repayment[] = [
   },
 ];
 
+const productSeed: Product[] = [
+  {
+    id: "prod_1",
+    name: "Fried Chicken",
+    defaultPrice: 180,
+    unit: "order",
+    isActive: true,
+    createdAt: now,
+    updatedAt: now,
+  },
+  {
+    id: "prod_2",
+    name: "Lechon Manok",
+    defaultPrice: 450,
+    unit: "whole",
+    isActive: true,
+    createdAt: now,
+    updatedAt: now,
+  },
+  {
+    id: "prod_3",
+    name: "Soft Drinks",
+    defaultPrice: 25,
+    unit: "bottle",
+    isActive: true,
+    createdAt: now,
+    updatedAt: now,
+  },
+];
+
 const saleSeed: Sale[] = [
   {
     id: "sale_1",
     date: "2026-07-04",
-    expenseId: "exp_2",
-    description: "Fried chicken",
-    quantitySold: 15,
-    amount: 4500,
+    productId: "prod_1",
+    quantitySold: 12,
+    unitPrice: 180,
+    amount: 2160,
+    notes: "Lunch rush",
     createdAt: now,
     updatedAt: now,
   },
   {
     id: "sale_2",
     date: "2026-07-04",
-    expenseId: "exp_2",
-    description: "Lechon manok",
-    quantitySold: 5,
-    amount: 2500,
+    productId: "prod_2",
+    quantitySold: 3,
+    unitPrice: 450,
+    amount: 1350,
     createdAt: now,
     updatedAt: now,
   },
   {
     id: "sale_3",
     date: "2026-07-04",
-    description: "Walk-in cold drinks",
-    amount: 800,
+    productId: "prod_3",
+    quantitySold: 10,
+    unitPrice: 25,
+    amount: 250,
+    notes: "Walk-in",
     createdAt: now,
     updatedAt: now,
   },
   {
     id: "sale_4",
     date: "2026-07-03",
-    expenseId: "exp_1",
-    description: "Trucking fee collected",
-    amount: 1200,
+    productId: "prod_1",
+    quantitySold: 8,
+    unitPrice: 180,
+    amount: 1440,
     createdAt: now,
     updatedAt: now,
   },
@@ -272,4 +308,5 @@ export const expensesTable = createTable(expenseSeed);
 export const advancesTable = createTable(advanceSeed);
 export const loansTable = createTable(loanSeed);
 export const repaymentsTable = createTable(repaymentSeed);
+export const productsTable = createTable(productSeed);
 export const salesTable = createTable(saleSeed);

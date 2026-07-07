@@ -4,6 +4,7 @@ import { ProtectedRoute } from "@/components/layout/ProtectedRoute"
 import { LoginPage } from "@/app/routes/pages/LoginPage"
 import { DashboardPage } from "@/app/routes/pages/DashboardPage"
 import { SalesPage } from "@/app/routes/pages/SalesPage"
+import { ProductsPage } from "@/app/routes/pages/ProductsPage"
 import { ExpensesPage } from "@/app/routes/pages/ExpensesPage"
 import { EmployeesPage } from "@/app/routes/pages/EmployeesPage"
 import { AttendancePage } from "@/app/routes/pages/AttendancePage"
@@ -26,6 +27,7 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <DashboardPage /> },
       { path: "sales", element: <SalesPage /> },
+      { path: "products", element: <ProductsPage /> },
       { path: "expenses", element: <ExpensesPage /> },
       { path: "employees", element: <EmployeesPage /> },
       { path: "attendance", element: <AttendancePage /> },

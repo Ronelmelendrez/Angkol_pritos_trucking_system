@@ -14,14 +14,6 @@ export function useSales() {
   });
 }
 
-export function useSalesByExpense(expenseId: string | undefined) {
-  return useQuery({
-    queryKey: [...SALES_KEY, "byExpense", expenseId],
-    queryFn: () => salesTable.list().filter((s) => s.expenseId === expenseId),
-    enabled: !!expenseId,
-  });
-}
-
 export function useAddSale() {
   const queryClient = useQueryClient();
   return useMutation({

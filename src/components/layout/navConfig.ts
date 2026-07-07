@@ -2,6 +2,7 @@ import {
   LayoutDashboard,
   Receipt,
   ShoppingCart,
+  Package,
   Users,
   Clock,
   Wallet,
@@ -19,6 +20,7 @@ export interface NavItem {
 export const NAV_ITEMS: NavItem[] = [
   { path: "/", label: "Dashboard", icon: LayoutDashboard },
   { path: "/sales", label: "Sales", icon: ShoppingCart },
+  { path: "/products", label: "Products", icon: Package },
   { path: "/expenses", label: "Expenses", icon: Receipt },
   { path: "/employees", label: "Employees", icon: Users },
   { path: "/attendance", label: "Attendance", icon: Clock },
