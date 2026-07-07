@@ -118,7 +118,7 @@ export function SaleForm({ onDone }: Props) {
       <div className="grid grid-cols-3 gap-4">
         <div>
           <Label htmlFor="sale-amount">Total sales (₱)</Label>
-          <Input id="sale-amount" type="number" step="0.01" min="0" value={amount} onChange={onAmountChange} />
+          <Input id="sale-amount" type="number" step="0.01" min="0" value={amount || ""} onChange={onAmountChange} placeholder="0" />
           {errors.amount && <p className="mt-1 text-xs text-danger">{errors.amount.message}</p>}
         </div>
         <div>
@@ -127,7 +127,7 @@ export function SaleForm({ onDone }: Props) {
         </div>
         <div>
           <Label htmlFor="sale-qty">Quantity</Label>
-          <Input id="sale-qty" type="number" step="0.01" min="0" value={quantitySold} onChange={onQtyChange} />
+          <Input id="sale-qty" type="number" step="0.01" min="0" value={quantitySold || ""} onChange={onQtyChange} placeholder="0" />
           {errors.quantitySold && <p className="mt-1 text-xs text-danger">{errors.quantitySold.message}</p>}
         </div>
       </div>
