@@ -60,9 +60,9 @@ export type ProductFormValues = z.infer<typeof productSchema>;
 export const saleSchema = z.object({
   date: z.string().min(1, "Date is required"),
   productId: z.string().min(1, "Choose a product"),
-  quantitySold: z.coerce.number().positive("Qty must be greater than 0"),
-  unitPrice: z.coerce.number().positive("Price must be greater than ₱0"),
-  amount: z.coerce.number().positive("Amount must be greater than ₱0"),
+  quantitySold: z.number().positive("Qty must be greater than 0"),
+  unitPrice: z.number().positive("Price must be greater than ₱0"),
+  amount: z.number().positive("Amount must be greater than ₱0"),
   notes: z.string().optional(),
 });
 export type SaleFormValues = z.infer<typeof saleSchema>;
