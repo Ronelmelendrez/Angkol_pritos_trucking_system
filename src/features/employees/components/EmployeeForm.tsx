@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Label } from "@/components/ui/Label";
 import { Checkbox } from "@/components/ui/Checkbox";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/Select";
 import { useAddEmployee, useUpdateEmployee } from "../hooks/useEmployees";
 import { useToast } from "@/components/ui/useToast";
 import { todayISO } from "@/utils/date";
@@ -35,6 +36,7 @@ export function EmployeeForm({ employee, onDone }: Props) {
       hourlyRate: employee?.hourlyRate ?? 60,
       hireDate: employee?.hireDate ?? todayISO(),
       isActive: employee?.isActive ?? true,
+      payFrequency: employee?.payFrequency ?? "semi_monthly",
     },
   });
 
@@ -77,6 +79,26 @@ export function EmployeeForm({ employee, onDone }: Props) {
           <Label htmlFor="hireDate">Hire date</Label>
           <Input id="hireDate" type="date" {...register("hireDate")} />
         </div>
+      </div>
+      <div>
+        <Label htmlFor="payFrequency">Pay frequency</Label>
+        <Controller
+          control={control}
+          name="payFrequency"
+          render={({ field }) => (
+            <Select value={field.value} onValueChange={field.onChange}>
+              <SelectTrigger id="payFrequency">
+                <SelectValue placeholder="Select frequency" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="semi_monthly">Semi-monthly (1st\u201315th / 16th\u2013end)</SelectItem>
+                <SelectItem value="weekly">Weekly (Mon\u2013Sun)</SelectItem>
+                <SelectItem value="monthly">Monthly</SelectItem>
+              </SelectContent>
+            </Select>
+          )}
+        />
+        {errors.payFrequency && <p className="mt-1 text-xs text-danger">{errors.payFrequency.message}</p>}
       </div>
       <Controller
         control={control}

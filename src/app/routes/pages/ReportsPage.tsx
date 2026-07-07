@@ -91,7 +91,7 @@ function ReportsContent() {
   const dateFrom = `${month}-01`;
   const dateTo = `${month}-${new Date(year, monthNum, 0).getDate().toString().padStart(2, "0")}`;
 
-  const { categoryBreakdown, dailyProfit, payroll, filteredSales, isLoading } = useReports(dateFrom, dateTo);
+  const { categoryBreakdown, dailyProfit, filteredSales, isLoading } = useReports(dateFrom, dateTo);
 
   return (
     <div className="flex flex-col gap-5">
@@ -127,11 +127,7 @@ function ReportsContent() {
 
       <div className="grid gap-4 md:grid-cols-2">
         <RevenueByProductCard sales={filteredSales} />
-        {isLoading ? (
-          <Skeleton className="h-48 w-full" />
-        ) : (
-          <PayrollSummary rows={payroll} />
-        )}
+        <PayrollSummary />
       </div>
     </div>
   );
