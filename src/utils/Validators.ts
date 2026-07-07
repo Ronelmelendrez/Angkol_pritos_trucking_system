@@ -24,6 +24,7 @@ export const employeeSchema = z.object({
   hourlyRate: z.coerce.number().positive("Rate must be greater than ₱0"),
   hireDate: z.string().min(1, "Hire date is required"),
   isActive: z.boolean(),
+  payFrequency: z.enum(["weekly", "semi_monthly", "monthly"]),
 });
 export type EmployeeFormValues = z.infer<typeof employeeSchema>;
 
