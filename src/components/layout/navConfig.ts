@@ -7,6 +7,7 @@ import {
   Clock,
   Wallet,
   Banknote,
+  DollarSign,
   BarChart3,
   type LucideIcon,
 } from "lucide-react"
@@ -26,5 +27,6 @@ export const NAV_ITEMS: NavItem[] = [
   { path: "/attendance", label: "Attendance", icon: Clock },
   { path: "/advances", label: "Advances", icon: Wallet },
   { path: "/loans", label: "Loans", icon: Banknote },
+  { path: "/payroll", label: "Payroll", icon: DollarSign },
   { path: "/reports", label: "Reports", icon: BarChart3 },
 ]

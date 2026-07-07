@@ -8,6 +8,7 @@ import {
   CalendarClock,
   HandCoins,
   Landmark,
+  DollarSign,
   BarChart3,
   Drumstick,
   X,
@@ -24,6 +25,7 @@ const NAV_ITEMS = [
   { to: "/attendance", label: "Attendance", icon: CalendarClock },
   { to: "/advances", label: "Cash Advances", icon: HandCoins },
   { to: "/loans", label: "Loans (Utang)", icon: Landmark },
+  { to: "/payroll", label: "Payroll", icon: DollarSign },
   { to: "/reports", label: "Reports", icon: BarChart3 },
 ];
 
