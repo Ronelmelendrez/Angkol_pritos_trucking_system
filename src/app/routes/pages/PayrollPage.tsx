@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useEffect } from "react";
 import { subMonths } from "date-fns/subMonths";
 import { addMonths } from "date-fns/addMonths";
 import { addWeeks } from "date-fns/addWeeks";
@@ -20,7 +20,23 @@ import type { PayrollRunDraftRow } from "@/features/payroll/hooks/usePayrollRun"
 
 function PayrollContent() {
   const [frequency, setFrequency] = useState<PayFrequencyFilter>("semi_monthly");
-  const [referenceDate, setReferenceDate] = useState(new Date());
+  const [referenceDate, setReferenceDate] = useState(() => {
+    try {
+      const saved = sessionStorage.getItem("payrollReferenceDate");
+      if (saved) return new Date(saved);
+    } catch {
+      /* empty */
+    }
+    return new Date();
+  });
+
+  useEffect(() => {
+    try {
+      sessionStorage.setItem("payrollReferenceDate", referenceDate.toISOString());
+    } catch {
+      /* empty */
+    }
+  }, [referenceDate]);
   const isAll = frequency === "all";
 
   const { data: history = [] } = usePayrollHistory();
@@ -33,15 +49,13 @@ function PayrollContent() {
   const [payingIds, setPayingIds] = useState<string[]>([]);
 
   const payPayroll = usePayPayroll();
-  const currentPeriod = !isAll ? getCurrentPeriod(frequency, referenceDate) : null;
 
-  const advanceDate = useCallback((d: Date, dir: 1 | -1, freq?: PayFrequency) => {
-    const f = freq ?? (frequency === "all" ? undefined : frequency);
+  const advanceDate = useCallback((d: Date, dir: 1 | -1, freq: PayFrequency) => {
     const day = d.getDate();
     const month = d.getMonth();
     const year = d.getFullYear();
-    if (f === "weekly") return dir === 1 ? addWeeks(d, 1) : addWeeks(d, -1);
-    if (f === "semi_monthly") {
+    if (freq === "weekly") return dir === 1 ? addWeeks(d, 1) : addWeeks(d, -1);
+    if (freq === "semi_monthly") {
       if (dir === 1) {
         if (day <= 15) return new Date(year, month, 25);
         return new Date(year, month + 1, 8);
@@ -50,10 +64,10 @@ function PayrollContent() {
       return new Date(year, month, 8);
     }
     return dir === 1 ? addMonths(d, 1) : subMonths(d, 1);
-  }, [frequency]);
+  }, []);
 
   const handlePrev = useCallback(() => {
-    setReferenceDate((d) => advanceDate(d, -1, frequency === "all" ? undefined : (frequency as PayFrequency)));
+    setReferenceDate((d) => advanceDate(d, -1, frequency === "all" ? "monthly" : (frequency as PayFrequency)));
     setSelectedAdvances({});
     setLoanDeductions({});
     setAdjustments({});
@@ -61,7 +75,7 @@ function PayrollContent() {
   }, [advanceDate, frequency]);
 
   const handleNext = useCallback(() => {
-    setReferenceDate((d) => advanceDate(d, 1, frequency === "all" ? undefined : (frequency as PayFrequency)));
+    setReferenceDate((d) => advanceDate(d, 1, frequency === "all" ? "monthly" : (frequency as PayFrequency)));
     setSelectedAdvances({});
     setLoanDeductions({});
     setAdjustments({});
@@ -98,6 +112,8 @@ function PayrollContent() {
       setPayingIds((prev) => prev.filter((id) => id !== row.employeeId));
     }
   }, [payPayroll, selectedAdvances, loanDeductions, advanceDate]);
+
+  const currentPeriod = !isAll ? getCurrentPeriod(frequency, referenceDate) : null;
 
   const paidEmployeeIds = useMemo(() => {
     if (isAll) return [];
