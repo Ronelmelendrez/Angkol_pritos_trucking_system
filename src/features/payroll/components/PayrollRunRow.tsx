@@ -20,6 +20,12 @@ interface Props {
   isPaid: boolean;
 }
 
+function periodDays(periodStart: string, periodEnd: string) {
+  const start = new Date(periodStart + "T00:00:00");
+  const end = new Date(periodEnd + "T00:00:00");
+  return Math.round((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+}
+
 export function PayrollRunRow({
   row,
   selectedAdvanceIds,
@@ -49,7 +55,7 @@ export function PayrollRunRow({
               <span className="font-semibold text-ink">{row.name}</span>
               <Badge variant="neutral">{row.payFrequency === "semi_monthly" ? "Semi-monthly" : row.payFrequency === "weekly" ? "Weekly" : "Monthly"}</Badge>
             </div>
-            <p className="mt-0.5 text-xs text-ink-faint">{row.daysWorked} days \u00d7 {formatCurrency(row.dailyRate)}/day</p>
+            <p className="mt-0.5 text-xs text-ink-faint">{row.daysWorked} / {periodDays(row.periodStart, row.periodEnd)} days {formatCurrency(row.dailyRate)}/day</p>
           </div>
           <div className="text-right">
             <p className="text-sm text-ink-faint">Gross</p>
