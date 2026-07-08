@@ -1,4 +1,12 @@
 import type { BaseRecord } from "@/types";
+import type { PayFrequency } from "@/features/payroll/utils/payPeriods";
+
+export interface PaydayRule {
+  frequency: PayFrequency;
+  offsetDays: number;
+  weekendAdjustment: "none" | "move_earlier" | "move_later";
+  fixedWeekday?: 0 | 1 | 2 | 3 | 4 | 5 | 6;
+}
 
 export interface PayRuleSettings {
   id: string;
@@ -13,6 +21,7 @@ export interface PayRuleSettings {
   holidayRateMultiplier: number;
   nightDifferentialPercent: number;
   roundHoursTo: 0 | 0.25 | 0.5;
+  paydayRules: PaydayRule[];
   createdAt: string;
   updatedAt: string;
 }

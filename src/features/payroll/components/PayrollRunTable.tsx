@@ -12,7 +12,7 @@ interface Props {
   onLoanDeductionChange: (employeeId: string, val: number) => void;
   onAdjustmentChange: (employeeId: string, val: number) => void;
   onAdjustmentNoteChange: (employeeId: string, note: string) => void;
-  onPay: (row: PayrollRunDraftRow) => void;
+  onPay: (row: PayrollRunDraftRow, paidAt: string) => void;
   payingIds: string[];
 }
 
@@ -47,7 +47,7 @@ export function PayrollRunTable({
           onLoanDeductionChange={(val) => onLoanDeductionChange(row.employeeId, val)}
           onAdjustmentChange={(val) => onAdjustmentChange(row.employeeId, val)}
           onAdjustmentNoteChange={(note) => onAdjustmentNoteChange(row.employeeId, note)}
-          onPay={() => onPay(row)}
+          onPay={(paidAt) => onPay(row, paidAt)}
           isPaying={payingIds.includes(row.employeeId)}
           isPaid={paidEmployeeIds.includes(row.employeeId)}
         />

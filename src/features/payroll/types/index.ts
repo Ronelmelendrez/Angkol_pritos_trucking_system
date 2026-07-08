@@ -12,7 +12,7 @@ export interface PayrollRun extends BaseRecord {
   adjustments: number;
   adjustmentNote?: string;
   netPay: number;
-  status: "draft" | "paid";
+  status: "upcoming" | "ready" | "paid";
   paidAt?: string;
   advanceIds: string[];
   loanId?: string;

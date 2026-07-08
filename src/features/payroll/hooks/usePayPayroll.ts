@@ -14,7 +14,7 @@ export function usePayPayroll() {
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: async ({ row, advanceIds, loanRepayAmount }: { row: PayrollRunDraftRow; advanceIds: string[]; loanRepayAmount: number }) => {
+    mutationFn: async ({ row, advanceIds, loanRepayAmount, paidAt }: { row: PayrollRunDraftRow; advanceIds: string[]; loanRepayAmount: number; paidAt: string }) => {
       const advanceTotal = advanceIds.reduce((s, id) => {
         const a = row.pendingAdvances.find((pa) => pa.id === id);
         return s + (a?.amount ?? 0);
@@ -35,7 +35,7 @@ export function usePayPayroll() {
         adjustmentNote: row.adjustmentNote || undefined,
         netPay: Math.max(0, netPay),
         status: "paid",
-        paidAt: new Date().toISOString(),
+        paidAt,
         advanceIds,
         ...(row.loanId && loanRepayAmount > 0 ? { loanId: row.loanId } : {}),
       });

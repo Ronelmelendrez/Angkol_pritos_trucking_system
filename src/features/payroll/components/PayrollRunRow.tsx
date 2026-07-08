@@ -6,6 +6,7 @@ import { Checkbox } from "@/components/ui/Checkbox";
 import { Badge } from "@/components/ui/Badge";
 import { formatCurrency } from "@/utils/currency";
 import { PayslipDialog } from "./PayslipDialog";
+import { PayConfirmationDialog } from "./PayConfirmationDialog";
 import type { PayrollRunDraftRow } from "../hooks/usePayrollRun";
 
 interface Props {
@@ -15,7 +16,7 @@ interface Props {
   onLoanDeductionChange: (val: number) => void;
   onAdjustmentChange: (val: number) => void;
   onAdjustmentNoteChange: (note: string) => void;
-  onPay: () => void;
+  onPay: (paidAt: string) => void;
   isPaying: boolean;
   isPaid: boolean;
 }
@@ -38,6 +39,7 @@ export function PayrollRunRow({
   isPaid,
 }: Props) {
   const [showPayslip, setShowPayslip] = useState(false);
+  const [showConfirmPay, setShowConfirmPay] = useState(false);
 
   const advanceTotal = selectedAdvanceIds.reduce((s, id) => {
     const a = row.pendingAdvances.find((pa) => pa.id === id);
@@ -135,7 +137,7 @@ export function PayrollRunRow({
             {isPaid ? (
               <Badge variant="success">Paid</Badge>
             ) : (
-              <Button size="sm" onClick={onPay} disabled={isPaying}>
+              <Button size="sm" onClick={() => setShowConfirmPay(true)} disabled={isPaying}>
                 <CheckCircle2 className="h-4 w-4" /> {isPaying ? "Saving..." : "Mark as paid"}
               </Button>
             )}
@@ -149,6 +151,16 @@ export function PayrollRunRow({
         row={row}
         advanceIds={selectedAdvanceIds}
         loanRepayAmount={row.loanDeduction}
+      />
+      <PayConfirmationDialog
+        open={showConfirmPay}
+        onOpenChange={setShowConfirmPay}
+        row={row}
+        onConfirm={(paidAt) => {
+          onPay(paidAt);
+          setShowConfirmPay(false);
+        }}
+        isPaying={isPaying}
       />
     </>
   );

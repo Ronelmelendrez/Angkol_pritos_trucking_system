@@ -336,6 +336,11 @@ const payRuleSettingsSeed: PayRuleSettings[] = [
     holidayRateMultiplier: 2.0,
     nightDifferentialPercent: 10,
     roundHoursTo: 0.25,
+    paydayRules: [
+      { frequency: "weekly", offsetDays: 0, weekendAdjustment: "none", fixedWeekday: 5 },
+      { frequency: "semi_monthly", offsetDays: 5, weekendAdjustment: "move_earlier" },
+      { frequency: "monthly", offsetDays: 5, weekendAdjustment: "move_earlier" },
+    ],
     createdAt: now,
     updatedAt: now,
   },

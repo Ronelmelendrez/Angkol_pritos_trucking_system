@@ -1,6 +1,8 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { subMonths } from "date-fns/subMonths";
 import { addMonths } from "date-fns/addMonths";
+import { format } from "date-fns/format";
+import { Clock, AlertTriangle, History } from "lucide-react";
 import { ErrorBoundary } from "@/components/layout/ErrorBoundary";
 import { PayPeriodPicker } from "@/features/payroll/components/PayPeriodPicker";
 import { PayrollRunTable } from "@/features/payroll/components/PayrollRunTable";
@@ -8,6 +10,10 @@ import { PayrollHistory } from "@/features/payroll/components/PayrollHistory";
 import { usePayPayroll } from "@/features/payroll/hooks/usePayPayroll";
 import { usePayrollHistory } from "@/features/payroll/hooks/usePayrollHistory";
 import { getCurrentPeriod } from "@/features/payroll/utils/payPeriods";
+import { getScheduledPayday } from "@/features/payroll/utils/paydays";
+import { usePayRuleSettings } from "@/features/settings/hooks/usePayRuleSettings";
+import { formatCurrency } from "@/utils/currency";
+import { Badge } from "@/components/ui/Badge";
 import type { PayFrequency } from "@/features/payroll/utils/payPeriods";
 import type { PayrollRunDraftRow } from "@/features/payroll/hooks/usePayrollRun";
 
@@ -16,6 +22,7 @@ function PayrollContent() {
   const [referenceDate, setReferenceDate] = useState(new Date());
 
   const { data: history = [] } = usePayrollHistory();
+  const { data: settings } = usePayRuleSettings();
 
   const paidEmployeeIds = history
     .filter((r) => {
@@ -62,18 +69,27 @@ function PayrollContent() {
     });
   }, []);
 
-  const handlePay = useCallback(async (row: PayrollRunDraftRow) => {
+  const handlePay = useCallback(async (row: PayrollRunDraftRow, paidAt: string) => {
     setPayingIds((prev) => [...prev, row.employeeId]);
     try {
       await payPayroll.mutateAsync({
         row,
         advanceIds: selectedAdvances[row.employeeId] ?? [],
         loanRepayAmount: loanDeductions[row.employeeId] ?? 0,
+        paidAt,
       });
     } finally {
       setPayingIds((prev) => prev.filter((id) => id !== row.employeeId));
     }
   }, [payPayroll, selectedAdvances, loanDeductions]);
+
+  const readyRuns = useMemo(() => {
+    return history
+      .filter((r) => r.status === "ready")
+      .sort((a, b) => a.periodStart.localeCompare(b.periodStart));
+  }, [history]);
+
+  const todayStr = new Date().toISOString().slice(0, 10);
 
   return (
     <div className="flex flex-col gap-5">
@@ -89,8 +105,13 @@ function PayrollContent() {
         />
       </div>
 
+      {/* Upcoming section */}
       <div>
-        <h3 className="mb-3 text-sm font-semibold text-ink">Current period</h3>
+        <div className="mb-3 flex items-center gap-2">
+          <Clock className="h-4 w-4 text-ink-faint" />
+          <h3 className="text-sm font-semibold text-ink">Upcoming</h3>
+          <Badge variant="neutral">{frequency === "semi_monthly" ? "Semi-monthly" : frequency === "weekly" ? "Weekly" : "Monthly"} period</Badge>
+        </div>
         <PayrollRunTable
           referenceDate={referenceDate}
           paidEmployeeIds={paidEmployeeIds}
@@ -107,6 +128,47 @@ function PayrollContent() {
         />
       </div>
 
+      {/* Ready to pay section */}
+      {readyRuns.length > 0 && (
+        <div>
+          <div className="mb-3 flex items-center gap-2">
+            <AlertTriangle className="h-4 w-4 text-warning" />
+            <h3 className="text-sm font-semibold text-ink">Ready to pay</h3>
+            <Badge variant="warning">{readyRuns.length} run{readyRuns.length > 1 ? "s" : ""}</Badge>
+          </div>
+          <div className="space-y-2">
+            {readyRuns.map((run) => {
+              const rule = settings?.paydayRules?.find((r) => r.frequency === "semi_monthly");
+              const period = getCurrentPeriod("semi_monthly", new Date(run.periodStart + "T00:00:00"));
+              const scheduledPayday = rule ? getScheduledPayday(period, rule) : run.periodEnd;
+              const isOverdue = scheduledPayday < todayStr;
+              const daysOverdue = isOverdue ? Math.ceil((new Date(todayStr).getTime() - new Date(scheduledPayday).getTime()) / (1000 * 60 * 60 * 24)) : 0;
+
+              return (
+                <div key={run.id} className="rounded-xl border border-line bg-surface p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <span className="font-medium text-ink">{run.employeeName}</span>
+                      <p className="text-xs text-ink-faint">{format(new Date(run.periodStart + "T00:00:00"), "MMM d")} - {format(new Date(run.periodEnd + "T00:00:00"), "MMM d, yy")}</p>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="text-right">
+                        <p className="text-sm text-ink-faint">Net pay</p>
+                        <p className="font-bold text-ink">{formatCurrency(run.netPay)}</p>
+                      </div>
+                      {isOverdue && (
+                        <Badge variant="warning">{daysOverdue}d overdue</Badge>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Paid history */}
       <PayrollHistory />
     </div>
   );
