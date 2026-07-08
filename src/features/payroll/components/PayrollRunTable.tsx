@@ -1,9 +1,12 @@
+import { useMemo } from "react";
 import { usePayrollRun, type PayrollRunDraftRow } from "../hooks/usePayrollRun";
 import { PayrollRunRow } from "./PayrollRunRow";
+import type { PayFrequency } from "../utils/payPeriods";
 
 interface Props {
   referenceDate: Date;
   paidEmployeeIds: string[];
+  frequencyFilter?: PayFrequency;
   selectedAdvances: Record<string, string[]>;
   loanDeductions: Record<string, number>;
   adjustments: Record<string, number>;
@@ -29,8 +32,14 @@ export function PayrollRunTable({
   onAdjustmentNoteChange,
   onPay,
   payingIds,
+  frequencyFilter,
 }: Props) {
-  const rows = usePayrollRun(referenceDate);
+  const allRows = usePayrollRun(referenceDate);
+
+  const rows = useMemo(() => {
+    if (!frequencyFilter) return allRows;
+    return allRows.filter((r) => r.payFrequency === frequencyFilter);
+  }, [allRows, frequencyFilter]);
 
   if (rows.length === 0) {
     return <p className="py-8 text-center text-sm text-ink-faint">No active employees to show.</p>;

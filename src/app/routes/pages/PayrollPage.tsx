@@ -14,7 +14,7 @@ import { getScheduledPayday } from "@/features/payroll/utils/paydays";
 import { usePayRuleSettings } from "@/features/settings/hooks/usePayRuleSettings";
 import { formatCurrency } from "@/utils/currency";
 import { Badge } from "@/components/ui/Badge";
-import type { PayFrequencyFilter } from "@/features/payroll/utils/payPeriods";
+import type { PayFrequency, PayFrequencyFilter } from "@/features/payroll/utils/payPeriods";
 import type { PayrollRunDraftRow } from "@/features/payroll/hooks/usePayrollRun";
 
 function PayrollContent() {
@@ -122,6 +122,7 @@ function PayrollContent() {
         <PayrollRunTable
           referenceDate={referenceDate}
           paidEmployeeIds={paidEmployeeIds}
+          frequencyFilter={isAll ? undefined : (frequency as PayFrequency)}
           selectedAdvances={selectedAdvances}
           loanDeductions={loanDeductions}
           adjustments={adjustments}
