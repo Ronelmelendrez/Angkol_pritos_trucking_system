@@ -33,7 +33,7 @@ export function EmployeeForm({ employee, onDone }: Props) {
     defaultValues: {
       name: employee?.name ?? "",
       phone: employee?.phone ?? "",
-      hourlyRate: employee?.hourlyRate ?? 60,
+      dailyRate: employee?.dailyRate ?? 500,
       hireDate: employee?.hireDate ?? todayISO(),
       isActive: employee?.isActive ?? true,
       payFrequency: employee?.payFrequency ?? "semi_monthly",
@@ -71,9 +71,9 @@ export function EmployeeForm({ employee, onDone }: Props) {
       </div>
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <Label htmlFor="hourlyRate">Hourly rate (₱)</Label>
-          <Input id="hourlyRate" type="number" step="0.01" min="0" {...register("hourlyRate")} />
-          {errors.hourlyRate && <p className="mt-1 text-xs text-danger">{errors.hourlyRate.message}</p>}
+          <Label htmlFor="dailyRate">Daily rate (₱)</Label>
+          <Input id="dailyRate" type="number" step="0.01" min="0" {...register("dailyRate")} />
+          {errors.dailyRate && <p className="mt-1 text-xs text-danger">{errors.dailyRate.message}</p>}
         </div>
         <div>
           <Label htmlFor="hireDate">Hire date</Label>

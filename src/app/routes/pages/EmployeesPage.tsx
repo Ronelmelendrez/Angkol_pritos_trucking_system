@@ -72,6 +72,7 @@ export function EmployeesPage() {
         employee={selected}
         open={!!selected}
         onOpenChange={(open) => { if (!open) setSelected(null); }}
+        onEdit={openEdit}
       />
     </Card>
   );

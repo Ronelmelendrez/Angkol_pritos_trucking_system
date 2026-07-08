@@ -21,7 +21,7 @@ export const employeeSchema = z.object({
     .string()
     .min(7, "Enter a valid phone number")
     .regex(/^[0-9+\-\s]+$/, "Digits only please"),
-  hourlyRate: z.coerce.number().positive("Rate must be greater than ₱0"),
+  dailyRate: z.coerce.number().positive("Rate must be greater than ₱0"),
   hireDate: z.string().min(1, "Hire date is required"),
   isActive: z.boolean(),
   payFrequency: z.enum(["weekly", "semi_monthly", "monthly"]),

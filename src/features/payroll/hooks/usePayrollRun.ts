@@ -5,6 +5,8 @@ import { useAdvances } from "@/features/advances/hooks/useAdvances";
 import { useLoans } from "@/features/loans/hooks/useLoans";
 import { getCurrentPeriod, type PayFrequency } from "../utils/payPeriods";
 
+const HOURS_PER_DAY = 8;
+
 export interface PayrollRunDraftRow {
   employeeId: string;
   name: string;
@@ -13,7 +15,8 @@ export interface PayrollRunDraftRow {
   periodEnd: string;
   periodLabel: string;
   hoursWorked: number;
-  hourlyRate: number;
+  daysWorked: number;
+  dailyRate: number;
   grossPay: number;
   pendingAdvances: { id: string; amount: number; reason?: string }[];
   advanceDeductions: number;
@@ -41,7 +44,8 @@ export function usePayrollRun(referenceDate: Date = new Date()) {
         .filter((a) => a.employeeId === emp.id && a.hoursWorked != null && a.date >= period.start && a.date <= period.end)
         .reduce((sum, a) => sum + (a.hoursWorked ?? 0), 0);
 
-      const grossPay = hoursWorked * emp.hourlyRate;
+      const daysWorked = hoursWorked / HOURS_PER_DAY;
+      const grossPay = daysWorked * emp.dailyRate;
 
       const pendingAdvances = advances
         .filter((a) => a.employeeId === emp.id && a.status === "pending")
@@ -57,7 +61,8 @@ export function usePayrollRun(referenceDate: Date = new Date()) {
         periodEnd: period.end,
         periodLabel: period.label,
         hoursWorked: Math.round(hoursWorked * 100) / 100,
-        hourlyRate: emp.hourlyRate,
+        daysWorked: Math.round(daysWorked * 100) / 100,
+        dailyRate: emp.dailyRate,
         grossPay,
         pendingAdvances,
         advanceDeductions: pendingAdvances.reduce((s, a) => s + a.amount, 0),

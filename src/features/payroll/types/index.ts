@@ -5,7 +5,7 @@ export interface PayrollRun extends BaseRecord {
   periodStart: string;
   periodEnd: string;
   hoursWorked: number;
-  hourlyRate: number;
+  dailyRate: number;
   grossPay: number;
   advanceDeductions: number;
   loanDeductions: number;

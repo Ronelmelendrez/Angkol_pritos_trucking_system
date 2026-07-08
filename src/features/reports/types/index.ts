@@ -23,7 +23,7 @@ export interface PayrollRow {
   employeeId: string;
   name: string;
   hoursWorked: number;
-  hourlyRate: number;
+  dailyRate: number;
   grossPay: number;
   pendingAdvances: number;
   netPay: number;

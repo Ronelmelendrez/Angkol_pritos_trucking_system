@@ -1,7 +1,8 @@
 import { useMemo } from "react";
-import { Phone, Wallet, Calendar, Clock, CircleDollarSign } from "lucide-react";
+import { Phone, Wallet, Calendar, Clock, CircleDollarSign, Pencil } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/Dialog";
 import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { useAttendance } from "@/features/attendance/hooks/useAttendance";
 import { useAdvances } from "@/features/advances/hooks/useAdvances";
@@ -14,6 +15,7 @@ interface Props {
   employee: Employee | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onEdit?: (employee: Employee) => void;
 }
 
 function initials(name: string) {
@@ -25,7 +27,7 @@ function initials(name: string) {
     .toUpperCase();
 }
 
-export function EmployeeDetailModal({ employee, open, onOpenChange }: Props) {
+export function EmployeeDetailModal({ employee, open, onOpenChange, onEdit }: Props) {
   const { data: attendance = [] } = useAttendance();
   const { data: advances = [] } = useAdvances();
 
@@ -69,6 +71,11 @@ export function EmployeeDetailModal({ employee, open, onOpenChange }: Props) {
                   </div>
                   <p className="text-sm text-ink-soft">Crew member since {formatDate(employee.hireDate)}</p>
                 </div>
+                {onEdit && (
+                  <Button variant="ghost" size="icon" className="ml-auto h-8 w-8 shrink-0 text-ink-faint" onClick={() => { onEdit(employee); onOpenChange(false); }}>
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                )}
               </div>
             </DialogHeader>
 
@@ -85,7 +92,7 @@ export function EmployeeDetailModal({ employee, open, onOpenChange }: Props) {
                   <Wallet className="h-3.5 w-3.5" />
                   Rate
                 </div>
-                <p className="text-sm font-medium text-ink">{formatCurrency(employee.hourlyRate)}/hr</p>
+                <p className="text-sm font-medium text-ink">{formatCurrency(employee.dailyRate)}/day</p>
               </Card>
               <Card className="p-3.5">
                 <div className="flex items-center gap-1.5 text-xs text-ink-soft mb-1">

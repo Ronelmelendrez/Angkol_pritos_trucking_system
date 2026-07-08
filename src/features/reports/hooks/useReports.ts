@@ -87,7 +87,7 @@ export function useReports(dateFrom?: string, dateTo?: string) {
         const hoursWorked = filteredAttendance
           .filter((a) => a.employeeId === emp.id && a.hoursWorked != null)
           .reduce((sum, a) => sum + (a.hoursWorked ?? 0), 0);
-        const grossPay = hoursWorked * emp.hourlyRate;
+        const grossPay = (hoursWorked / 8) * emp.dailyRate;
         const pendingAdvances = filteredAdvances
           .filter((a) => a.employeeId === emp.id && a.status === "pending")
           .reduce((sum, a) => sum + a.amount, 0);
@@ -95,7 +95,7 @@ export function useReports(dateFrom?: string, dateTo?: string) {
           employeeId: emp.id,
           name: emp.name,
           hoursWorked: Math.round(hoursWorked * 100) / 100,
-          hourlyRate: emp.hourlyRate,
+          dailyRate: emp.dailyRate,
           grossPay,
           pendingAdvances,
           netPay: grossPay - pendingAdvances,

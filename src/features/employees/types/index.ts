@@ -5,7 +5,7 @@ export type PayFrequency = "weekly" | "semi_monthly" | "monthly";
 export interface Employee extends BaseRecord {
   name: string;
   phone: string;
-  hourlyRate: number;
+  dailyRate: number;
   hireDate: string;
   isActive: boolean;
   avatarColor: string;

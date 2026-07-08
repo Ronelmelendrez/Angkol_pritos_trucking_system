@@ -36,12 +36,12 @@ export function PayslipDialog({ open, onOpenChange, row, advanceIds, loanRepayAm
           </div>
           <hr className="border-line" />
           <div className="flex justify-between">
-            <span className="text-ink-faint">Hours worked</span>
-            <span className="font-medium text-ink">{row.hoursWorked} hrs</span>
+            <span className="text-ink-faint">Days worked</span>
+            <span className="font-medium text-ink">{row.daysWorked} days</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-ink-faint">Hourly rate</span>
-            <span className="font-medium text-ink">{formatCurrency(row.hourlyRate)}/hr</span>
+            <span className="text-ink-faint">Daily rate</span>
+            <span className="font-medium text-ink">{formatCurrency(row.dailyRate)}/day</span>
           </div>
           <div className="flex justify-between">
             <span className="font-medium text-ink">Gross pay</span>

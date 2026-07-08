@@ -27,7 +27,7 @@ export function usePayPayroll() {
         periodStart: row.periodStart,
         periodEnd: row.periodEnd,
         hoursWorked: row.hoursWorked,
-        hourlyRate: row.hourlyRate,
+        dailyRate: row.dailyRate,
         grossPay: row.grossPay,
         advanceDeductions: advanceTotal,
         loanDeductions: loanRepayAmount,

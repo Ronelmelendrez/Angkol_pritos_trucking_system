@@ -49,7 +49,7 @@ export function PayrollRunRow({
               <span className="font-semibold text-ink">{row.name}</span>
               <Badge variant="neutral">{row.payFrequency === "semi_monthly" ? "Semi-monthly" : row.payFrequency === "weekly" ? "Weekly" : "Monthly"}</Badge>
             </div>
-            <p className="mt-0.5 text-xs text-ink-faint">{row.hoursWorked} hrs \u00d7 {formatCurrency(row.hourlyRate)}/hr</p>
+            <p className="mt-0.5 text-xs text-ink-faint">{row.daysWorked} days \u00d7 {formatCurrency(row.dailyRate)}/day</p>
           </div>
           <div className="text-right">
             <p className="text-sm text-ink-faint">Gross</p>

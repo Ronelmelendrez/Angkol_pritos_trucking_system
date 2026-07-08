@@ -73,7 +73,7 @@ export function EmployeeCard({ employee, onSelect, onEdit, onDelete }: Props) {
           <Phone className="h-3.5 w-3.5 text-ink-faint" /> {employee.phone}
         </div>
         <div className="flex items-center gap-2">
-          <Wallet className="h-3.5 w-3.5 text-ink-faint" /> {formatCurrency(employee.hourlyRate)}/hr
+          <Wallet className="h-3.5 w-3.5 text-ink-faint" /> {formatCurrency(employee.dailyRate)}/day
         </div>
         <div className="flex items-center gap-2">
           <Calendar className="h-3.5 w-3.5 text-ink-faint" /> Hired {formatDate(employee.hireDate)}
