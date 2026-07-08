@@ -10,6 +10,7 @@ import {
   Landmark,
   DollarSign,
   BarChart3,
+  Settings,
   Drumstick,
   X,
 } from "lucide-react";
@@ -27,6 +28,7 @@ const NAV_ITEMS = [
   { to: "/loans", label: "Loans (Utang)", icon: Landmark },
   { to: "/payroll", label: "Payroll", icon: DollarSign },
   { to: "/reports", label: "Reports", icon: BarChart3 },
+  { to: "/settings", label: "Settings", icon: Settings },
 ];
 
 export function Sidebar() {

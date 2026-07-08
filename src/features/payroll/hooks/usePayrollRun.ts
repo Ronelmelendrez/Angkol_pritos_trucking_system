@@ -3,9 +3,9 @@ import { useEmployees } from "@/features/employees/hooks/useEmployees";
 import { useAttendance } from "@/features/attendance/hooks/useAttendance";
 import { useAdvances } from "@/features/advances/hooks/useAdvances";
 import { useLoans } from "@/features/loans/hooks/useLoans";
+import { usePayRuleSettings, useAllEmployeePayOverrides } from "@/features/settings/hooks/usePayRuleSettings";
+import { resolvePayRules, computeGrossPay } from "@/features/settings/utils/resolvePayRules";
 import { getCurrentPeriod, type PayFrequency } from "../utils/payPeriods";
-
-const HOURS_PER_DAY = 8;
 
 export interface PayrollRunDraftRow {
   employeeId: string;
@@ -33,8 +33,12 @@ export function usePayrollRun(referenceDate: Date = new Date()) {
   const { data: attendance = [] } = useAttendance();
   const { data: advances = [] } = useAdvances();
   const { data: loans = [] } = useLoans();
+  const { data: globalSettings } = usePayRuleSettings();
+  const { data: allOverrides = [] } = useAllEmployeePayOverrides();
 
   return useMemo(() => {
+    if (!globalSettings) return [];
+
     const active = employees.filter((e) => e.isActive);
     return active.map((emp) => {
       const freq = emp.payFrequency ?? "semi_monthly";
@@ -46,13 +50,23 @@ export function usePayrollRun(referenceDate: Date = new Date()) {
 
       const hoursWorked = periodRecords.reduce((sum, a) => sum + (a.hoursWorked ?? 0), 0);
 
+      const override = allOverrides.find((o) => o.employeeId === emp.id);
+      const rules = resolvePayRules(globalSettings, override);
+
+      const grossPayInputs = periodRecords.map((a) => ({
+        hoursWorked: a.hoursWorked ?? 0,
+        shift: a.shift,
+        clockIn: a.clockIn,
+        clockOut: a.clockOut,
+      }));
+
+      const grossPay = computeGrossPay(grossPayInputs, emp.dailyRate, rules);
+
       const daysWorked = periodRecords.reduce((sum, a) => {
         if (a.shift === "half") return sum + 0.5;
         if (a.shift === "full") return sum + 1;
-        return sum + (a.hoursWorked ?? 0) / HOURS_PER_DAY;
+        return sum + (a.hoursWorked ?? 0) / rules.standardHoursPerDay;
       }, 0);
-
-      const grossPay = daysWorked * emp.dailyRate;
 
       const pendingAdvances = advances
         .filter((a) => a.employeeId === emp.id && a.status === "pending")
@@ -81,5 +95,5 @@ export function usePayrollRun(referenceDate: Date = new Date()) {
         netPay: grossPay,
       };
     });
-  }, [employees, attendance, advances, loans, referenceDate]);
+  }, [employees, attendance, advances, loans, globalSettings, allOverrides, referenceDate]);
 }

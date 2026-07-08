@@ -7,6 +7,7 @@ import type { PayrollRun } from "@/features/payroll/types";
 import type { Product } from "@/features/products/types";
 import type { Sale } from "@/features/sales/types";
 import type { BaseRecord } from "@/types";
+import type { PayRuleSettings, EmployeePayOverride } from "@/features/settings/types";
 import { ADVANCE_STATUSES, EXPENSE_CATEGORIES, LOAN_STATUSES, PAYMENT_METHODS } from "@/lib/constants";
 
 type RecordTable<T extends BaseRecord> = {
@@ -320,3 +321,26 @@ export const salesTable = createTable(saleSeed);
 
 const payrollRunSeed: PayrollRun[] = [];
 export const payrollRunsTable = createTable(payrollRunSeed);
+
+const payRuleSettingsSeed: PayRuleSettings[] = [
+  {
+    id: "global",
+    standardHoursPerDay: 8,
+    halfDayThresholdHours: 4,
+    halfDayRateMultiplier: 0.5,
+    overtimeRateMultiplier: 1.25,
+    lateGraceMinutes: 10,
+    lateDeductionPerMinute: 0,
+    absenceDeductionMode: "full_day",
+    restDayRateMultiplier: 1.3,
+    holidayRateMultiplier: 2.0,
+    nightDifferentialPercent: 10,
+    roundHoursTo: 0.25,
+    createdAt: now,
+    updatedAt: now,
+  },
+];
+export const payRuleSettingsTable = createTable(payRuleSettingsSeed);
+
+const employeePayOverrideSeed: EmployeePayOverride[] = [];
+export const employeePayOverridesTable = createTable(employeePayOverrideSeed);

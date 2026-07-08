@@ -10,6 +10,7 @@ const TITLES: Record<string, string> = {
   "/advances": "Cash Advances",
   "/loans": "Loans (Utang)",
   "/reports": "Reports",
+  "/settings": "Settings",
 };
 
 export function AppShell() {

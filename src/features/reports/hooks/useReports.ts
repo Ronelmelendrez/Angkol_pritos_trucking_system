@@ -5,6 +5,8 @@ import { useAttendance } from "@/features/attendance/hooks/useAttendance";
 import { useEmployees } from "@/features/employees/hooks/useEmployees";
 import { useAdvances } from "@/features/advances/hooks/useAdvances";
 import { useSales } from "@/features/sales/hooks/useSales";
+import { usePayRuleSettings } from "@/features/settings/hooks/usePayRuleSettings";
+import { resolvePayRules, computeGrossPay } from "@/features/settings/utils/resolvePayRules";
 import { CATEGORY_COLORS } from "@/lib/constants";
 import type { CategoryBreakdown, DailyProfitPoint, PayrollRow } from "../types";
 
@@ -14,6 +16,7 @@ export function useReports(dateFrom?: string, dateTo?: string) {
   const { data: employees = [], isLoading: employeesLoading } = useEmployees();
   const { data: advances = [], isLoading: advancesLoading } = useAdvances();
   const { data: sales = [], isLoading: salesLoading } = useSales();
+  const { data: globalSettings } = usePayRuleSettings();
 
   const isLoading = expensesLoading || attendanceLoading || employeesLoading || advancesLoading || salesLoading;
 
@@ -81,6 +84,7 @@ export function useReports(dateFrom?: string, dateTo?: string) {
   }, [filteredExpenses, filteredSales, effectiveFrom, effectiveTo]);
 
   const payroll = useMemo<PayrollRow[]>(() => {
+    if (!globalSettings) return [];
     return employees
       .filter((e) => e.isActive)
       .map((emp) => {
@@ -88,12 +92,14 @@ export function useReports(dateFrom?: string, dateTo?: string) {
           (a) => a.employeeId === emp.id && a.hoursWorked != null,
         );
         const hoursWorked = empAttendance.reduce((sum, a) => sum + (a.hoursWorked ?? 0), 0);
-        const daysWorked = empAttendance.reduce((sum, a) => {
-          if (a.shift === "half") return sum + 0.5;
-          if (a.shift === "full") return sum + 1;
-          return sum + (a.hoursWorked ?? 0) / 8;
-        }, 0);
-        const grossPay = daysWorked * emp.dailyRate;
+        const grossPayInputs = empAttendance.map((a) => ({
+          hoursWorked: a.hoursWorked ?? 0,
+          shift: a.shift,
+          clockIn: a.clockIn,
+          clockOut: a.clockOut,
+        }));
+        const rules = resolvePayRules(globalSettings);
+        const grossPay = computeGrossPay(grossPayInputs, emp.dailyRate, rules);
         const pendingAdvances = filteredAdvances
           .filter((a) => a.employeeId === emp.id && a.status === "pending")
           .reduce((sum, a) => sum + a.amount, 0);
@@ -107,7 +113,7 @@ export function useReports(dateFrom?: string, dateTo?: string) {
           netPay: grossPay - pendingAdvances,
         };
       });
-  }, [employees, filteredAttendance, filteredAdvances]);
+  }, [employees, filteredAttendance, filteredAdvances, globalSettings]);
 
   const totals = useMemo(() => {
     const totalExpenses = filteredExpenses.reduce((sum, e) => sum + e.amount, 0);

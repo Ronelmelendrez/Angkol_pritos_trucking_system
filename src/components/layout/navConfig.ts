@@ -9,6 +9,7 @@ import {
   Banknote,
   DollarSign,
   BarChart3,
+  Settings,
   type LucideIcon,
 } from "lucide-react"
 
@@ -29,4 +30,5 @@ export const NAV_ITEMS: NavItem[] = [
   { path: "/loans", label: "Loans", icon: Banknote },
   { path: "/payroll", label: "Payroll", icon: DollarSign },
   { path: "/reports", label: "Reports", icon: BarChart3 },
+  { path: "/settings", label: "Settings", icon: Settings },
 ]

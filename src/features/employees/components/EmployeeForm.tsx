@@ -7,9 +7,11 @@ import { Input } from "@/components/ui/Input";
 import { Label } from "@/components/ui/Label";
 import { Checkbox } from "@/components/ui/Checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/Select";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/Tabs";
 import { useAddEmployee, useUpdateEmployee } from "../hooks/useEmployees";
 import { useToast } from "@/components/ui/useToast";
 import { todayISO } from "@/utils/date";
+import { EmployeePayOverrideForm } from "./EmployeePayOverrideForm";
 import type { Employee } from "../types";
 
 interface Props {
@@ -57,8 +59,8 @@ export function EmployeeForm({ employee, onDone }: Props) {
     }
   }
 
-  return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+  const formFields = (
+    <>
       <div>
         <Label htmlFor="name">Full name</Label>
         <Input id="name" placeholder="e.g. Rosa Dimaculangan" {...register("name")} />
@@ -110,6 +112,27 @@ export function EmployeeForm({ employee, onDone }: Props) {
           </label>
         )}
       />
+    </>
+  );
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      {isEditing ? (
+        <Tabs defaultValue="details">
+          <TabsList className="mb-4">
+            <TabsTrigger value="details">Details</TabsTrigger>
+            <TabsTrigger value="payRules">Pay rules</TabsTrigger>
+          </TabsList>
+          <TabsContent value="details" className="space-y-4">
+            {formFields}
+          </TabsContent>
+          <TabsContent value="payRules">
+            <EmployeePayOverrideForm employee={employee} />
+          </TabsContent>
+        </Tabs>
+      ) : (
+        <div className="space-y-4">{formFields}</div>
+      )}
       <Button type="submit" className="w-full" size="lg" disabled={isPending}>
         {isPending && <Loader2 className="h-4 w-4 animate-spin" />}
         {isPending ? "Saving..." : isEditing ? "Save changes" : "Add employee"}
