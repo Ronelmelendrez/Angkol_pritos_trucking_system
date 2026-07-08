@@ -73,10 +73,11 @@ function PayrollContent() {
         loanRepayAmount: loanDeductions[row.employeeId] ?? 0,
         paidAt,
       });
+      handleNext();
     } finally {
       setPayingIds((prev) => prev.filter((id) => id !== row.employeeId));
     }
-  }, [payPayroll, selectedAdvances, loanDeductions]);
+  }, [payPayroll, selectedAdvances, loanDeductions, handleNext]);
 
   const paidEmployeeIds = useMemo(() => {
     if (isAll) return [];
