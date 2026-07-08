@@ -42,6 +42,7 @@ export function AttendanceLog({ records, employees, isLoading }: Props) {
           <tr>
             <th className="px-4 py-3 font-medium">Employee</th>
             <th className="px-4 py-3 font-medium">Date</th>
+            <th className="px-4 py-3 font-medium">Shift</th>
             <th className="px-4 py-3 font-medium">Clock in</th>
             <th className="px-4 py-3 font-medium">Clock out</th>
             <th className="px-4 py-3 text-right font-medium">Hours</th>
@@ -52,6 +53,15 @@ export function AttendanceLog({ records, employees, isLoading }: Props) {
             <tr key={r.id} className="bg-surface">
               <td className="px-4 py-3 font-medium text-ink">{employeeName(r.employeeId)}</td>
               <td className="px-4 py-3 text-ink-soft">{formatDate(r.date)}</td>
+              <td className="px-4 py-3">
+                {r.shift ? (
+                  <Badge variant={r.shift === "half" ? "warning" : "success"}>
+                    {r.shift === "half" ? "Half" : "Full"}
+                  </Badge>
+                ) : (
+                  <span className="text-ink-faint">—</span>
+                )}
+              </td>
               <td className="px-4 py-3 text-ink-soft">{formatTime(r.clockIn)}</td>
               <td className="px-4 py-3">
                 {r.clockOut ? (

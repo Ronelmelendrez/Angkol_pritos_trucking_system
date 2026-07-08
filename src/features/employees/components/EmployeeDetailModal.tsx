@@ -115,6 +115,11 @@ export function EmployeeDetailModal({ employee, open, onOpenChange, onEdit }: Pr
                   {employeeAttendance.map((record) => (
                     <div key={record.id} className="flex items-center justify-between px-4 py-2 text-sm">
                       <span className="text-ink">{formatDate(record.date)}</span>
+                      {record.shift && (
+                        <Badge variant={record.shift === "half" ? "warning" : "success"}>
+                          {record.shift === "half" ? "Half" : "Full"}
+                        </Badge>
+                      )}
                       <span className="text-ink-soft">
                         {formatTime(record.clockIn)}
                         {record.clockOut ? ` — ${formatTime(record.clockOut)}` : " (clocked in)"}

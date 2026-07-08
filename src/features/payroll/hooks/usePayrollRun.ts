@@ -40,11 +40,18 @@ export function usePayrollRun(referenceDate: Date = new Date()) {
       const freq = emp.payFrequency ?? "semi_monthly";
       const period = getCurrentPeriod(freq, referenceDate);
 
-      const hoursWorked = attendance
-        .filter((a) => a.employeeId === emp.id && a.hoursWorked != null && a.date >= period.start && a.date <= period.end)
-        .reduce((sum, a) => sum + (a.hoursWorked ?? 0), 0);
+      const periodRecords = attendance.filter(
+        (a) => a.employeeId === emp.id && a.hoursWorked != null && a.date >= period.start && a.date <= period.end,
+      );
 
-      const daysWorked = hoursWorked / HOURS_PER_DAY;
+      const hoursWorked = periodRecords.reduce((sum, a) => sum + (a.hoursWorked ?? 0), 0);
+
+      const daysWorked = periodRecords.reduce((sum, a) => {
+        if (a.shift === "half") return sum + 0.5;
+        if (a.shift === "full") return sum + 1;
+        return sum + (a.hoursWorked ?? 0) / HOURS_PER_DAY;
+      }, 0);
+
       const grossPay = daysWorked * emp.dailyRate;
 
       const pendingAdvances = advances

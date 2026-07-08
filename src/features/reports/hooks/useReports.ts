@@ -84,10 +84,16 @@ export function useReports(dateFrom?: string, dateTo?: string) {
     return employees
       .filter((e) => e.isActive)
       .map((emp) => {
-        const hoursWorked = filteredAttendance
-          .filter((a) => a.employeeId === emp.id && a.hoursWorked != null)
-          .reduce((sum, a) => sum + (a.hoursWorked ?? 0), 0);
-        const grossPay = (hoursWorked / 8) * emp.dailyRate;
+        const empAttendance = filteredAttendance.filter(
+          (a) => a.employeeId === emp.id && a.hoursWorked != null,
+        );
+        const hoursWorked = empAttendance.reduce((sum, a) => sum + (a.hoursWorked ?? 0), 0);
+        const daysWorked = empAttendance.reduce((sum, a) => {
+          if (a.shift === "half") return sum + 0.5;
+          if (a.shift === "full") return sum + 1;
+          return sum + (a.hoursWorked ?? 0) / 8;
+        }, 0);
+        const grossPay = daysWorked * emp.dailyRate;
         const pendingAdvances = filteredAdvances
           .filter((a) => a.employeeId === emp.id && a.status === "pending")
           .reduce((sum, a) => sum + a.amount, 0);

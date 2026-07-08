@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Clock, LogIn, LogOut, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { Badge } from "@/components/ui/Badge";
 import { formatTime } from "@/utils/date";
 import { useClockIn, useClockOut } from "../hooks/useAttendance";
 import { useToast } from "@/components/ui/useToast";
@@ -23,6 +24,12 @@ interface Props {
   activeRecord?: AttendanceRecord;
 }
 
+function clockOutShift(): "half" | "full" {
+  const hour = new Date().getHours();
+  const minutes = new Date().getMinutes();
+  return hour < 13 || (hour === 13 && minutes < 30) ? "half" : "full";
+}
+
 export function ClockInOutButton({ employee, activeRecord }: Props) {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const clockIn = useClockIn();
@@ -30,6 +37,7 @@ export function ClockInOutButton({ employee, activeRecord }: Props) {
   const { toast } = useToast();
   const isClockedIn = !!activeRecord && !activeRecord.clockOut;
   const isPending = clockIn.isPending || clockOut.isPending;
+  const shift = clockOutShift();
 
   async function handleClockIn() {
     try {
@@ -137,6 +145,10 @@ export function ClockInOutButton({ employee, activeRecord }: Props) {
                     Clocked in at {formatTime(activeRecord.clockIn)}
                   </span>
                 )}
+                <span className="mt-2 inline-flex items-center gap-1.5 text-xs text-ink-faint">
+                  Shift: <Badge variant={shift === "half" ? "warning" : "success"}>{shift === "half" ? "Half day" : "Full day"}</Badge>
+                  {shift === "half" && <span className="text-ink-faint">(morning only)</span>}
+                </span>
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
