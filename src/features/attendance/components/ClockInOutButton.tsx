@@ -35,7 +35,10 @@ export function ClockInOutButton({ employee, activeRecord }: Props) {
   const clockIn = useClockIn();
   const clockOut = useClockOut();
   const { toast } = useToast();
-  const isClockedIn = !!activeRecord && !activeRecord.clockOut;
+
+  // Use mutation result immediately so clock-out shows right after clock-in
+  const record = clockIn.isSuccess && clockIn.data ? clockIn.data : activeRecord;
+  const isClockedIn = !!record && !record.clockOut;
   const isPending = clockIn.isPending || clockOut.isPending;
   const shift = clockOutShift();
 
@@ -49,9 +52,9 @@ export function ClockInOutButton({ employee, activeRecord }: Props) {
   }
 
   async function handleConfirmClockOut() {
-    if (!activeRecord) return;
+    if (!record) return;
     try {
-      await clockOut.mutateAsync(activeRecord);
+      await clockOut.mutateAsync(record);
       toast({ title: `${employee.name} clocked out`, variant: "success" });
     } catch {
       toast({ title: "Couldn't update attendance", variant: "error" });
@@ -115,7 +118,7 @@ export function ClockInOutButton({ employee, activeRecord }: Props) {
             <p className="truncate font-semibold text-ink">{employee.name}</p>
             <p className="flex items-center gap-1 text-xs text-ink-soft">
               <Clock className="h-3 w-3" />
-              {activeRecord ? `Clocked in at ${formatTime(activeRecord.clockIn)}` : ""}
+              {record ? `Clocked in at ${formatTime(record.clockIn)}` : ""}
             </p>
           </div>
         </div>
@@ -140,9 +143,9 @@ export function ClockInOutButton({ employee, activeRecord }: Props) {
               <AlertDialogTitle>Confirm clock-out</AlertDialogTitle>
               <AlertDialogDescription>
                 Are you sure you want to clock out <strong>{employee.name}</strong>?
-                {activeRecord && (
+                {record && (
                   <span className="block mt-1 text-xs text-ink-faint">
-                    Clocked in at {formatTime(activeRecord.clockIn)}
+                    Clocked in at {formatTime(record.clockIn)}
                   </span>
                 )}
                 <span className="mt-2 inline-flex items-center gap-1.5 text-xs text-ink-faint">
