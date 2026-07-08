@@ -13,7 +13,7 @@ export function getCurrentPeriod(frequency: PayFrequency, referenceDate: Date = 
     case "weekly": {
       const start = startOfWeek(referenceDate, { weekStartsOn: 1 });
       const end = endOfWeek(referenceDate, { weekStartsOn: 1 });
-      const label = `${format(start, "MMM d")}\u2013${format(end, "d, yyyy")}`;
+      const label = `${format(start, "MMM d")}-${format(end, "d, yyyy")}`;
       return { start: format(start, "yyyy-MM-dd"), end: format(end, "yyyy-MM-dd"), label };
     }
     case "semi_monthly": {
@@ -24,12 +24,12 @@ export function getCurrentPeriod(frequency: PayFrequency, referenceDate: Date = 
       if (day <= midMonth) {
         const start = new Date(year, month, 1);
         const end = new Date(year, month, midMonth);
-        const label = `${format(start, "MMM d")}\u2013${format(end, "d, yyyy")}`;
+        const label = `${format(start, "MMM d")}-${format(end, "d, yyyy")}`;
         return { start: format(start, "yyyy-MM-dd"), end: format(end, "yyyy-MM-dd"), label };
       }
       const start = new Date(year, month, 16);
       const end = endOfMonth(referenceDate);
-      const label = `${format(start, "MMM d")}\u2013${format(end, "d, yyyy")}`;
+      const label = `${format(start, "MMM d")}-${format(end, "d, yyyy")}`;
       return { start: format(start, "yyyy-MM-dd"), end: format(end, "yyyy-MM-dd"), label };
     }
     case "monthly": {

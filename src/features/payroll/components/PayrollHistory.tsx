@@ -61,7 +61,7 @@ export function PayrollHistory() {
                 <tr key={run.id}>
                   <td className="py-2.5 pr-2 text-xs text-ink-faint">
                     {format(new Date(run.periodStart + "T00:00:00"), "MMM d")}
-                    {" \u2013 "}
+                    {" - "}
                     {format(new Date(run.periodEnd + "T00:00:00"), "MMM d, yy")}
                   </td>
                   <td className="py-2.5 pr-2 font-medium text-ink">{run.employeeName}</td>
