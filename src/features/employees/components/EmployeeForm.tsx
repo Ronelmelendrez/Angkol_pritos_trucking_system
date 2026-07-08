@@ -91,8 +91,8 @@ export function EmployeeForm({ employee, onDone }: Props) {
                 <SelectValue placeholder="Select frequency" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="semi_monthly">Semi-monthly (1st\u201315th / 16th\u2013end)</SelectItem>
-                <SelectItem value="weekly">Weekly (Mon\u2013Sun)</SelectItem>
+                <SelectItem value="semi_monthly">Semi-monthly (1st-15th / 16th-end)</SelectItem>
+                <SelectItem value="weekly">Weekly (Mon-Sun)</SelectItem>
                 <SelectItem value="monthly">Monthly</SelectItem>
               </SelectContent>
             </Select>
