@@ -1,6 +1,7 @@
 import { useState, useCallback, useMemo } from "react";
 import { subMonths } from "date-fns/subMonths";
 import { addMonths } from "date-fns/addMonths";
+import { addWeeks } from "date-fns/addWeeks";
 import { format } from "date-fns/format";
 import { Clock, AlertTriangle } from "lucide-react";
 import { ErrorBoundary } from "@/components/layout/ErrorBoundary";
@@ -34,23 +35,40 @@ function PayrollContent() {
   const payPayroll = usePayPayroll();
   const currentPeriod = !isAll ? getCurrentPeriod(frequency, referenceDate) : null;
 
+  const advanceDate = useCallback((d: Date, dir: 1 | -1, freq?: PayFrequency) => {
+    const f = freq ?? (frequency === "all" ? undefined : frequency);
+    const day = d.getDate();
+    const month = d.getMonth();
+    const year = d.getFullYear();
+    if (f === "weekly") return dir === 1 ? addWeeks(d, 1) : addWeeks(d, -1);
+    if (f === "semi_monthly") {
+      if (dir === 1) {
+        if (day <= 15) return new Date(year, month, 25);
+        return new Date(year, month + 1, 8);
+      }
+      if (day <= 15) return new Date(year, month - 1, 25);
+      return new Date(year, month, 8);
+    }
+    return dir === 1 ? addMonths(d, 1) : subMonths(d, 1);
+  }, [frequency]);
+
   const handlePrev = useCallback(() => {
-    setReferenceDate((d) => subMonths(d, 1));
+    setReferenceDate((d) => advanceDate(d, -1, frequency === "all" ? undefined : (frequency as PayFrequency)));
     setSelectedAdvances({});
     setLoanDeductions({});
     setAdjustments({});
     setAdjustmentNotes({});
-  }, []);
+  }, [advanceDate, frequency]);
 
   const handleNext = useCallback(() => {
-    setReferenceDate((d) => addMonths(d, 1));
+    setReferenceDate((d) => advanceDate(d, 1, frequency === "all" ? undefined : (frequency as PayFrequency)));
     setSelectedAdvances({});
     setLoanDeductions({});
     setAdjustments({});
     setAdjustmentNotes({});
-  }, []);
+  }, [advanceDate, frequency]);
 
-  const canGoNext = !isAll && getCurrentPeriod(frequency, addMonths(referenceDate, 1)).end <= new Date().toISOString().slice(0, 10);
+  const canGoNext = !isAll && getCurrentPeriod(frequency as PayFrequency, advanceDate(referenceDate, 1, frequency as PayFrequency)).end <= new Date().toISOString().slice(0, 10);
 
   const handleAdvanceToggle = useCallback((employeeId: string, advanceId: string) => {
     setSelectedAdvances((prev) => {
@@ -71,11 +89,15 @@ function PayrollContent() {
         loanRepayAmount: loanDeductions[row.employeeId] ?? 0,
         paidAt,
       });
-      handleNext();
+      setSelectedAdvances({});
+      setLoanDeductions({});
+      setAdjustments({});
+      setAdjustmentNotes({});
+      setReferenceDate((d) => advanceDate(d, 1, row.payFrequency));
     } finally {
       setPayingIds((prev) => prev.filter((id) => id !== row.employeeId));
     }
-  }, [payPayroll, selectedAdvances, loanDeductions, handleNext]);
+  }, [payPayroll, selectedAdvances, loanDeductions, advanceDate]);
 
   const paidEmployeeIds = useMemo(() => {
     if (isAll) return [];
