@@ -14,10 +14,8 @@ import { getScheduledPayday } from "@/features/payroll/utils/paydays";
 import { usePayRuleSettings } from "@/features/settings/hooks/usePayRuleSettings";
 import { formatCurrency } from "@/utils/currency";
 import { Badge } from "@/components/ui/Badge";
-import type { PayFrequency, PayFrequencyFilter } from "@/features/payroll/utils/payPeriods";
+import type { PayFrequencyFilter } from "@/features/payroll/utils/payPeriods";
 import type { PayrollRunDraftRow } from "@/features/payroll/hooks/usePayrollRun";
-
-const FREQUENCIES: PayFrequency[] = ["semi_monthly", "weekly", "monthly"] as const;
 
 function PayrollContent() {
   const [frequency, setFrequency] = useState<PayFrequencyFilter>("semi_monthly");
@@ -115,60 +113,27 @@ function PayrollContent() {
         />
       </div>
 
-      {isAll ? (
-        FREQUENCIES.map((freq) => {
-          const period = getCurrentPeriod(freq, referenceDate);
-          const freqPaidIds = history
-            .filter((r) => r.periodStart === period.start && r.periodEnd === period.end && r.status === "paid")
-            .map((r) => r.employeeId);
-
-          return (
-            <div key={freq}>
-              <div className="mb-3 flex items-center gap-2">
-                <Clock className="h-4 w-4 text-ink-faint" />
-                <h3 className="text-sm font-semibold text-ink">{FREQ_LABELS[freq]}</h3>
-                <Badge variant="neutral">{period.label}</Badge>
-              </div>
-              <PayrollRunTable
-                referenceDate={referenceDate}
-                paidEmployeeIds={freqPaidIds}
-                selectedAdvances={selectedAdvances}
-                loanDeductions={loanDeductions}
-                adjustments={adjustments}
-                adjustmentNotes={adjustmentNotes}
-                onAdvanceToggle={handleAdvanceToggle}
-                onLoanDeductionChange={(empId, val) => setLoanDeductions((p) => ({ ...p, [empId]: val }))}
-                onAdjustmentChange={(empId, val) => setAdjustments((p) => ({ ...p, [empId]: val }))}
-                onAdjustmentNoteChange={(empId, note) => setAdjustmentNotes((p) => ({ ...p, [empId]: note }))}
-                onPay={handlePay}
-                payingIds={payingIds}
-              />
-            </div>
-          );
-        })
-      ) : (
-        <div>
-          <div className="mb-3 flex items-center gap-2">
-            <Clock className="h-4 w-4 text-ink-faint" />
-            <h3 className="text-sm font-semibold text-ink">Upcoming</h3>
-            <Badge variant="neutral">{FREQ_LABELS[frequency]} period</Badge>
-          </div>
-          <PayrollRunTable
-            referenceDate={referenceDate}
-            paidEmployeeIds={paidEmployeeIds}
-            selectedAdvances={selectedAdvances}
-            loanDeductions={loanDeductions}
-            adjustments={adjustments}
-            adjustmentNotes={adjustmentNotes}
-            onAdvanceToggle={handleAdvanceToggle}
-            onLoanDeductionChange={(empId, val) => setLoanDeductions((p) => ({ ...p, [empId]: val }))}
-            onAdjustmentChange={(empId, val) => setAdjustments((p) => ({ ...p, [empId]: val }))}
-            onAdjustmentNoteChange={(empId, note) => setAdjustmentNotes((p) => ({ ...p, [empId]: note }))}
-            onPay={handlePay}
-            payingIds={payingIds}
-          />
+      <div>
+        <div className="mb-3 flex items-center gap-2">
+          <Clock className="h-4 w-4 text-ink-faint" />
+          <h3 className="text-sm font-semibold text-ink">Upcoming</h3>
+          {!isAll && <Badge variant="neutral">{FREQ_LABELS[frequency]} period</Badge>}
         </div>
-      )}
+        <PayrollRunTable
+          referenceDate={referenceDate}
+          paidEmployeeIds={paidEmployeeIds}
+          selectedAdvances={selectedAdvances}
+          loanDeductions={loanDeductions}
+          adjustments={adjustments}
+          adjustmentNotes={adjustmentNotes}
+          onAdvanceToggle={handleAdvanceToggle}
+          onLoanDeductionChange={(empId, val) => setLoanDeductions((p) => ({ ...p, [empId]: val }))}
+          onAdjustmentChange={(empId, val) => setAdjustments((p) => ({ ...p, [empId]: val }))}
+          onAdjustmentNoteChange={(empId, note) => setAdjustmentNotes((p) => ({ ...p, [empId]: note }))}
+          onPay={handlePay}
+          payingIds={payingIds}
+        />
+      </div>
 
       {readyRuns.length > 0 && (
         <div>
