@@ -1,4 +1,4 @@
-import { useForm } from "react-hook-form";
+import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import { repaymentSchema, type RepaymentFormValues } from "@/utils/validators";
@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Label } from "@/components/ui/Label";
 import { useRepayLoan } from "../hooks/useLoans";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/components/ui/useToast";
 import { formatCurrency } from "@/utils/currency";
 import { todayISO } from "@/utils/date";
 import type { Loan } from "../types";
@@ -20,7 +20,7 @@ export function RepaymentForm({ loan, onDone }: { loan: Loan; onDone?: () => voi
     handleSubmit,
     formState: { errors },
   } = useForm<RepaymentFormValues>({
-    resolver: zodResolver(repaymentSchema),
+    resolver: zodResolver(repaymentSchema) as unknown as Resolver<RepaymentFormValues>,
     defaultValues: { amount: 0, date: todayISO() },
   });
 

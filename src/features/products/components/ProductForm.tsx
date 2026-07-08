@@ -1,4 +1,4 @@
-import { useForm } from "react-hook-form";
+import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import { productSchema, type ProductFormValues } from "@/utils/validators";
@@ -25,7 +25,7 @@ export function ProductForm({ initial, onDone }: Props) {
     handleSubmit,
     formState: { errors },
   } = useForm<ProductFormValues>({
-    resolver: zodResolver(productSchema),
+    resolver: zodResolver(productSchema) as unknown as Resolver<ProductFormValues>,
     defaultValues: initial
       ? { name: initial.name, defaultPrice: initial.defaultPrice, unit: initial.unit }
       : { name: "", defaultPrice: 0, unit: "order" },

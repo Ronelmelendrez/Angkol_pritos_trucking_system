@@ -1,4 +1,6 @@
-import { startOfWeek, endOfWeek, startOfMonth, endOfMonth, format } from "date-fns";
+import { startOfWeek } from "date-fns/startOfWeek";
+import { endOfWeek } from "date-fns/endOfWeek";
+import { startOfMonth, endOfMonth, format } from "date-fns";
 
 export type PayFrequency = "weekly" | "semi_monthly" | "monthly";
 
