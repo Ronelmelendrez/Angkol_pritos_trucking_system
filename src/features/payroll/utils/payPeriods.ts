@@ -3,6 +3,7 @@ import { endOfWeek } from "date-fns/endOfWeek";
 import { startOfMonth, endOfMonth, format } from "date-fns";
 
 export type PayFrequency = "weekly" | "semi_monthly" | "monthly";
+export type PayFrequencyFilter = PayFrequency | "all";
 
 export interface PayPeriod {
   start: string;
