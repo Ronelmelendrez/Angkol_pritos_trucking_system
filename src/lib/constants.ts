@@ -6,6 +6,7 @@ export const EXPENSE_CATEGORIES = [
   "Packaging",
   "Fuel",
   "Repairs",
+  "Salaries",
   "Misc",
 ] as const;
 export type ExpenseCategory = (typeof EXPENSE_CATEGORIES)[number];
@@ -21,6 +22,7 @@ export const CATEGORY_COLORS: Record<ExpenseCategory, string> = {
   Packaging: "#8D6E63",
   Fuel: "#6D4C41",
   Repairs: "#B8860B",
+  Salaries: "#2ECC71",
   Misc: "#A08D86",
 };
 

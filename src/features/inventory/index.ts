@@ -1,7 +1,7 @@
 export { InventoryLedgerTable } from "./components/InventoryLedgerTable";
 export { StockAdjustmentForm } from "./components/StockAdjustmentForm";
 export { ProductStockCard } from "./components/ProductStockCard";
-export { LowStockBanner } from "./components/LowStockBanner";
+
 export { InventoryFilters } from "./components/InventoryFilters";
 export { InventoryOverviewTab } from "./components/InventoryOverviewTab";
 export { InventoryAdjustmentsTab } from "./components/InventoryAdjustmentsTab";

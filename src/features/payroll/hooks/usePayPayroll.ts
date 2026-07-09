@@ -1,11 +1,12 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { payrollRunsTable, loansTable } from "@/lib/mockData";
+import { expensesTable, payrollRunsTable, loansTable } from "@/lib/mockData";
 import { useMarkAdvanceDeducted } from "@/features/advances/hooks/useAdvances";
 import { useRepayLoan } from "@/features/loans/hooks/useLoans";
 import { useToast } from "@/components/ui/useToast";
 import type { PayrollRunDraftRow } from "./usePayrollRun";
 
 const PAYROLL_KEY = ["payroll_runs"] as const;
+const EXPENSES_KEY = ["expenses"] as const;
 
 export function usePayPayroll() {
   const queryClient = useQueryClient();
@@ -40,6 +41,14 @@ export function usePayPayroll() {
         ...(row.loanId && loanRepayAmount > 0 ? { loanId: row.loanId } : {}),
       });
 
+      await expensesTable.create({
+        date: paidAt,
+        category: "Salaries",
+        description: `Payroll — ${row.name} (${row.periodStart} to ${row.periodEnd})`,
+        amount: row.grossPay,
+        paymentMethod: "Cash",
+      });
+
       for (const id of advanceIds) {
         await markAdvanceDeducted.mutateAsync(id);
       }
@@ -54,6 +63,7 @@ export function usePayPayroll() {
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: PAYROLL_KEY });
+      queryClient.invalidateQueries({ queryKey: EXPENSES_KEY });
     },
     onError: () => {
       toast({ title: "Payroll save failed", description: "Could not mark period as paid.", variant: "error" });
