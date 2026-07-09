@@ -1,18 +1,20 @@
 import { useState, useMemo } from "react";
 import { Trash2, ShoppingCart, ChevronDown } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
-import { Skeleton } from "@/components/ui/Skeleton";
 import { Button } from "@/components/ui/Button";
 import { formatCurrency } from "@/utils/currency";
 import { formatDate } from "@/utils/date";
 import { cn } from "@/utils/cn";
-import { useDeleteSale, useSales } from "../hooks/useSales";
+import { useDeleteSale } from "../hooks/useSales";
 import { useProducts } from "@/features/products/hooks/useProducts";
 import { useToast } from "@/components/ui/useToast";
 import type { Sale } from "../types";
 
-export function SalesList() {
-  const { data: sales = [], isLoading } = useSales();
+interface Props {
+  sales: Sale[];
+}
+
+export function SalesList({ sales }: Props) {
   const { data: products = [] } = useProducts();
   const deleteSale = useDeleteSale();
   const { toast } = useToast();
@@ -50,22 +52,6 @@ export function SalesList() {
     } catch {
       toast({ title: "Couldn't remove sale", variant: "error" });
     }
-  }
-
-  if (isLoading) {
-    return (
-      <div className="space-y-4">
-        {Array.from({ length: 3 }).map((_, i) => (
-          <div key={i} className="rounded-xl border border-line p-4">
-            <Skeleton className="mb-3 h-5 w-44" />
-            <div className="space-y-2">
-              <Skeleton className="h-12 w-full" />
-              <Skeleton className="h-12 w-full" />
-            </div>
-          </div>
-        ))}
-      </div>
-    );
   }
 
   if (sales.length === 0) {

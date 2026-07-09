@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useCallback } from "react";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card";
@@ -6,8 +6,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { useExpenses } from "@/features/expenses/hooks/useExpenses";
 import { ExpenseForm } from "@/features/expenses/components/ExpenseForm";
 import { ExpenseFilters } from "@/features/expenses/components/ExpenseFilters";
-import { ExpenseDayList } from "@/features/expenses/components/ExpenseDayList";
+import { ExpenseList } from "@/features/expenses/components/ExpenseList";
+import { ExpenseGridCard } from "@/features/expenses/components/ExpenseGridCard";
+import { TransactionViewTabs } from "@/components/layout/TransactionViewTabs";
 import { formatCurrency } from "@/utils/currency";
+import { CATEGORY_COLORS } from "@/lib/constants";
+import type { Expense } from "@/features/expenses/types";
 import type { ExpenseFilters as ExpenseFiltersType } from "@/features/expenses/types";
 
 export function ExpensesPage() {
@@ -31,6 +35,16 @@ export function ExpensesPage() {
   }, [expenses, filters]);
 
   const dailyTotal = filtered.reduce((sum, e) => sum + e.amount, 0);
+
+  const renderTable = useCallback(
+    (data: Expense[]) => <ExpenseList expenses={data} isLoading={isLoading} />,
+    [isLoading],
+  );
+
+  const renderGridCard = useCallback(
+    (expense: Expense) => <ExpenseGridCard expense={expense} />,
+    [],
+  );
 
   return (
     <div className="space-y-5">
@@ -62,7 +76,18 @@ export function ExpensesPage() {
           <ExpenseFilters filters={filters} onChange={setFilters} />
         </div>
 
-        <ExpenseDayList expenses={filtered} isLoading={isLoading} />
+        <TransactionViewTabs
+          data={filtered}
+          isLoading={isLoading}
+          getDate={(e) => e.date}
+          getAmount={(e) => e.amount}
+          renderTable={renderTable}
+          renderGridCard={renderGridCard}
+          groupedTabLabel="By Category"
+          getGroupKey={(e) => e.category}
+          getGroupColor={(key) => CATEGORY_COLORS[key as keyof typeof CATEGORY_COLORS] ?? "#888"}
+          emptyMessage="No expenses match these filters"
+        />
       </Card>
     </div>
   );
