@@ -12,6 +12,8 @@ export const expenseSchema = z.object({
   paymentMethod: z.enum(PAYMENT_METHODS, {
     error: "Choose a payment method",
   }),
+  productId: z.string().optional().or(z.literal("")),
+  quantityPurchased: z.coerce.number().positive("Qty must be greater than 0").optional(),
 });
 export type ExpenseFormValues = z.infer<typeof expenseSchema>;
 

@@ -24,6 +24,13 @@ export const CATEGORY_COLORS: Record<ExpenseCategory, string> = {
   Misc: "#A08D86",
 };
 
+export const STOCK_CATEGORIES = ["Raw Chicken", "Lechon Manok"] as const;
+export type StockCategory = (typeof STOCK_CATEGORIES)[number];
+
+export function isStockCategory(category: string): category is StockCategory {
+  return STOCK_CATEGORIES.includes(category as StockCategory);
+}
+
 export const USER_ROLES = ["manager", "staff"] as const;
 export type UserRole = (typeof USER_ROLES)[number];
 

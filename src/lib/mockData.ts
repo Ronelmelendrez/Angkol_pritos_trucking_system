@@ -6,9 +6,12 @@ import type { Loan, Repayment } from "@/features/loans/types";
 import type { PayrollRun } from "@/features/payroll/types";
 import type { Product } from "@/features/products/types";
 import type { Sale } from "@/features/sales/types";
+import type { StockAdjustment } from "@/features/inventory/types";
 import type { BaseRecord } from "@/types";
 import type { PayRuleSettings, EmployeePayOverride } from "@/features/settings/types";
 import { ADVANCE_STATUSES, EXPENSE_CATEGORIES, LOAN_STATUSES, PAYMENT_METHODS } from "@/lib/constants";
+
+export type NewStockAdjustment = Omit<StockAdjustment, keyof BaseRecord>;
 
 type RecordTable<T extends BaseRecord> = {
   list: () => T[];
@@ -146,10 +149,12 @@ const expenseSeed: Expense[] = [
     id: "exp_2",
     date: "2026-07-03",
     category: EXPENSE_CATEGORIES[0],
-    description: "Raw chicken supply",
-    amount: 9200,
+    description: "35kg raw chicken",
+    amount: 8050,
     supplier: "Farm Fresh",
     paymentMethod: PAYMENT_METHODS[0],
+    productId: "prod_1",
+    quantityPurchased: 35,
     createdAt: now,
     updatedAt: now,
   },
@@ -161,6 +166,19 @@ const expenseSeed: Expense[] = [
     amount: 540,
     supplier: undefined,
     paymentMethod: PAYMENT_METHODS[1],
+    createdAt: now,
+    updatedAt: now,
+  },
+  {
+    id: "exp_4",
+    date: "2026-07-04",
+    category: EXPENSE_CATEGORIES[1],
+    description: "10 whole lechon manok",
+    amount: 7000,
+    supplier: "Mang Jose",
+    paymentMethod: PAYMENT_METHODS[0],
+    productId: "prod_2",
+    quantityPurchased: 10,
     createdAt: now,
     updatedAt: now,
   },
@@ -318,6 +336,9 @@ export const loansTable = createTable(loanSeed);
 export const repaymentsTable = createTable(repaymentSeed);
 export const productsTable = createTable(productSeed);
 export const salesTable = createTable(saleSeed);
+
+const adjustmentSeed: StockAdjustment[] = [];
+export const adjustmentsTable = createTable(adjustmentSeed);
 
 const payrollRunSeed: PayrollRun[] = [];
 export const payrollRunsTable = createTable(payrollRunSeed);

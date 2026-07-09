@@ -8,6 +8,8 @@ export interface Expense extends BaseRecord {
   amount: number;
   supplier?: string;
   paymentMethod: PaymentMethod;
+  productId?: string;
+  quantityPurchased?: number;
 }
 
 export type NewExpense = Omit<Expense, "id" | "createdAt" | "updatedAt">;

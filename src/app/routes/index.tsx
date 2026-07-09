@@ -6,6 +6,7 @@ import { DashboardPage } from "@/app/routes/pages/DashboardPage"
 import { SalesPage } from "@/app/routes/pages/SalesPage"
 import { ProductsPage } from "@/app/routes/pages/ProductsPage"
 import { ExpensesPage } from "@/app/routes/pages/ExpensesPage"
+import { InventoryPage } from "@/app/routes/pages/InventoryPage"
 import { EmployeesPage } from "@/app/routes/pages/EmployeesPage"
 import { AttendancePage } from "@/app/routes/pages/AttendancePage"
 import { AdvancesPage } from "@/app/routes/pages/AdvancesPage"
@@ -31,6 +32,7 @@ export const router = createBrowserRouter([
       { path: "sales", element: <SalesPage /> },
       { path: "products", element: <ProductsPage /> },
       { path: "expenses", element: <ExpensesPage /> },
+      { path: "inventory", element: <InventoryPage /> },
       { path: "employees", element: <EmployeesPage /> },
       { path: "attendance", element: <AttendancePage /> },
       { path: "advances", element: <AdvancesPage /> },
