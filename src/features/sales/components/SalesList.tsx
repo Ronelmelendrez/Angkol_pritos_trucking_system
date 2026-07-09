@@ -1,7 +1,8 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Trash2, ShoppingCart } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
+import { Pagination } from "@/components/ui/Pagination";
 import { formatCurrency } from "@/utils/currency";
 import { formatDate } from "@/utils/date";
 import { useDeleteSale } from "../hooks/useSales";
@@ -9,11 +10,14 @@ import { useProducts } from "@/features/products/hooks/useProducts";
 import { useToast } from "@/components/ui/useToast";
 import type { Sale } from "../types";
 
+const PAGE_SIZE = 10;
+
 interface Props {
   sales: Sale[];
 }
 
 export function SalesList({ sales }: Props) {
+  const [page, setPage] = useState(1);
   const { data: products = [] } = useProducts();
   const deleteSale = useDeleteSale();
   const { toast } = useToast();
@@ -32,6 +36,10 @@ export function SalesList({ sales }: Props) {
     }
     return Array.from(map.entries()).sort((a, b) => b[0].localeCompare(a[0]));
   }, [sales]);
+
+  const totalPages = Math.max(1, Math.ceil(groups.length / PAGE_SIZE));
+  const safePage = Math.min(page, totalPages);
+  const pageGroups = groups.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
 
   async function handleDelete(id: string) {
     try {
@@ -53,60 +61,64 @@ export function SalesList({ sales }: Props) {
   }
 
   return (
-    <div className="space-y-4">
-      {groups.map(([date, items]) => {
-        const dayTotal = items.reduce((sum, s) => sum + s.amount, 0);
+    <div>
+      <div className="space-y-4">
+        {pageGroups.map(([date, items]) => {
+          const dayTotal = items.reduce((sum, s) => sum + s.amount, 0);
 
-        return (
-          <div key={date} className="overflow-hidden rounded-xl border border-line bg-surface">
-            <div className="flex items-center justify-between gap-3 bg-ink/[0.02] px-5 py-3">
-              <div className="flex items-center gap-3">
-                <span className="stamp text-base font-semibold text-ink">{formatDate(date)}</span>
-                <span className="text-sm text-ink-soft">
-                  {items.length} sale{items.length === 1 ? "" : "s"}
-                </span>
-              </div>
+          return (
+            <div key={date} className="overflow-hidden rounded-xl border border-line bg-surface">
+              <div className="flex items-center justify-between gap-3 bg-ink/[0.02] px-5 py-3">
+                <div className="flex items-center gap-3">
+                  <span className="stamp text-base font-semibold text-ink">{formatDate(date)}</span>
+                  <span className="text-sm text-ink-soft">
+                    {items.length} sale{items.length === 1 ? "" : "s"}
+                  </span>
+                </div>
               <span className="font-semibold text-ink">{formatCurrency(dayTotal)}</span>
-            </div>
+              </div>
 
-            <div className="divide-y divide-dashed divide-line">
-              {items.map((sale) => {
-                const product = sale.productId ? productMap.get(sale.productId) : undefined;
-                return (
-                  <div
-                    key={sale.id}
-                    className="flex items-center justify-between gap-3 px-5 py-2.5 text-sm hover:bg-primary/[0.02]"
-                  >
-                    <div className="flex min-w-0 flex-1 items-center gap-3">
-                      {product && (
-                        <Badge variant="neutral" className="shrink-0 text-[10px]">
-                          {product.name}
-                        </Badge>
-                      )}
-                      <span className="text-xs text-ink-faint">
-                        {sale.quantitySold} × {formatCurrency(sale.unitPrice)}
-                      </span>
-                      {sale.notes && (
-                        <span className="hidden sm:inline truncate text-ink-faint">· {sale.notes}</span>
-                      )}
-                    </div>
-                    <span className="shrink-0 font-semibold text-ink">{formatCurrency(sale.amount)}</span>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-7 w-7 shrink-0 text-ink-faint hover:text-danger"
-                      onClick={() => handleDelete(sale.id)}
-                      aria-label="Delete sale"
+              <div className="divide-y divide-dashed divide-line">
+                {items.map((sale) => {
+                  const product = sale.productId ? productMap.get(sale.productId) : undefined;
+                  return (
+                    <div
+                      key={sale.id}
+                      className="flex items-center justify-between gap-3 px-5 py-2.5 text-sm hover:bg-primary/[0.02]"
                     >
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </Button>
-                  </div>
-                );
-              })}
+                      <div className="flex min-w-0 flex-1 items-center gap-3">
+                        {product && (
+                          <Badge variant="neutral" className="shrink-0 text-[10px]">
+                            {product.name}
+                          </Badge>
+                        )}
+                        <span className="text-xs text-ink-faint">
+                          {sale.quantitySold} × {formatCurrency(sale.unitPrice)}
+                        </span>
+                        {sale.notes && (
+                          <span className="hidden sm:inline truncate text-ink-faint">· {sale.notes}</span>
+                        )}
+                      </div>
+                      <span className="shrink-0 font-semibold text-ink">{formatCurrency(sale.amount)}</span>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7 shrink-0 text-ink-faint hover:text-danger"
+                        onClick={() => handleDelete(sale.id)}
+                        aria-label="Delete sale"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </Button>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
-          </div>
-        );
-      })}
+          );
+        })}
+      </div>
+
+      <Pagination currentPage={safePage} totalPages={totalPages} onPageChange={setPage} />
     </div>
   );
 }

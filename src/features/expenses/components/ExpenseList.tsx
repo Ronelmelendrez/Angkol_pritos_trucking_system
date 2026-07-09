@@ -1,15 +1,17 @@
-import { useMemo } from "react";
-import { Trash2, Receipt, ChevronDown } from "lucide-react";
+import { useMemo, useState } from "react";
+import { Trash2, Receipt } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { Button } from "@/components/ui/Button";
+import { Pagination } from "@/components/ui/Pagination";
 import { formatCurrency } from "@/utils/currency";
 import { formatDate } from "@/utils/date";
 import { CATEGORY_COLORS } from "@/lib/constants";
-import { cn } from "@/utils/cn";
 import { useDeleteExpense } from "../hooks/useExpenses";
 import { useToast } from "@/components/ui/useToast";
 import type { Expense } from "../types";
+
+const PAGE_SIZE = 10;
 
 interface Props {
   expenses: Expense[];
@@ -17,6 +19,7 @@ interface Props {
 }
 
 export function ExpenseList({ expenses, isLoading }: Props) {
+  const [page, setPage] = useState(1);
   const deleteExpense = useDeleteExpense();
   const { toast } = useToast();
 
@@ -29,6 +32,10 @@ export function ExpenseList({ expenses, isLoading }: Props) {
     }
     return Array.from(map.entries()).sort((a, b) => b[0].localeCompare(a[0]));
   }, [expenses]);
+
+  const totalPages = Math.max(1, Math.ceil(groups.length / PAGE_SIZE));
+  const safePage = Math.min(page, totalPages);
+  const pageGroups = groups.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
 
   async function handleDelete(id: string, description: string) {
     try {
@@ -66,59 +73,63 @@ export function ExpenseList({ expenses, isLoading }: Props) {
   }
 
   return (
-    <div className="space-y-4">
-      {groups.map(([date, items]) => {
-        const dayTotal = items.reduce((sum, e) => sum + e.amount, 0);
+    <div>
+      <div className="space-y-4">
+        {pageGroups.map(([date, items]) => {
+          const dayTotal = items.reduce((sum, e) => sum + e.amount, 0);
 
-        return (
-          <div key={date} className="overflow-hidden rounded-xl border border-line bg-surface">
-            <div className="flex items-center justify-between gap-3 bg-ink/[0.02] px-5 py-3">
-              <div className="flex items-center gap-3">
-                <span className="stamp text-base font-semibold text-ink">{formatDate(date)}</span>
-                <span className="text-sm text-ink-soft">
-                  {items.length} item{items.length === 1 ? "" : "s"}
-                </span>
-              </div>
-              <span className="font-semibold text-ink">{formatCurrency(dayTotal)}</span>
-            </div>
-
-            <div className="divide-y divide-dashed divide-line">
-              {items.map((exp) => (
-                <div
-                  key={exp.id}
-                  className="flex items-center justify-between gap-3 px-5 py-2.5 text-sm hover:bg-primary/[0.02]"
-                >
-                  <div className="flex min-w-0 flex-1 items-center gap-3">
-                    <Badge
-                      className="shrink-0 border-0"
-                      style={{
-                        backgroundColor: `${CATEGORY_COLORS[exp.category]}1a`,
-                        color: CATEGORY_COLORS[exp.category],
-                      }}
-                    >
-                      {exp.category}
-                    </Badge>
-                    <span className="truncate text-ink">{exp.description}</span>
-                    {exp.supplier && (
-                      <span className="hidden sm:inline shrink-0 text-ink-faint">· {exp.supplier}</span>
-                    )}
-                  </div>
-                  <span className="shrink-0 font-semibold text-ink">{formatCurrency(exp.amount)}</span>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-7 w-7 shrink-0 text-ink-faint hover:text-danger"
-                    onClick={() => handleDelete(exp.id, exp.description)}
-                    aria-label={`Delete ${exp.description}`}
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </Button>
+          return (
+            <div key={date} className="overflow-hidden rounded-xl border border-line bg-surface">
+              <div className="flex items-center justify-between gap-3 bg-ink/[0.02] px-5 py-3">
+                <div className="flex items-center gap-3">
+                  <span className="stamp text-base font-semibold text-ink">{formatDate(date)}</span>
+                  <span className="text-sm text-ink-soft">
+                    {items.length} item{items.length === 1 ? "" : "s"}
+                  </span>
                 </div>
-              ))}
+                <span className="font-semibold text-ink">{formatCurrency(dayTotal)}</span>
+              </div>
+
+              <div className="divide-y divide-dashed divide-line">
+                {items.map((exp) => (
+                  <div
+                    key={exp.id}
+                    className="flex items-center justify-between gap-3 px-5 py-2.5 text-sm hover:bg-primary/[0.02]"
+                  >
+                    <div className="flex min-w-0 flex-1 items-center gap-3">
+                      <Badge
+                        className="shrink-0 border-0"
+                        style={{
+                          backgroundColor: `${CATEGORY_COLORS[exp.category]}1a`,
+                          color: CATEGORY_COLORS[exp.category],
+                        }}
+                      >
+                        {exp.category}
+                      </Badge>
+                      <span className="truncate text-ink">{exp.description}</span>
+                      {exp.supplier && (
+                        <span className="hidden sm:inline shrink-0 text-ink-faint">· {exp.supplier}</span>
+                      )}
+                    </div>
+                    <span className="shrink-0 font-semibold text-ink">{formatCurrency(exp.amount)}</span>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-7 w-7 shrink-0 text-ink-faint hover:text-danger"
+                      onClick={() => handleDelete(exp.id, exp.description)}
+                      aria-label={`Delete ${exp.description}`}
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
-        );
-      })}
+          );
+        })}
+      </div>
+
+      <Pagination currentPage={safePage} totalPages={totalPages} onPageChange={setPage} />
     </div>
   );
 }
