@@ -8,7 +8,12 @@ import { PayrollSummary } from "@/features/reports/components/PayrollSummary"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card"
 import { Skeleton } from "@/components/ui/Skeleton"
 import { Input } from "@/components/ui/Input"
+import { Button } from "@/components/ui/Button"
+import { Label } from "@/components/ui/Label"
 import { formatCurrency } from "@/utils/currency"
+import { format, startOfMonth, endOfMonth } from "date-fns"
+import { startOfWeek } from "date-fns/startOfWeek"
+import { endOfWeek } from "date-fns/endOfWeek"
 import { useProducts } from "@/features/products/hooks/useProducts"
 import type { RevenueByProduct } from "@/features/reports/types"
 import type { Sale } from "@/features/sales/types"
@@ -81,30 +86,79 @@ function RevenueByProductCard({ sales }: { sales: Sale[] }) {
   );
 }
 
-function ReportsContent() {
-  const now = new Date();
-  const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
-  const [month, setMonth] = useState(currentMonth);
+type Preset = "today" | "this-week" | "this-month" | "custom";
 
-  const year = Number(month.slice(0, 4));
-  const monthNum = Number(month.slice(5, 7));
-  const dateFrom = `${month}-01`;
-  const dateTo = `${month}-${new Date(year, monthNum, 0).getDate().toString().padStart(2, "0")}`;
+function ReportsContent() {
+  const today = new Date();
+  const todayStr = format(today, "yyyy-MM-dd");
+
+  const [preset, setPreset] = useState<Preset>("this-month");
+  const [customFrom, setCustomFrom] = useState(todayStr);
+  const [customTo, setCustomTo] = useState(todayStr);
+
+  const dateFrom = useMemo(() => {
+    switch (preset) {
+      case "today": return todayStr;
+      case "this-week": return format(startOfWeek(today, { weekStartsOn: 1 }), "yyyy-MM-dd");
+      case "this-month": return format(startOfMonth(today), "yyyy-MM-dd");
+      case "custom": return customFrom;
+    }
+  }, [preset, customFrom, todayStr]);
+
+  const dateTo = useMemo(() => {
+    switch (preset) {
+      case "today": return todayStr;
+      case "this-week": return format(endOfWeek(today, { weekStartsOn: 1 }), "yyyy-MM-dd");
+      case "this-month": return format(endOfMonth(today), "yyyy-MM-dd");
+      case "custom": return customTo;
+    }
+  }, [preset, customTo, todayStr]);
+
+  const rangeLabel = useMemo(() => {
+    if (dateFrom === dateTo) return dateFrom;
+    return `${dateFrom} \u2013 ${dateTo}`;
+  }, [dateFrom, dateTo]);
 
   const { categoryBreakdown, dailyProfit, filteredSales, isLoading } = useReports(dateFrom, dateTo);
 
+  function handlePreset(p: Preset) {
+    setPreset(p);
+  }
+
   return (
     <div className="flex flex-col gap-5">
-      <div className="flex items-center justify-between">
-        <h2 className="font-display text-lg font-semibold text-char-900 md:text-xl">
-          Reports
-        </h2>
-        <Input
-          type="month"
-          value={month}
-          onChange={(e) => setMonth(e.target.value)}
-          className="w-44"
-        />
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h2 className="font-display text-lg font-semibold text-char-900 md:text-xl">
+            Reports
+          </h2>
+          <p className="text-xs text-ink-faint">{rangeLabel}</p>
+        </div>
+        <div className="flex flex-wrap items-end gap-3">
+          <div className="flex gap-1">
+            {(["today", "this-week", "this-month"] as const).map((p) => (
+              <Button key={p} variant={preset === p ? "default" : "outline"} size="sm" onClick={() => handlePreset(p)}>
+                {p === "today" ? "Today" : p === "this-week" ? "This week" : "This month"}
+              </Button>
+            ))}
+          </div>
+          {preset === "custom" ? (
+            <div className="flex items-end gap-2">
+              <div>
+                <Label className="text-xs text-ink-faint">From</Label>
+                <Input type="date" value={customFrom} onChange={(e) => { setPreset("custom"); setCustomFrom(e.target.value); }} className="w-36" />
+              </div>
+              <div>
+                <Label className="text-xs text-ink-faint">To</Label>
+                <Input type="date" value={customTo} onChange={(e) => { setPreset("custom"); setCustomTo(e.target.value); }} className="w-36" />
+              </div>
+            </div>
+          ) : (
+            <Button variant="outline" size="sm" onClick={() => setPreset("custom")}>
+              Custom range
+            </Button>
+          )}
+        </div>
       </div>
 
       {isLoading ? (
