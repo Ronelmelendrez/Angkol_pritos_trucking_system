@@ -3,12 +3,15 @@ import { Landmark, PhilippinePeso } from "lucide-react";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
+import { Pagination } from "@/components/ui/Pagination";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/Dialog";
 import { formatCurrency } from "@/utils/currency";
 import { formatDate } from "@/utils/date";
 import { RepaymentForm } from "./RepaymentForm";
 import type { Loan } from "../types";
 import type { Employee } from "@/features/employees/types";
+
+const PAGE_SIZE = 10;
 
 interface Props {
   loans: Loan[];
@@ -18,6 +21,11 @@ interface Props {
 
 export function LoansList({ loans, employees, isLoading }: Props) {
   const [activeLoan, setActiveLoan] = useState<Loan | null>(null);
+  const [page, setPage] = useState(1);
+
+  const totalPages = Math.max(1, Math.ceil(loans.length / PAGE_SIZE));
+  const safePage = Math.min(page, totalPages);
+  const pageItems = loans.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
 
   if (isLoading) {
     return (
@@ -43,7 +51,7 @@ export function LoansList({ loans, employees, isLoading }: Props) {
   return (
     <>
       <div className="space-y-3">
-        {loans.map((loan) => {
+        {pageItems.map((loan) => {
           const progress = loan.principal > 0 ? 1 - loan.remainingBalance / loan.principal : 1;
           return (
             <div key={loan.id} className="ticket ticket-perf p-4">
@@ -82,6 +90,8 @@ export function LoansList({ loans, employees, isLoading }: Props) {
           );
         })}
       </div>
+
+      <Pagination currentPage={safePage} totalPages={totalPages} onPageChange={setPage} />
 
       <Dialog open={!!activeLoan} onOpenChange={(open) => !open && setActiveLoan(null)}>
         <DialogContent>

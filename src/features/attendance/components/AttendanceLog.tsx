@@ -1,9 +1,13 @@
+import { useState, useMemo } from "react";
 import { CalendarClock } from "lucide-react";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { Badge } from "@/components/ui/Badge";
+import { Pagination } from "@/components/ui/Pagination";
 import { formatDate, formatTime } from "@/utils/date";
 import type { AttendanceRecord } from "../types";
 import type { Employee } from "@/features/employees/types";
+
+const PAGE_SIZE = 15;
 
 interface Props {
   records: AttendanceRecord[];
@@ -12,6 +16,17 @@ interface Props {
 }
 
 export function AttendanceLog({ records, employees, isLoading }: Props) {
+  const [page, setPage] = useState(1);
+
+  const sorted = useMemo(
+    () => [...records].sort((a, b) => (a.clockIn < b.clockIn ? 1 : -1)),
+    [records],
+  );
+
+  const totalPages = Math.max(1, Math.ceil(sorted.length / PAGE_SIZE));
+  const safePage = Math.min(page, totalPages);
+  const pageItems = sorted.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
+
   if (isLoading) {
     return (
       <div className="space-y-2">
@@ -33,50 +48,52 @@ export function AttendanceLog({ records, employees, isLoading }: Props) {
 
   const employeeName = (id: string) => employees.find((e) => e.id === id)?.name ?? "Unknown";
 
-  const sorted = [...records].sort((a, b) => (a.clockIn < b.clockIn ? 1 : -1));
-
   return (
-    <div className="overflow-hidden rounded-xl border border-line">
-      <table className="w-full text-sm">
-        <thead className="bg-ink/3 text-left text-xs uppercase tracking-wide text-ink-soft">
-          <tr>
-            <th className="px-4 py-3 font-medium">Employee</th>
-            <th className="px-4 py-3 font-medium">Date</th>
-            <th className="px-4 py-3 font-medium">Shift</th>
-            <th className="px-4 py-3 font-medium">Clock in</th>
-            <th className="px-4 py-3 font-medium">Clock out</th>
-            <th className="px-4 py-3 text-right font-medium">Hours</th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-line">
-          {sorted.map((r) => (
-            <tr key={r.id} className="bg-surface">
-              <td className="px-4 py-3 font-medium text-ink">{employeeName(r.employeeId)}</td>
-              <td className="px-4 py-3 text-ink-soft">{formatDate(r.date)}</td>
-              <td className="px-4 py-3">
-                {r.shift ? (
-                  <Badge variant={r.shift === "half" ? "warning" : "success"}>
-                    {r.shift === "half" ? "Half" : "Full"}
-                  </Badge>
-                ) : (
-                  <span className="text-ink-faint">—</span>
-                )}
-              </td>
-              <td className="px-4 py-3 text-ink-soft">{formatTime(r.clockIn)}</td>
-              <td className="px-4 py-3">
-                {r.clockOut ? (
-                  <span className="text-ink-soft">{formatTime(r.clockOut)}</span>
-                ) : (
-                  <Badge variant="success">In progress</Badge>
-                )}
-              </td>
-              <td className="px-4 py-3 text-right text-ink">
-                {r.hoursWorked != null ? `${r.hoursWorked.toFixed(2)} hrs` : "—"}
-              </td>
+    <div>
+      <div className="overflow-hidden rounded-xl border border-line">
+        <table className="w-full text-sm">
+          <thead className="bg-ink/3 text-left text-xs uppercase tracking-wide text-ink-soft">
+            <tr>
+              <th className="px-4 py-3 font-medium">Employee</th>
+              <th className="px-4 py-3 font-medium">Date</th>
+              <th className="px-4 py-3 font-medium">Shift</th>
+              <th className="px-4 py-3 font-medium">Clock in</th>
+              <th className="px-4 py-3 font-medium">Clock out</th>
+              <th className="px-4 py-3 text-right font-medium">Hours</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody className="divide-y divide-line">
+            {pageItems.map((r) => (
+              <tr key={r.id} className="bg-surface">
+                <td className="px-4 py-3 font-medium text-ink">{employeeName(r.employeeId)}</td>
+                <td className="px-4 py-3 text-ink-soft">{formatDate(r.date)}</td>
+                <td className="px-4 py-3">
+                  {r.shift ? (
+                    <Badge variant={r.shift === "half" ? "warning" : "success"}>
+                      {r.shift === "half" ? "Half" : "Full"}
+                    </Badge>
+                  ) : (
+                    <span className="text-ink-faint">—</span>
+                  )}
+                </td>
+                <td className="px-4 py-3 text-ink-soft">{formatTime(r.clockIn)}</td>
+                <td className="px-4 py-3">
+                  {r.clockOut ? (
+                    <span className="text-ink-soft">{formatTime(r.clockOut)}</span>
+                  ) : (
+                    <Badge variant="success">In progress</Badge>
+                  )}
+                </td>
+                <td className="px-4 py-3 text-right text-ink">
+                  {r.hoursWorked != null ? `${r.hoursWorked.toFixed(2)} hrs` : "—"}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <Pagination currentPage={safePage} totalPages={totalPages} onPageChange={setPage} />
     </div>
   );
 }

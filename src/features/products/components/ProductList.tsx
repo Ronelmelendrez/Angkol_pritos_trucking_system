@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Pencil, Package } from "lucide-react";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { Button } from "@/components/ui/Button";
+import { Pagination } from "@/components/ui/Pagination";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/Dialog";
 import { Badge } from "@/components/ui/Badge";
 import { formatCurrency } from "@/utils/currency";
@@ -9,9 +10,16 @@ import { useProducts } from "../hooks/useProducts";
 import { ProductForm } from "./ProductForm";
 import type { Product } from "../types";
 
+const PAGE_SIZE = 10;
+
 export function ProductList() {
   const { data: products = [], isLoading } = useProducts();
   const [editing, setEditing] = useState<Product | null>(null);
+  const [page, setPage] = useState(1);
+
+  const totalPages = Math.max(1, Math.ceil(products.length / PAGE_SIZE));
+  const safePage = Math.min(page, totalPages);
+  const pageItems = products.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
 
   if (isLoading) {
     return (
@@ -45,7 +53,7 @@ export function ProductList() {
       </Dialog>
 
       <div className="divide-y divide-line rounded-xl border border-line">
-        {products.map((product) => (
+        {pageItems.map((product) => (
           <div key={product.id} className="flex items-center justify-between gap-3 px-5 py-3 text-sm">
             <div className="flex min-w-0 flex-1 items-center gap-3">
               <span className="truncate font-medium text-ink">{product.name}</span>
@@ -76,6 +84,8 @@ export function ProductList() {
           </div>
         ))}
       </div>
+
+      <Pagination currentPage={safePage} totalPages={totalPages} onPageChange={setPage} />
     </>
   );
 }

@@ -1,11 +1,16 @@
+import { useState } from "react";
 import { usePayrollHistory } from "../hooks/usePayrollHistory";
 import { formatCurrency } from "@/utils/currency";
 import { format } from "date-fns/format";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
+import { Pagination } from "@/components/ui/Pagination";
 import { Skeleton } from "@/components/ui/Skeleton";
 
+const PAGE_SIZE = 10;
+
 export function PayrollHistory() {
+  const [page, setPage] = useState(1);
   const { data: runs, isLoading } = usePayrollHistory();
 
   if (isLoading) {
@@ -37,6 +42,10 @@ export function PayrollHistory() {
 
   const sorted = [...paidRuns].sort((a, b) => b.periodStart.localeCompare(a.periodStart));
 
+  const totalPages = Math.max(1, Math.ceil(sorted.length / PAGE_SIZE));
+  const safePage = Math.min(page, totalPages);
+  const pageItems = sorted.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
+
   return (
     <Card>
       <CardHeader>
@@ -58,7 +67,7 @@ export function PayrollHistory() {
             </tr>
           </thead>
           <tbody className="divide-y divide-line">
-            {sorted.map((run) => {
+            {pageItems.map((run) => {
               const deductions = run.advanceDeductions + run.loanDeductions;
               return (
                 <tr key={run.id}>
@@ -85,6 +94,9 @@ export function PayrollHistory() {
             })}
           </tbody>
         </table>
+      </div>
+      <div className="px-4 pb-4">
+        <Pagination currentPage={safePage} totalPages={totalPages} onPageChange={setPage} />
       </div>
     </Card>
   );
