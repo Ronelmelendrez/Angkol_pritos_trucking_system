@@ -27,7 +27,7 @@ export function ProductForm({ initial, onDone }: Props) {
   } = useForm<ProductFormValues>({
     resolver: zodResolver(productSchema) as unknown as Resolver<ProductFormValues>,
     defaultValues: initial
-      ? { name: initial.name, defaultPrice: initial.defaultPrice, unit: initial.unit }
+      ? { name: initial.name, defaultPrice: initial.defaultPrice, unit: initial.unit, reorderThreshold: initial.reorderThreshold }
       : { name: "", defaultPrice: 0, unit: "order" },
   });
 
@@ -65,6 +65,13 @@ export function ProductForm({ initial, onDone }: Props) {
           <Input id="product-unit" placeholder="e.g. order, piece, kg" {...register("unit")} />
           {errors.unit && <p className="mt-1 text-xs text-danger">{errors.unit.message}</p>}
         </div>
+      </div>
+
+      <div>
+        <Label htmlFor="product-threshold">Reorder threshold (optional)</Label>
+        <Input id="product-threshold" type="number" step="1" min="0" {...register("reorderThreshold")} placeholder="e.g. 5" />
+        {errors.reorderThreshold && <p className="mt-1 text-xs text-danger">{errors.reorderThreshold.message}</p>}
+        <p className="mt-1 text-xs text-ink-faint">Low-stock alert triggers when current qty drops below this.</p>
       </div>
 
       <Button type="submit" className="w-full" size="lg" disabled={addProduct.isPending || updateProduct.isPending}>

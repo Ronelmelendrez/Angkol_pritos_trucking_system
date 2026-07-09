@@ -346,6 +346,7 @@ export const payrollRunsTable = createTable(payrollRunSeed);
 const payRuleSettingsSeed: PayRuleSettings[] = [
   {
     id: "global",
+    defaultReorderThreshold: 5,
     standardHoursPerDay: 8,
     halfDayThresholdHours: 4,
     halfDayRateMultiplier: 0.5,

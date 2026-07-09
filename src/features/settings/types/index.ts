@@ -10,6 +10,7 @@ export interface PaydayRule {
 
 export interface PayRuleSettings {
   id: string;
+  defaultReorderThreshold: number;
   standardHoursPerDay: number;
   halfDayThresholdHours: number;
   halfDayRateMultiplier: number;

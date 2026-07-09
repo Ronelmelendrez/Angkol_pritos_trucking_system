@@ -52,6 +52,11 @@ export function ProductList() {
               <Badge variant="neutral" className="shrink-0 text-[10px]">
                 {product.unit}
               </Badge>
+              {product.reorderThreshold !== undefined && (
+                <Badge variant="neutral" className="shrink-0 text-[10px]">
+                  Min {product.reorderThreshold}
+                </Badge>
+              )}
               {!product.isActive && (
                 <Badge variant="neutral" className="shrink-0 text-[10px]">
                   Inactive
