@@ -12,7 +12,6 @@ import { useEmployees } from "@/features/employees/hooks/useEmployees";
 import { useAttendance } from "@/features/attendance/hooks/useAttendance";
 import { useSales } from "@/features/sales/hooks/useSales";
 import { useReports } from "@/features/reports/hooks/useReports";
-import { LowStockBanner } from "@/features/inventory/components/LowStockBanner";
 import { formatCurrency, formatCurrencyCompact } from "@/utils/currency";
 import { formatDate, isDateToday } from "@/utils/date";
 import { CATEGORY_COLORS } from "@/lib/constants";
@@ -47,7 +46,6 @@ export function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      <LowStockBanner />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
