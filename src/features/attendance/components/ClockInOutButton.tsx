@@ -36,8 +36,7 @@ export function ClockInOutButton({ employee, activeRecord }: Props) {
   const clockOut = useClockOut();
   const { toast } = useToast();
 
-  // Use mutation result immediately so clock-out shows right after clock-in
-  const record = clockIn.isSuccess && clockIn.data ? clockIn.data : activeRecord;
+  const record = activeRecord;
   const isClockedIn = !!record && !record.clockOut;
   const isPending = clockIn.isPending || clockOut.isPending;
   const shift = clockOutShift();
