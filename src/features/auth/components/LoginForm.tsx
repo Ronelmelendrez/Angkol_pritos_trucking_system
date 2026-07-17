@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/Label";
 import { useToast } from "@/components/ui/useToast";
 
 export function LoginForm() {
-  const [email, setEmail] = useState("manager@angkolprito.ph");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { login, isLoggingIn } = useAuth();
   const { toast } = useToast();
@@ -17,7 +17,7 @@ export function LoginForm() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     try {
-      await login({ email, password: password || "demo" });
+      await login({ email, password });
       toast({ title: "Welcome back!", description: "Logged in as manager.", variant: "success" });
       navigate("/", { replace: true });
     } catch {
@@ -34,7 +34,7 @@ export function LoginForm() {
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          placeholder="manager@manongsgrill.ph"
+          placeholder="manager@angkolprito.ph"
           required
         />
       </div>
@@ -45,7 +45,7 @@ export function LoginForm() {
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          placeholder="Any password works in demo mode"
+          placeholder="Enter your password"
           required
         />
       </div>
@@ -57,9 +57,6 @@ export function LoginForm() {
         )}
         {isLoggingIn ? "Signing in..." : "Sign in"}
       </Button>
-      <p className="text-center text-xs text-ink-faint">
-        Demo mode — any password works
-      </p>
     </form>
   );
 }
