@@ -3,14 +3,14 @@ import { Sidebar } from "./Sidebar";
 import { Header } from "./Header";
 
 const TITLES: Record<string, string> = {
-  "/": "Dashboard",
-  "/expenses": "Expenses",
-  "/employees": "Employees",
-  "/attendance": "Attendance",
-  "/advances": "Cash Advances",
-  "/loans": "Loans (Utang)",
-  "/reports": "Reports",
-  "/settings": "Settings",
+  "/dashboard": "Dashboard",
+  "/dashboard/expenses": "Expenses",
+  "/dashboard/employees": "Employees",
+  "/dashboard/attendance": "Attendance",
+  "/dashboard/advances": "Cash Advances",
+  "/dashboard/loans": "Loans (Utang)",
+  "/dashboard/reports": "Reports",
+  "/dashboard/settings": "Settings",
 };
 
 export function AppShell() {

@@ -227,7 +227,7 @@ export function DashboardPage() {
               <CardDescription>Latest transactions logged</CardDescription>
             </div>
             <Link
-              to="/expenses"
+              to="/dashboard/expenses"
               className="flex items-center gap-1 text-sm font-medium text-primary hover:underline"
             >
               View all <ArrowRight className="h-3.5 w-3.5" />
@@ -274,7 +274,7 @@ export function DashboardPage() {
               <CardDescription>Currently employed</CardDescription>
             </div>
             <Link
-              to="/employees"
+              to="/dashboard/employees"
               className="flex items-center gap-1 text-sm font-medium text-primary hover:underline"
             >
               View all <ArrowRight className="h-3.5 w-3.5" />

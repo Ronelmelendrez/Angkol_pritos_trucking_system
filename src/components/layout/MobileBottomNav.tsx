@@ -10,7 +10,7 @@ export function MobileBottomNav() {
           <li key={item.path} className="flex-1">
             <NavLink
               to={item.path}
-              end={item.path === "/"}
+              end={item.path === "/dashboard"}
               className={({ isActive }) =>
                 cn(
                   "flex flex-col items-center gap-0.5 py-2 text-[10px] font-medium transition-colors",

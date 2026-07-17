@@ -19,18 +19,18 @@ import { cn } from "@/utils/cn";
 import { useUiStore } from "@/app/store/useUiStore";
 
 const NAV_ITEMS = [
-  { to: "/", label: "Dashboard", icon: LayoutDashboard, end: true },
-  { to: "/sales", label: "Sales", icon: ShoppingCart },
-  { to: "/products", label: "Products", icon: Package },
-  { to: "/expenses", label: "Expenses", icon: Receipt },
-  { to: "/inventory", label: "Inventory", icon: ClipboardList },
-  { to: "/employees", label: "Employees", icon: Users },
-  { to: "/attendance", label: "Attendance", icon: CalendarClock },
-  { to: "/advances", label: "Cash Advances", icon: HandCoins },
-  { to: "/loans", label: "Loans (Utang)", icon: Landmark },
-  { to: "/payroll", label: "Payroll", icon: DollarSign },
-  { to: "/reports", label: "Reports", icon: BarChart3 },
-  { to: "/settings", label: "Settings", icon: Settings },
+  { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard, end: true },
+  { to: "/dashboard/sales", label: "Sales", icon: ShoppingCart },
+  { to: "/dashboard/products", label: "Products", icon: Package },
+  { to: "/dashboard/expenses", label: "Expenses", icon: Receipt },
+  { to: "/dashboard/inventory", label: "Inventory", icon: ClipboardList },
+  { to: "/dashboard/employees", label: "Employees", icon: Users },
+  { to: "/dashboard/attendance", label: "Attendance", icon: CalendarClock },
+  { to: "/dashboard/advances", label: "Cash Advances", icon: HandCoins },
+  { to: "/dashboard/loans", label: "Loans (Utang)", icon: Landmark },
+  { to: "/dashboard/payroll", label: "Payroll", icon: DollarSign },
+  { to: "/dashboard/reports", label: "Reports", icon: BarChart3 },
+  { to: "/dashboard/settings", label: "Settings", icon: Settings },
 ];
 
 export function Sidebar() {

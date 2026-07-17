@@ -2,6 +2,7 @@ import { createBrowserRouter, Navigate } from "react-router-dom"
 import { AppLayout } from "@/components/layout/AppLayout"
 import { ProtectedRoute } from "@/components/layout/ProtectedRoute"
 import { LoginPage } from "@/app/routes/pages/LoginPage"
+import { LandingPage } from "@/app/routes/pages/LandingPage"
 import { DashboardPage } from "@/app/routes/pages/DashboardPage"
 import { SalesPage } from "@/app/routes/pages/SalesPage"
 import { ProductsPage } from "@/app/routes/pages/ProductsPage"
@@ -17,11 +18,15 @@ import { SettingsPage } from "@/app/routes/pages/SettingsPage"
 
 export const router = createBrowserRouter([
   {
+    path: "/",
+    element: <LandingPage />,
+  },
+  {
     path: "/login",
     element: <LoginPage />,
   },
   {
-    path: "/",
+    path: "/dashboard",
     element: (
       <ProtectedRoute>
         <AppLayout />

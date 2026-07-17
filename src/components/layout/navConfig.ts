@@ -21,16 +21,16 @@ export interface NavItem {
 }
 
 export const NAV_ITEMS: NavItem[] = [
-  { path: "/", label: "Dashboard", icon: LayoutDashboard },
-  { path: "/sales", label: "Sales", icon: ShoppingCart },
-  { path: "/products", label: "Products", icon: Package },
-  { path: "/expenses", label: "Expenses", icon: Receipt },
-  { path: "/inventory", label: "Inventory", icon: ClipboardList },
-  { path: "/employees", label: "Employees", icon: Users },
-  { path: "/attendance", label: "Attendance", icon: Clock },
-  { path: "/advances", label: "Advances", icon: Wallet },
-  { path: "/loans", label: "Loans", icon: Banknote },
-  { path: "/payroll", label: "Payroll", icon: DollarSign },
-  { path: "/reports", label: "Reports", icon: BarChart3 },
-  { path: "/settings", label: "Settings", icon: Settings },
+  { path: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { path: "/dashboard/sales", label: "Sales", icon: ShoppingCart },
+  { path: "/dashboard/products", label: "Products", icon: Package },
+  { path: "/dashboard/expenses", label: "Expenses", icon: Receipt },
+  { path: "/dashboard/inventory", label: "Inventory", icon: ClipboardList },
+  { path: "/dashboard/employees", label: "Employees", icon: Users },
+  { path: "/dashboard/attendance", label: "Attendance", icon: Clock },
+  { path: "/dashboard/advances", label: "Advances", icon: Wallet },
+  { path: "/dashboard/loans", label: "Loans", icon: Banknote },
+  { path: "/dashboard/payroll", label: "Payroll", icon: DollarSign },
+  { path: "/dashboard/reports", label: "Reports", icon: BarChart3 },
+  { path: "/dashboard/settings", label: "Settings", icon: Settings },
 ]
