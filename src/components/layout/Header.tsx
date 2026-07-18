@@ -3,7 +3,18 @@ import { useNavigate } from "react-router-dom";
 import { useUiStore } from "@/app/store/useUiStore";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { Button } from "@/components/ui/Button";
+import { Avatar, AvatarFallback } from "@/components/ui/Avatar";
 import { useToast } from "@/components/ui/useToast";
+
+function getInitials(name?: string): string {
+  if (!name) return "?";
+  return name
+    .split(" ")
+    .map((w) => w[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
+}
 
 export function Header({ title }: { title: string }) {
   const { toggleSidebar } = useUiStore();
@@ -35,6 +46,9 @@ export function Header({ title }: { title: string }) {
           <p className="text-sm font-medium leading-tight text-ink">{user?.name}</p>
           <p className="text-[11px] capitalize leading-tight text-ink-faint">{user?.role}</p>
         </div>
+        <Avatar className="h-8 w-8">
+          <AvatarFallback>{getInitials(user?.name)}</AvatarFallback>
+        </Avatar>
         <Button variant="ghost" size="icon" onClick={handleLogout} aria-label="Sign out">
           <LogOut className="h-4 w-4" />
         </Button>
