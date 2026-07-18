@@ -38,8 +38,9 @@ async function main() {
   });
 
   if (error) {
-    if (error.message.includes("already exists")) {
-      console.log("User already exists. Updating role to manager...");
+    const msg = error.message.toLowerCase();
+    if (msg.includes("already")) {
+      console.log("User already exists. Updating profile...");
 
       const { data: existing } = await supabase.auth.admin.listUsers();
       const user = existing?.users?.find((u) => u.email === adminEmail);
@@ -47,8 +48,10 @@ async function main() {
       if (user) {
         await supabase
           .from("profiles")
-          .update({ role: "manager", name: "Admin" })
-          .eq("id", user.id);
+          .upsert(
+            { id: user.id, name: "Admin", email: adminEmail, role: "manager" },
+            { onConflict: "id" }
+          );
         console.log("Profile updated to manager.");
       }
       return;
@@ -58,6 +61,21 @@ async function main() {
   }
 
   console.log(`User created: ${data.user.id}`);
+
+  // Ensure profile exists with manager role (upsert in case trigger didn't fire)
+  const { error: profileError } = await supabase
+    .from("profiles")
+    .upsert(
+      { id: data.user.id, name: "Admin", email: adminEmail, role: "manager" },
+      { onConflict: "id" }
+    );
+
+  if (profileError) {
+    console.error("Profile upsert failed:", profileError.message);
+  } else {
+    console.log("Profile created with manager role.");
+  }
+
   console.log("Admin seeded successfully.");
 }
 
