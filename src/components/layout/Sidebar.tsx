@@ -14,6 +14,8 @@ import {
   Settings,
   Drumstick,
   X,
+  PanelLeftClose,
+  PanelLeftOpen,
 } from "lucide-react";
 import { cn } from "@/utils/cn";
 import { useUiStore } from "@/app/store/useUiStore";
@@ -34,7 +36,7 @@ const NAV_ITEMS = [
 ];
 
 export function Sidebar() {
-  const { isSidebarOpen, closeSidebar } = useUiStore();
+  const { isSidebarOpen, closeSidebar, isSidebarCollapsed, toggleCollapse } = useUiStore();
 
   return (
     <>
@@ -49,29 +51,34 @@ export function Sidebar() {
 
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r border-line bg-surface transition-transform duration-200 lg:sticky lg:top-0 lg:h-screen lg:translate-x-0",
+          "fixed inset-y-0 left-0 z-50 flex flex-col border-r border-line bg-surface transition-all duration-200 lg:sticky lg:top-0 lg:h-screen lg:translate-x-0",
+          isSidebarCollapsed ? "w-[4.5rem]" : "w-64",
           isSidebarOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
-        <div className="flex items-center justify-between px-5 py-5">
-          <div className="flex items-center gap-2.5">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-white">
+        {/* Header */}
+        <div className="flex items-center px-4 py-5">
+          <div className="flex items-center gap-2.5 overflow-hidden">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary text-white">
               <Drumstick className="h-5 w-5" />
             </div>
-            <div>
-              <p className="stamp text-sm font-semibold leading-tight text-ink">Angkol Prito"s</p>
-              <p className="text-[11px] leading-tight text-ink-faint">&amp; Lechon Manok</p>
-            </div>
+            {!isSidebarCollapsed && (
+              <div className="whitespace-nowrap">
+                <p className="stamp text-sm font-semibold leading-tight text-ink">Angkol Prito"s</p>
+                <p className="text-[11px] leading-tight text-ink-faint">&amp; Lechon Manok</p>
+              </div>
+            )}
           </div>
           <button
             onClick={closeSidebar}
-            className="rounded-full p-1.5 text-ink-soft hover:bg-ink/5 lg:hidden"
+            className="ml-auto rounded-full p-1.5 text-ink-soft hover:bg-ink/5 lg:hidden"
             aria-label="Close menu"
           >
             <X className="h-4 w-4" />
           </button>
         </div>
 
+        {/* Nav items */}
         <nav className="flex-1 space-y-1 overflow-y-auto px-3 pb-4">
           {NAV_ITEMS.map((item) => (
             <NavLink
@@ -79,9 +86,11 @@ export function Sidebar() {
               to={item.to}
               end={item.end}
               onClick={closeSidebar}
+              title={isSidebarCollapsed ? item.label : undefined}
               className={({ isActive }) =>
                 cn(
                   "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors",
+                  isSidebarCollapsed && "justify-center px-2",
                   isActive
                     ? "bg-primary/10 text-primary-dark"
                     : "text-ink-soft hover:bg-ink/5 hover:text-ink"
@@ -89,13 +98,31 @@ export function Sidebar() {
               }
             >
               <item.icon className="h-4.5 w-4.5 shrink-0" />
-              {item.label}
+              {!isSidebarCollapsed && <span className="whitespace-nowrap">{item.label}</span>}
             </NavLink>
           ))}
         </nav>
 
-        <div className="border-t border-line px-5 py-4">
-          <p className="text-[11px] text-ink-faint">🍗 Fresh daily, served with pride.</p>
+        {/* Collapse toggle + footer */}
+        <div className="border-t border-line">
+          <button
+            onClick={toggleCollapse}
+            className="hidden w-full items-center gap-3 px-5 py-3 text-sm font-medium text-ink-soft transition-colors hover:bg-ink/5 hover:text-ink lg:flex"
+          >
+            {isSidebarCollapsed ? (
+              <PanelLeftOpen className="h-4.5 w-4.5 shrink-0" />
+            ) : (
+              <>
+                <PanelLeftClose className="h-4.5 w-4.5 shrink-0" />
+                <span>Collapse</span>
+              </>
+            )}
+          </button>
+          {!isSidebarCollapsed && (
+            <div className="border-t border-line px-5 py-4">
+              <p className="text-[11px] text-ink-faint">🍗 Fresh daily, served with pride.</p>
+            </div>
+          )}
         </div>
       </aside>
     </>
