@@ -36,7 +36,15 @@ export const supabaseAuthProvider: AuthProvider = {
       password: credentials.password,
     });
 
-    if (error) throw error;
+    if (error) {
+      if (error.message.includes("Invalid login credentials")) {
+        throw new Error("Invalid email or password.");
+      }
+      if (error.message.includes("Email not confirmed")) {
+        throw new Error("Email not confirmed. Please contact admin.");
+      }
+      throw new Error(error.message);
+    }
 
     const { data: profile } = await supabase
       .from("profiles")
