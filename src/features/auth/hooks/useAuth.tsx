@@ -1,4 +1,6 @@
+import { useEffect } from "react";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
+import { supabase } from "@/lib/supabaseClient";
 import { supabaseAuthProvider as authProvider } from "@/app/providers/AuthProvider.supabase";
 import type { LoginCredentials } from "../types";
 
@@ -26,6 +28,23 @@ export function useAuth() {
       queryClient.setQueryData(SESSION_QUERY_KEY, null);
     },
   });
+
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event) => {
+        if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
+          const user = await authProvider.getSession();
+          queryClient.setQueryData(SESSION_QUERY_KEY, user);
+        } else if (event === "SIGNED_OUT") {
+          queryClient.setQueryData(SESSION_QUERY_KEY, null);
+        }
+      }
+    );
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [queryClient]);
 
   return {
     user: sessionQuery.data ?? null,
