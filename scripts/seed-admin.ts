@@ -4,7 +4,8 @@
  * Usage (run once locally, never commit credentials):
  *   npx tsx scripts/seed-admin.ts
  *
- * Requires SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in .env or shell env.
+ * Requires VITE_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY,
+ * SEED_ADMIN_EMAIL, and SEED_ADMIN_PASSWORD in .env.
  */
 
 import { createClient } from "@supabase/supabase-js";
@@ -14,16 +15,16 @@ dotenv.config();
 
 const supabaseUrl = process.env.VITE_SUPABASE_URL;
 const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const adminEmail = process.env.SEED_ADMIN_EMAIL;
+const adminPassword = process.env.SEED_ADMIN_PASSWORD;
 
-if (!supabaseUrl || !serviceRoleKey) {
+if (!supabaseUrl || !serviceRoleKey || !adminEmail || !adminPassword) {
   console.error(
-    "Missing env vars. Ensure VITE_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are set."
+    "Missing env vars. Ensure VITE_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, " +
+    "SEED_ADMIN_EMAIL, and SEED_ADMIN_PASSWORD are set in .env"
   );
   process.exit(1);
 }
-
-const adminEmail = process.env.SEED_ADMIN_EMAIL || "admin@angkolpritos.com";
-const adminPassword = process.env.SEED_ADMIN_PASSWORD || "angkolpritos123";
 
 const supabase = createClient(supabaseUrl, serviceRoleKey);
 
