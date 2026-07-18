@@ -30,7 +30,7 @@ function saveState(state: RateLimitState) {
 
 export function useRateLimit() {
   const [state, setState] = useState<RateLimitState>(loadState);
-  const [now, setNow] = useState(Date.now());
+  const [now, setNow] = useState(() => Date.now());
 
   const isLocked = !!state.lockedUntil && now < state.lockedUntil;
   const remainingSeconds = isLocked
