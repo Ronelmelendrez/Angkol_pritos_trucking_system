@@ -1,20 +1,14 @@
-import { Menu, LogOut } from "lucide-react";
+import { Menu, LogOut, Settings } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useUiStore } from "@/app/store/useUiStore";
 import { useAuth } from "@/features/auth/hooks/useAuth";
-import { Button } from "@/components/ui/Button";
-import { Avatar, AvatarFallback } from "@/components/ui/Avatar";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/DropdownMenu";
 import { useToast } from "@/components/ui/useToast";
-
-function getInitials(name?: string): string {
-  if (!name) return "?";
-  return name
-    .split(" ")
-    .map((w) => w[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2);
-}
 
 export function Header({ title }: { title: string }) {
   const { toggleSidebar } = useUiStore();
@@ -41,18 +35,28 @@ export function Header({ title }: { title: string }) {
         <h1 className="stamp text-lg font-semibold text-ink sm:text-xl">{title}</h1>
       </div>
 
-      <div className="flex items-center gap-3">
-        <div className="hidden text-right sm:block">
-          <p className="text-sm font-medium leading-tight text-ink">{user?.name}</p>
-          <p className="text-[11px] capitalize leading-tight text-ink-faint">{user?.role}</p>
-        </div>
-        <Avatar className="h-8 w-8">
-          <AvatarFallback>{getInitials(user?.name)}</AvatarFallback>
-        </Avatar>
-        <Button variant="ghost" size="icon" onClick={handleLogout} aria-label="Sign out">
-          <LogOut className="h-4 w-4" />
-        </Button>
-      </div>
+      <DropdownMenu>
+        <DropdownMenuTrigger className="outline-none">
+          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-sm font-bold text-white cursor-pointer hover:opacity-90 transition-opacity">
+            AP
+          </div>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-48">
+          <div className="px-2.5 py-2">
+            <p className="text-sm font-medium text-ink">{user?.name}</p>
+            <p className="text-xs capitalize text-ink-faint">{user?.role}</p>
+          </div>
+          <div className="my-1 h-px bg-line" />
+          <DropdownMenuItem onClick={() => navigate("/dashboard/settings")}>
+            <Settings className="h-4 w-4" />
+            Settings
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={handleLogout}>
+            <LogOut className="h-4 w-4" />
+            Sign out
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </header>
   );
 }
