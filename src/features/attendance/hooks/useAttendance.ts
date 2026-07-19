@@ -56,26 +56,46 @@ export function useManualAttendance() {
       employeeId,
       date,
       status,
+      shift,
     }: {
       employeeId: string;
       date: string;
       status: AttendanceStatus;
+      shift?: ShiftType;
     }) => {
       const existing = attendanceTable
         .list()
         .find((r) => r.employeeId === employeeId && r.date === date);
 
+      const isPresent = status === "present" && shift;
+
+      const patch: Partial<AttendanceRecord> = { status };
+
+      if (isPresent) {
+        const clockInTime = `${date}T05:00:00`;
+        const clockOutTime = shift === "full" ? `${date}T19:00:00` : `${date}T12:00:00`;
+        patch.clockIn = clockInTime;
+        patch.clockOut = clockOutTime;
+        patch.hoursWorked = hoursBetween(clockInTime, clockOutTime);
+        patch.shift = shift;
+      } else {
+        patch.clockIn = null;
+        patch.clockOut = null;
+        patch.hoursWorked = null;
+        patch.shift = null;
+      }
+
       if (existing) {
-        return attendanceTable.update(existing.id, { status });
+        return attendanceTable.update(existing.id, patch);
       }
 
       return attendanceTable.create({
         employeeId,
         date,
-        clockIn: null,
-        clockOut: null,
-        hoursWorked: null,
-        shift: null,
+        clockIn: patch.clockIn ?? null,
+        clockOut: patch.clockOut ?? null,
+        hoursWorked: patch.hoursWorked ?? null,
+        shift: patch.shift ?? null,
         status,
       });
     },
