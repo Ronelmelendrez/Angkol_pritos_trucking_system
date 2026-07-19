@@ -1,9 +1,9 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Menu, LogOut, Settings, Search, Bell, Command, ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useUiStore } from "@/app/store/useUiStore";
 import { useAuth } from "@/features/auth/hooks/useAuth";
-import { NAV_ITEMS } from "@/components/layout/navConfig";
+import { CommandSearch } from "@/components/layout/CommandSearch";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -19,18 +19,6 @@ export function Header({ title }: { title: string }) {
   const navigate = useNavigate();
 
   const [searchOpen, setSearchOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const searchRef = useRef<HTMLInputElement>(null);
-
-  const filtered = searchQuery.trim()
-    ? NAV_ITEMS.filter((item) =>
-        item.label.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-    : [];
-
-  useEffect(() => {
-    if (searchOpen) searchRef.current?.focus();
-  }, [searchOpen]);
 
   useEffect(() => {
     function handleKey(e: KeyboardEvent) {
@@ -38,17 +26,10 @@ export function Header({ title }: { title: string }) {
         e.preventDefault();
         setSearchOpen((prev) => !prev);
       }
-      if (e.key === "Escape") setSearchOpen(false);
     }
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
   }, []);
-
-  function handleSearchSelect(path: string) {
-    navigate(path);
-    setSearchOpen(false);
-    setSearchQuery("");
-  }
 
   async function handleLogout() {
     await logout();
@@ -77,7 +58,6 @@ export function Header({ title }: { title: string }) {
 
         {/* Right: search trigger + notifications + avatar */}
         <div className="flex items-center gap-2">
-          {/* Search trigger */}
           <button
             onClick={() => setSearchOpen(true)}
             className="flex items-center gap-2 rounded-lg border border-line bg-surface px-3 py-1.5 text-sm text-ink-faint transition-colors hover:border-primary/30 hover:text-ink"
@@ -89,7 +69,6 @@ export function Header({ title }: { title: string }) {
             </kbd>
           </button>
 
-          {/* Notifications */}
           <button
             className="relative rounded-lg p-2 text-ink-soft transition-colors hover:bg-ink/5 hover:text-ink"
             aria-label="Notifications"
@@ -98,7 +77,6 @@ export function Header({ title }: { title: string }) {
             <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-primary" />
           </button>
 
-          {/* Avatar dropdown */}
           <DropdownMenu>
             <DropdownMenuTrigger className="outline-none">
               <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-xs font-bold text-white cursor-pointer transition-transform hover:scale-105">
@@ -124,45 +102,7 @@ export function Header({ title }: { title: string }) {
         </div>
       </header>
 
-      {/* Search modal overlay */}
-      {searchOpen && (
-        <div className="fixed inset-0 z-[100] flex items-start justify-center bg-ink/40 backdrop-blur-[2px] pt-[15vh]">
-          <div className="w-full max-w-md rounded-xl border border-line bg-surface shadow-xl">
-            <div className="flex items-center gap-3 border-b border-line px-4 py-3">
-              <Search className="h-4 w-4 text-ink-faint" />
-              <input
-                ref={searchRef}
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Go to..."
-                className="flex-1 bg-transparent text-sm text-ink outline-none placeholder:text-ink-faint"
-              />
-              <kbd className="rounded border border-line bg-background px-1.5 py-0.5 text-[10px] font-medium text-ink-faint">
-                ESC
-              </kbd>
-            </div>
-            <div className="max-h-64 overflow-y-auto p-1">
-              {filtered.length > 0 ? (
-                filtered.map((item) => (
-                  <button
-                    key={item.path}
-                    onClick={() => handleSearchSelect(item.path)}
-                    className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-ink transition-colors hover:bg-primary/10"
-                  >
-                    <item.icon className="h-4 w-4 text-ink-faint" />
-                    {item.label}
-                  </button>
-                ))
-              ) : (
-                <p className="px-3 py-4 text-center text-sm text-ink-faint">
-                  {searchQuery ? "No results found." : "Type to search pages..."}
-                </p>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
+      <CommandSearch open={searchOpen} onClose={() => setSearchOpen(false)} />
     </>
   );
 }
