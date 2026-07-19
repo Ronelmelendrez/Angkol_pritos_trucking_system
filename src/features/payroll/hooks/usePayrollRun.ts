@@ -27,6 +27,8 @@ export interface PayrollRunDraftRow {
   adjustments: number;
   adjustmentNote: string;
   netPay: number;
+  presentCount: number;
+  absentCount: number;
 }
 
 function getEmployeePeriod(
@@ -62,15 +64,21 @@ export function usePayrollRun() {
       const period = getEmployeePeriod(freq, emp.id, paidRuns);
 
       const periodRecords = attendance.filter(
-        (a) => a.employeeId === emp.id && a.hoursWorked != null && a.date >= period.start && a.date <= period.end,
+        (a) => a.employeeId === emp.id && a.date >= period.start && a.date <= period.end,
       );
 
-      const hoursWorked = periodRecords.reduce((sum, a) => sum + (a.hoursWorked ?? 0), 0);
+      const recordsWithHours = periodRecords.filter((a) => a.hoursWorked != null);
+      const hoursWorked = recordsWithHours.reduce((sum, a) => sum + (a.hoursWorked ?? 0), 0);
+
+      const presentCount = periodRecords.filter(
+        (a) => a.status === "present" || (!a.status && a.clockIn),
+      ).length;
+      const absentCount = periodRecords.filter((a) => a.status === "absent").length;
 
       const override = allOverrides.find((o) => o.employeeId === emp.id);
       const rules = resolvePayRules(globalSettings, override);
 
-      const grossPayInputs = periodRecords.map((a) => ({
+      const grossPayInputs = recordsWithHours.map((a) => ({
         hoursWorked: a.hoursWorked ?? 0,
         shift: a.shift,
         clockIn: a.clockIn,
@@ -79,7 +87,7 @@ export function usePayrollRun() {
 
       const grossPay = computeGrossPay(grossPayInputs, emp.dailyRate, rules);
 
-      const daysWorked = periodRecords.reduce((sum, a) => {
+      const daysWorked = recordsWithHours.reduce((sum, a) => {
         if (a.shift === "half") return sum + 0.5;
         if (a.shift === "full") return sum + 1;
         return sum + (a.hoursWorked ?? 0) / rules.standardHoursPerDay;
@@ -110,6 +118,8 @@ export function usePayrollRun() {
         adjustments: 0,
         adjustmentNote: "",
         netPay: grossPay,
+        presentCount,
+        absentCount,
       };
     });
   }, [employees, attendance, advances, loans, globalSettings, allOverrides, paidRuns]);
