@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useUiStore } from "@/app/store/useUiStore";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { CommandSearch } from "@/components/layout/CommandSearch";
+import { NotificationPanel } from "@/components/layout/NotificationPanel";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -19,6 +20,7 @@ export function Header({ title }: { title: string }) {
   const navigate = useNavigate();
 
   const [searchOpen, setSearchOpen] = useState(false);
+  const [notifOpen, setNotifOpen] = useState(false);
 
   useEffect(() => {
     function handleKey(e: KeyboardEvent) {
@@ -70,6 +72,7 @@ export function Header({ title }: { title: string }) {
           </button>
 
           <button
+            onClick={() => setNotifOpen(true)}
             className="relative rounded-lg p-2 text-ink-soft transition-colors hover:bg-ink/5 hover:text-ink"
             aria-label="Notifications"
           >
@@ -103,6 +106,7 @@ export function Header({ title }: { title: string }) {
       </header>
 
       <CommandSearch open={searchOpen} onClose={() => setSearchOpen(false)} />
+      <NotificationPanel open={notifOpen} onClose={() => setNotifOpen(false)} />
     </>
   );
 }
