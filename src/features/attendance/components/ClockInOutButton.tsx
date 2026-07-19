@@ -117,7 +117,7 @@ export function ClockInOutButton({ employee, activeRecord }: Props) {
             <p className="truncate font-semibold text-ink">{employee.name}</p>
             <p className="flex items-center gap-1 text-xs text-ink-soft">
               <Clock className="h-3 w-3" />
-              {record ? `Clocked in at ${formatTime(record.clockIn)}` : ""}
+              {record?.clockIn ? `Clocked in at ${formatTime(record.clockIn)}` : ""}
             </p>
           </div>
         </div>
@@ -144,7 +144,7 @@ export function ClockInOutButton({ employee, activeRecord }: Props) {
                 Are you sure you want to clock out <strong>{employee.name}</strong>?
                 {record && (
                   <span className="block mt-1 text-xs text-ink-faint">
-                    Clocked in at {formatTime(record.clockIn)}
+                    Clocked in at {record.clockIn ? formatTime(record.clockIn) : "—"}
                   </span>
                 )}
                 <span className="mt-2 inline-flex items-center gap-1.5 text-xs text-ink-faint">

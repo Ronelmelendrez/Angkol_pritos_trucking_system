@@ -19,7 +19,7 @@ export function AttendanceLog({ records, employees, isLoading }: Props) {
   const [page, setPage] = useState(1);
 
   const sorted = useMemo(
-    () => [...records].sort((a, b) => (a.clockIn < b.clockIn ? 1 : -1)),
+    () => [...records].sort((a, b) => (a.clockIn ?? "") < (b.clockIn ?? "") ? 1 : -1),
     [records],
   );
 
@@ -76,7 +76,7 @@ export function AttendanceLog({ records, employees, isLoading }: Props) {
                     <span className="text-ink-faint">—</span>
                   )}
                 </td>
-                <td className="px-4 py-3 text-ink-soft">{formatTime(r.clockIn)}</td>
+                <td className="px-4 py-3 text-ink-soft">{r.clockIn ? formatTime(r.clockIn) : "—"}</td>
                 <td className="px-4 py-3">
                   {r.clockOut ? (
                     <span className="text-ink-soft">{formatTime(r.clockOut)}</span>

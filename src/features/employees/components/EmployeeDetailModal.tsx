@@ -121,7 +121,7 @@ export function EmployeeDetailModal({ employee, open, onOpenChange, onEdit }: Pr
                         </Badge>
                       )}
                       <span className="text-ink-soft">
-                        {formatTime(record.clockIn)}
+                        {record.clockIn ? formatTime(record.clockIn) : "—"}
                         {record.clockOut ? ` — ${formatTime(record.clockOut)}` : " (clocked in)"}
                       </span>
                       <span className={cn("font-medium", record.hoursWorked ? "text-ink" : "text-warning")}>

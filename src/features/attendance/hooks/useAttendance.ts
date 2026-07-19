@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { attendanceTable } from "@/lib/mockData";
 import { hoursBetween, nowISO, todayISO } from "@/utils/date";
-import type { AttendanceRecord, ShiftType } from "../types";
+import type { AttendanceRecord, AttendanceStatus, ShiftType } from "../types";
 
 const ATTENDANCE_KEY = ["attendance"] as const;
 
@@ -28,6 +28,7 @@ export function useClockIn() {
         clockOut: null,
         hoursWorked: null,
         shift: null,
+        status: "present",
       }),
     onSettled: () => queryClient.invalidateQueries({ queryKey: ATTENDANCE_KEY }),
   });
@@ -40,8 +41,42 @@ export function useClockOut() {
       const clockOut = nowISO();
       return attendanceTable.update(record.id, {
         clockOut,
-        hoursWorked: hoursBetween(record.clockIn, clockOut),
+        hoursWorked: hoursBetween(record.clockIn!, clockOut),
         shift: detectShift(clockOut),
+      });
+    },
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ATTENDANCE_KEY }),
+  });
+}
+
+export function useManualAttendance() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({
+      employeeId,
+      date,
+      status,
+    }: {
+      employeeId: string;
+      date: string;
+      status: AttendanceStatus;
+    }) => {
+      const existing = attendanceTable
+        .list()
+        .find((r) => r.employeeId === employeeId && r.date === date);
+
+      if (existing) {
+        return attendanceTable.update(existing.id, { status });
+      }
+
+      return attendanceTable.create({
+        employeeId,
+        date,
+        clockIn: null,
+        clockOut: null,
+        hoursWorked: null,
+        shift: null,
+        status,
       });
     },
     onSettled: () => queryClient.invalidateQueries({ queryKey: ATTENDANCE_KEY }),

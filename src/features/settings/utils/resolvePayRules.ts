@@ -16,7 +16,7 @@ export function resolvePayRules(
 export interface GrossPayInput {
   hoursWorked: number;
   shift: "full" | "half" | null;
-  clockIn: string;
+  clockIn: string | null;
   clockOut: string | null;
 }
 
