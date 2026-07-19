@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { Eye, CheckCircle2 } from "lucide-react";
+import { Eye, CheckCircle2, CheckCircle, XCircle, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Checkbox } from "@/components/ui/Checkbox";
 import { Badge } from "@/components/ui/Badge";
 import { formatCurrency } from "@/utils/currency";
+import { formatDate } from "@/utils/date";
 import { PayslipDialog } from "./PayslipDialog";
 import { PayConfirmationDialog } from "./PayConfirmationDialog";
 import type { PayrollRunDraftRow } from "../hooks/usePayrollRun";
@@ -57,7 +58,26 @@ export function PayrollRunRow({
               <span className="font-semibold text-ink">{row.name}</span>
               <Badge variant="neutral">{row.payFrequency === "semi_monthly" ? "Semi-monthly" : row.payFrequency === "weekly" ? "Weekly" : "Monthly"}</Badge>
             </div>
-            <p className="mt-0.5 text-xs text-ink-faint">{row.daysWorked} / {periodDays(row.periodStart, row.periodEnd)} days {formatCurrency(row.dailyRate)}/day</p>
+            <div className="mt-0.5 flex items-center gap-3 text-xs text-ink-faint">
+              <span className="flex items-center gap-1">
+                <Calendar className="h-3 w-3" />
+                {formatDate(row.periodStart)} — {formatDate(row.periodEnd)}
+              </span>
+              <span>·</span>
+              <span>{row.daysWorked} / {periodDays(row.periodStart, row.periodEnd)} days</span>
+              <span>·</span>
+              <span>{formatCurrency(row.dailyRate)}/day</span>
+            </div>
+            <div className="mt-1 flex items-center gap-3 text-xs">
+              <span className="flex items-center gap-1 text-success">
+                <CheckCircle className="h-3 w-3" />
+                {row.presentCount} present
+              </span>
+              <span className="flex items-center gap-1 text-danger">
+                <XCircle className="h-3 w-3" />
+                {row.absentCount} absent
+              </span>
+            </div>
           </div>
           <div className="text-right">
             <p className="text-sm text-ink-faint">Gross</p>
