@@ -55,3 +55,9 @@ export function getPreviousPeriods(frequency: PayFrequency, count: number, refer
   }
   return periods;
 }
+
+export function getNextPeriod(freq: PayFrequency, afterEnd: string): PayPeriod {
+  const d = new Date(afterEnd + "T00:00:00");
+  d.setDate(d.getDate() + 1);
+  return getCurrentPeriod(freq, d);
+}

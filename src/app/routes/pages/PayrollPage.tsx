@@ -1,8 +1,5 @@
-import { useState, useCallback, useMemo, useEffect } from "react";
-import { subMonths } from "date-fns/subMonths";
-import { addMonths } from "date-fns/addMonths";
-import { addWeeks } from "date-fns/addWeeks";
-import { format } from "date-fns/format";
+import { useState, useCallback, useMemo } from "react";
+import { format } from "date-fns";
 import { Clock, AlertTriangle } from "lucide-react";
 import { ErrorBoundary } from "@/components/layout/ErrorBoundary";
 import { PayPeriodPicker } from "@/features/payroll/components/PayPeriodPicker";
@@ -10,37 +7,22 @@ import { PayrollRunTable } from "@/features/payroll/components/PayrollRunTable";
 import { PayrollHistory } from "@/features/payroll/components/PayrollHistory";
 import { usePayPayroll } from "@/features/payroll/hooks/usePayPayroll";
 import { usePayrollHistory } from "@/features/payroll/hooks/usePayrollHistory";
+import { usePayrollRun } from "@/features/payroll/hooks/usePayrollRun";
 import { getCurrentPeriod } from "@/features/payroll/utils/payPeriods";
 import { getScheduledPayday } from "@/features/payroll/utils/paydays";
 import { usePayRuleSettings } from "@/features/settings/hooks/usePayRuleSettings";
 import { formatCurrency } from "@/utils/currency";
 import { Badge } from "@/components/ui/Badge";
-import type { PayFrequency, PayFrequencyFilter } from "@/features/payroll/utils/payPeriods";
+import type { PayFrequencyFilter } from "@/features/payroll/utils/payPeriods";
 import type { PayrollRunDraftRow } from "@/features/payroll/hooks/usePayrollRun";
 
 function PayrollContent() {
   const [frequency, setFrequency] = useState<PayFrequencyFilter>("semi_monthly");
-  const [referenceDate, setReferenceDate] = useState(() => {
-    try {
-      const saved = sessionStorage.getItem("payrollReferenceDate");
-      if (saved) return new Date(saved);
-    } catch {
-      /* empty */
-    }
-    return new Date();
-  });
-
-  useEffect(() => {
-    try {
-      sessionStorage.setItem("payrollReferenceDate", referenceDate.toISOString());
-    } catch {
-      /* empty */
-    }
-  }, [referenceDate]);
   const isAll = frequency === "all";
 
   const { data: history = [] } = usePayrollHistory();
   const { data: settings } = usePayRuleSettings();
+  const draftRows = usePayrollRun();
 
   const [selectedAdvances, setSelectedAdvances] = useState<Record<string, string[]>>({});
   const [loanDeductions, setLoanDeductions] = useState<Record<string, number>>({});
@@ -49,40 +31,6 @@ function PayrollContent() {
   const [payingIds, setPayingIds] = useState<string[]>([]);
 
   const payPayroll = usePayPayroll();
-
-  const advanceDate = useCallback((d: Date, dir: 1 | -1, freq: PayFrequency) => {
-    const day = d.getDate();
-    const month = d.getMonth();
-    const year = d.getFullYear();
-    if (freq === "weekly") return dir === 1 ? addWeeks(d, 1) : addWeeks(d, -1);
-    if (freq === "semi_monthly") {
-      if (dir === 1) {
-        if (day <= 15) return new Date(year, month, 25);
-        return new Date(year, month + 1, 8);
-      }
-      if (day <= 15) return new Date(year, month - 1, 25);
-      return new Date(year, month, 8);
-    }
-    return dir === 1 ? addMonths(d, 1) : subMonths(d, 1);
-  }, []);
-
-  const handlePrev = useCallback(() => {
-    setReferenceDate((d) => advanceDate(d, -1, frequency === "all" ? "monthly" : (frequency as PayFrequency)));
-    setSelectedAdvances({});
-    setLoanDeductions({});
-    setAdjustments({});
-    setAdjustmentNotes({});
-  }, [advanceDate, frequency]);
-
-  const handleNext = useCallback(() => {
-    setReferenceDate((d) => advanceDate(d, 1, frequency === "all" ? "monthly" : (frequency as PayFrequency)));
-    setSelectedAdvances({});
-    setLoanDeductions({});
-    setAdjustments({});
-    setAdjustmentNotes({});
-  }, [advanceDate, frequency]);
-
-  const canGoNext = !isAll && getCurrentPeriod(frequency as PayFrequency, advanceDate(referenceDate, 1, frequency as PayFrequency)).end <= new Date().toISOString().slice(0, 10);
 
   const handleAdvanceToggle = useCallback((employeeId: string, advanceId: string) => {
     setSelectedAdvances((prev) => {
@@ -103,25 +51,45 @@ function PayrollContent() {
         loanRepayAmount: loanDeductions[row.employeeId] ?? 0,
         paidAt,
       });
-      setSelectedAdvances({});
-      setLoanDeductions({});
-      setAdjustments({});
-      setAdjustmentNotes({});
-      setReferenceDate((d) => advanceDate(d, 1, row.payFrequency));
+      setSelectedAdvances((prev) => {
+        const next = { ...prev };
+        delete next[row.employeeId];
+        return next;
+      });
+      setLoanDeductions((prev) => {
+        const next = { ...prev };
+        delete next[row.employeeId];
+        return next;
+      });
+      setAdjustments((prev) => {
+        const next = { ...prev };
+        delete next[row.employeeId];
+        return next;
+      });
+      setAdjustmentNotes((prev) => {
+        const next = { ...prev };
+        delete next[row.employeeId];
+        return next;
+      });
     } finally {
       setPayingIds((prev) => prev.filter((id) => id !== row.employeeId));
     }
-  }, [payPayroll, selectedAdvances, loanDeductions, advanceDate]);
-
-  const currentPeriod = !isAll ? getCurrentPeriod(frequency, referenceDate) : null;
+  }, [payPayroll, selectedAdvances, loanDeductions]);
 
   const paidEmployeeIds = useMemo(() => {
-    if (isAll) return [];
-    const period = currentPeriod!;
-    return history
-      .filter((r) => r.periodStart === period.start && r.periodEnd === period.end && r.status === "paid")
+    return draftRows
+      .filter((row) => {
+        if (isAll) return false;
+        return history.some(
+          (r) =>
+            r.employeeId === row.employeeId &&
+            r.periodStart === row.periodStart &&
+            r.periodEnd === row.periodEnd &&
+            r.status === "paid",
+        );
+      })
       .map((r) => r.employeeId);
-  }, [history, isAll, currentPeriod]);
+  }, [draftRows, history, isAll, frequency]);
 
   const readyRuns = useMemo(() => {
     return history
@@ -142,12 +110,12 @@ function PayrollContent() {
       <div className="flex items-center justify-between">
         <h2 className="font-display text-lg font-semibold text-char-900 md:text-xl">Payroll</h2>
         <PayPeriodPicker
-          periodLabel={currentPeriod?.label ?? ""}
+          periodLabel=""
           frequency={frequency}
           onFrequencyChange={setFrequency}
-          onPrev={handlePrev}
-          onNext={handleNext}
-          canGoNext={canGoNext}
+          onPrev={() => {}}
+          onNext={() => {}}
+          canGoNext={false}
         />
       </div>
 
@@ -158,13 +126,9 @@ function PayrollContent() {
           {!isAll && <Badge variant="neutral">{FREQ_LABELS[frequency]} period</Badge>}
         </div>
         <PayrollRunTable
-          referenceDate={referenceDate}
           paidEmployeeIds={paidEmployeeIds}
-          frequencyFilter={isAll ? undefined : (frequency as PayFrequency)}
+          frequencyFilter={isAll ? undefined : (frequency as "weekly" | "semi_monthly" | "monthly")}
           selectedAdvances={selectedAdvances}
-          loanDeductions={loanDeductions}
-          adjustments={adjustments}
-          adjustmentNotes={adjustmentNotes}
           onAdvanceToggle={handleAdvanceToggle}
           onLoanDeductionChange={(empId, val) => setLoanDeductions((p) => ({ ...p, [empId]: val }))}
           onAdjustmentChange={(empId, val) => setAdjustments((p) => ({ ...p, [empId]: val }))}

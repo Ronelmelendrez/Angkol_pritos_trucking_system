@@ -7,13 +7,9 @@ import type { PayFrequency } from "../utils/payPeriods";
 const PAGE_SIZE = 10;
 
 interface Props {
-  referenceDate: Date;
   paidEmployeeIds: string[];
   frequencyFilter?: PayFrequency;
   selectedAdvances: Record<string, string[]>;
-  loanDeductions: Record<string, number>;
-  adjustments: Record<string, number>;
-  adjustmentNotes: Record<string, string>;
   onAdvanceToggle: (employeeId: string, advanceId: string) => void;
   onLoanDeductionChange: (employeeId: string, val: number) => void;
   onAdjustmentChange: (employeeId: string, val: number) => void;
@@ -23,12 +19,8 @@ interface Props {
 }
 
 export function PayrollRunTable({
-  referenceDate,
   paidEmployeeIds,
   selectedAdvances,
-  loanDeductions,
-  adjustments,
-  adjustmentNotes,
   onAdvanceToggle,
   onLoanDeductionChange,
   onAdjustmentChange,
@@ -38,7 +30,7 @@ export function PayrollRunTable({
   frequencyFilter,
 }: Props) {
   const [page, setPage] = useState(1);
-  const allRows = usePayrollRun(referenceDate);
+  const allRows = usePayrollRun();
 
   const rows = useMemo(() => {
     if (!frequencyFilter) return allRows;

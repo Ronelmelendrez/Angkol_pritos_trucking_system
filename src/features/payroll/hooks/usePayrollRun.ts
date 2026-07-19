@@ -5,7 +5,8 @@ import { useAdvances } from "@/features/advances/hooks/useAdvances";
 import { useLoans } from "@/features/loans/hooks/useLoans";
 import { usePayRuleSettings, useAllEmployeePayOverrides } from "@/features/settings/hooks/usePayRuleSettings";
 import { resolvePayRules, computeGrossPay } from "@/features/settings/utils/resolvePayRules";
-import { getCurrentPeriod, type PayFrequency } from "../utils/payPeriods";
+import { getCurrentPeriod, getNextPeriod, type PayFrequency, type PayPeriod } from "../utils/payPeriods";
+import { usePayrollHistory } from "./usePayrollHistory";
 
 export interface PayrollRunDraftRow {
   employeeId: string;
@@ -28,13 +29,29 @@ export interface PayrollRunDraftRow {
   netPay: number;
 }
 
-export function usePayrollRun(referenceDate: Date = new Date()) {
+function getEmployeePeriod(
+  freq: PayFrequency,
+  employeeId: string,
+  paidRuns: { employeeId: string; periodEnd: string; status: string }[],
+): PayPeriod {
+  const lastPaid = paidRuns
+    .filter((r) => r.employeeId === employeeId && r.status === "paid")
+    .sort((a, b) => b.periodEnd.localeCompare(a.periodEnd))[0];
+
+  if (lastPaid) {
+    return getNextPeriod(freq, lastPaid.periodEnd);
+  }
+  return getCurrentPeriod(freq);
+}
+
+export function usePayrollRun() {
   const { data: employees = [] } = useEmployees();
   const { data: attendance = [] } = useAttendance();
   const { data: advances = [] } = useAdvances();
   const { data: loans = [] } = useLoans();
   const { data: globalSettings } = usePayRuleSettings();
   const { data: allOverrides = [] } = useAllEmployeePayOverrides();
+  const { data: paidRuns = [] } = usePayrollHistory();
 
   return useMemo(() => {
     if (!globalSettings) return [];
@@ -42,7 +59,7 @@ export function usePayrollRun(referenceDate: Date = new Date()) {
     const active = employees.filter((e) => e.isActive);
     return active.map((emp) => {
       const freq = emp.payFrequency ?? "semi_monthly";
-      const period = getCurrentPeriod(freq, referenceDate);
+      const period = getEmployeePeriod(freq, emp.id, paidRuns);
 
       const periodRecords = attendance.filter(
         (a) => a.employeeId === emp.id && a.hoursWorked != null && a.date >= period.start && a.date <= period.end,
@@ -95,5 +112,5 @@ export function usePayrollRun(referenceDate: Date = new Date()) {
         netPay: grossPay,
       };
     });
-  }, [employees, attendance, advances, loans, globalSettings, allOverrides, referenceDate]);
+  }, [employees, attendance, advances, loans, globalSettings, allOverrides, paidRuns]);
 }
