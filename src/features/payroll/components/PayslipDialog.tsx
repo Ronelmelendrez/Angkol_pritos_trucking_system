@@ -1,6 +1,8 @@
 import { format } from "date-fns";
+import { CheckCircle, XCircle, Calendar } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/Dialog";
 import { formatCurrency } from "@/utils/currency";
+import { formatDate } from "@/utils/date";
 import type { PayrollRunDraftRow } from "../hooks/usePayrollRun";
 
 interface Props {
@@ -30,11 +32,28 @@ export function PayslipDialog({ open, onOpenChange, row, advanceIds, loanRepayAm
             <span className="text-ink-faint">Period</span>
             <span className="font-medium text-ink">{row.periodLabel}</span>
           </div>
+          <div className="flex items-center justify-between">
+            <span className="text-ink-faint">Date range</span>
+            <span className="flex items-center gap-1 font-medium text-ink">
+              <Calendar className="h-3 w-3" />
+              {formatDate(row.periodStart)} — {formatDate(row.periodEnd)}
+            </span>
+          </div>
           <div className="flex justify-between">
             <span className="text-ink-faint">Pay date</span>
             <span className="font-medium text-ink">{format(new Date(), "MMM d, yyyy")}</span>
           </div>
           <hr className="border-line" />
+          <div className="flex items-center gap-4">
+            <span className="flex items-center gap-1 text-xs text-success">
+              <CheckCircle className="h-3 w-3" />
+              {row.presentCount} present
+            </span>
+            <span className="flex items-center gap-1 text-xs text-danger">
+              <XCircle className="h-3 w-3" />
+              {row.absentCount} absent
+            </span>
+          </div>
           <div className="flex justify-between">
             <span className="text-ink-faint">Days worked</span>
             <span className="font-medium text-ink">{row.daysWorked} days</span>
