@@ -25,7 +25,7 @@ export function PayslipDialog({ open, onOpenChange, row, advanceIds, loanRepayAm
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>Payslip \u2014 {row.name}</DialogTitle>
+          <DialogTitle>Payslip — {row.name}</DialogTitle>
         </DialogHeader>
         <div className="space-y-3 text-sm">
           <div className="flex justify-between">
@@ -63,8 +63,8 @@ export function PayslipDialog({ open, onOpenChange, row, advanceIds, loanRepayAm
             <span className="font-medium text-ink">{formatCurrency(row.dailyRate)}/day</span>
           </div>
           <div className="flex justify-between">
-            <span className="font-medium text-ink">Gross pay</span>
-            <span className="font-semibold text-ink">{formatCurrency(row.grossPay)}</span>
+            <span className="text-ink-faint">Gross pay</span>
+            <span className="font-medium text-ink">{formatCurrency(row.grossPay)}</span>
           </div>
           <hr className="border-line" />
           {advanceTotal > 0 && (

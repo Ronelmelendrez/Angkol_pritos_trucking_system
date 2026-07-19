@@ -14,7 +14,6 @@ export interface PayRuleSettings {
   standardHoursPerDay: number;
   halfDayThresholdHours: number;
   halfDayRateMultiplier: number;
-  overtimeRateMultiplier: number;
   lateGraceMinutes: number;
   lateDeductionPerMinute: number;
   absenceDeductionMode: "full_day" | "none";
@@ -33,7 +32,6 @@ export interface EmployeePayOverride {
   id: string;
   employeeId: string;
   halfDayRateMultiplier?: number;
-  overtimeRateMultiplier?: number;
   lateDeductionPerMinute?: number;
   createdAt: string;
   updatedAt: string;

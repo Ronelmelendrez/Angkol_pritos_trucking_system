@@ -20,20 +20,17 @@ export function EmployeePayOverrideForm({ employee }: Props) {
   const { register, handleSubmit, reset } = useForm({
     defaultValues: {
       halfDayRateMultiplier: override?.halfDayRateMultiplier ?? "",
-      overtimeRateMultiplier: override?.overtimeRateMultiplier ?? "",
       lateDeductionPerMinute: override?.lateDeductionPerMinute ?? "",
     },
     values: {
       halfDayRateMultiplier: override?.halfDayRateMultiplier ?? "",
-      overtimeRateMultiplier: override?.overtimeRateMultiplier ?? "",
       lateDeductionPerMinute: override?.lateDeductionPerMinute ?? "",
     },
   });
 
-  async function onSubmit(values: { halfDayRateMultiplier: string | number; overtimeRateMultiplier: string | number; lateDeductionPerMinute: string | number }) {
+  async function onSubmit(values: { halfDayRateMultiplier: string | number; lateDeductionPerMinute: string | number }) {
     const payload: Record<string, number> = {};
     if (values.halfDayRateMultiplier !== "") payload.halfDayRateMultiplier = Number(values.halfDayRateMultiplier);
-    if (values.overtimeRateMultiplier !== "") payload.overtimeRateMultiplier = Number(values.overtimeRateMultiplier);
     if (values.lateDeductionPerMinute !== "") payload.lateDeductionPerMinute = Number(values.lateDeductionPerMinute);
 
     try {
@@ -45,7 +42,7 @@ export function EmployeePayOverrideForm({ employee }: Props) {
   }
 
   function handleReset() {
-    reset({ halfDayRateMultiplier: "", overtimeRateMultiplier: "", lateDeductionPerMinute: "" });
+    reset({ halfDayRateMultiplier: "", lateDeductionPerMinute: "" });
     setOverride.mutate(
       { employeeId: employee.id },
       { onSuccess: () => toast({ title: "Overrides cleared", description: "Using global defaults.", variant: "success" }) },
@@ -69,16 +66,6 @@ export function EmployeePayOverrideForm({ employee }: Props) {
         <Input id="halfDayRateMultiplier" type="number" step="0.05" min="0" max="1" placeholder={String(global.halfDayRateMultiplier)} {...register("halfDayRateMultiplier")} />
         {hasOverride && override?.halfDayRateMultiplier != null && (
           <p className="mt-0.5 text-xs text-primary-dark">Overriding default {global.halfDayRateMultiplier}× → {override.halfDayRateMultiplier}×</p>
-        )}
-      </div>
-
-      <div>
-        <Label htmlFor="overtimeRateMultiplier">
-          Overtime multiplier <span className="text-ink-faint">(global: {global.overtimeRateMultiplier}×)</span>
-        </Label>
-        <Input id="overtimeRateMultiplier" type="number" step="0.05" min="1" placeholder={String(global.overtimeRateMultiplier)} {...register("overtimeRateMultiplier")} />
-        {hasOverride && override?.overtimeRateMultiplier != null && (
-          <p className="mt-0.5 text-xs text-primary-dark">Overriding default {global.overtimeRateMultiplier}× → {override.overtimeRateMultiplier}×</p>
         )}
       </div>
 

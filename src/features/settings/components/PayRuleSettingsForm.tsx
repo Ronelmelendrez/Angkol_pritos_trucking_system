@@ -16,7 +16,6 @@ const payRuleSettingsSchema = z.object({
   standardHoursPerDay: z.coerce.number().min(1).max(24),
   halfDayThresholdHours: z.coerce.number().min(0),
   halfDayRateMultiplier: z.coerce.number().min(0).max(1),
-  overtimeRateMultiplier: z.coerce.number().min(1),
   lateGraceMinutes: z.coerce.number().min(0),
   lateDeductionPerMinute: z.coerce.number().min(0),
   absenceDeductionMode: z.enum(["full_day", "none"]),
@@ -71,7 +70,6 @@ export function PayRuleSettingsForm() {
       standardHoursPerDay: settings.standardHoursPerDay,
       halfDayThresholdHours: settings.halfDayThresholdHours,
       halfDayRateMultiplier: settings.halfDayRateMultiplier,
-      overtimeRateMultiplier: settings.overtimeRateMultiplier,
       lateGraceMinutes: settings.lateGraceMinutes,
       lateDeductionPerMinute: settings.lateDeductionPerMinute,
       absenceDeductionMode: settings.absenceDeductionMode,
@@ -153,8 +151,8 @@ export function PayRuleSettingsForm() {
       </Card>
 
       <Card>
-        <CardHeader><CardTitle>Half-day &amp; overtime</CardTitle></CardHeader>
-        <div className="grid grid-cols-3 gap-4 p-6 pt-0">
+        <CardHeader><CardTitle>Half-day rate</CardTitle></CardHeader>
+        <div className="grid grid-cols-2 gap-4 p-6 pt-0">
           <div>
             <Label htmlFor="halfDayThresholdHours">Half-day threshold (hrs)</Label>
             <Input id="halfDayThresholdHours" type="number" step="0.5" min="0" {...register("halfDayThresholdHours")} />
@@ -163,10 +161,6 @@ export function PayRuleSettingsForm() {
           <div>
             <Label htmlFor="halfDayRateMultiplier">Half-day rate multiplier</Label>
             <Input id="halfDayRateMultiplier" type="number" step="0.05" min="0" max="1" {...register("halfDayRateMultiplier")} />
-          </div>
-          <div>
-            <Label htmlFor="overtimeRateMultiplier">Overtime multiplier</Label>
-            <Input id="overtimeRateMultiplier" type="number" step="0.05" min="1" {...register("overtimeRateMultiplier")} />
           </div>
         </div>
       </Card>

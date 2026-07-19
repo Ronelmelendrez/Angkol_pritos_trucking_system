@@ -8,7 +8,6 @@ export function resolvePayRules(
   return {
     ...global,
     ...(override.halfDayRateMultiplier != null && { halfDayRateMultiplier: override.halfDayRateMultiplier }),
-    ...(override.overtimeRateMultiplier != null && { overtimeRateMultiplier: override.overtimeRateMultiplier }),
     ...(override.lateDeductionPerMinute != null && { lateDeductionPerMinute: override.lateDeductionPerMinute }),
   };
 }
@@ -38,14 +37,7 @@ export function computeGrossPay(
     }
 
     if (r.shift === "full") {
-      if (hours > rules.standardHoursPerDay) {
-        total += dailyRate;
-        const otHours = hours - rules.standardHoursPerDay;
-        const otPay = (dailyRate / rules.standardHoursPerDay) * otHours * (rules.overtimeRateMultiplier - 1);
-        total += otPay;
-      } else {
-        total += dailyRate;
-      }
+      total += dailyRate;
       continue;
     }
 
@@ -53,11 +45,6 @@ export function computeGrossPay(
 
     if (hours <= rules.halfDayThresholdHours) {
       total += dailyRate * rules.halfDayRateMultiplier;
-    } else if (hours > rules.standardHoursPerDay) {
-      total += dailyRate;
-      const otHours = hours - rules.standardHoursPerDay;
-      const otPay = (dailyRate / rules.standardHoursPerDay) * otHours * (rules.overtimeRateMultiplier - 1);
-      total += otPay;
     } else {
       total += (hours / rules.standardHoursPerDay) * dailyRate;
     }

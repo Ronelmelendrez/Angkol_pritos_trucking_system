@@ -353,7 +353,6 @@ const payRuleSettingsSeed: PayRuleSettings[] = [
     standardHoursPerDay: 8,
     halfDayThresholdHours: 4,
     halfDayRateMultiplier: 0.5,
-    overtimeRateMultiplier: 1.25,
     lateGraceMinutes: 10,
     lateDeductionPerMinute: 0,
     absenceDeductionMode: "full_day",

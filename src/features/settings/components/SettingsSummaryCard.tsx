@@ -14,7 +14,6 @@ export function SettingsSummaryCard() {
         <Row label="Rounding" value={settings.roundHoursTo === 0 ? "None" : `Nearest ${settings.roundHoursTo}h`} />
         <Row label="Half-day threshold" value={`≤${settings.halfDayThresholdHours}h`} />
         <Row label="Half-day rate" value={`${(settings.halfDayRateMultiplier * 100).toFixed(0)}%`} />
-        <Row label="Overtime multiplier" value={`${settings.overtimeRateMultiplier}×`} />
         <Row label="Late grace" value={`${settings.lateGraceMinutes} min`} />
         <Row label="Late deduction" value={`₱${settings.lateDeductionPerMinute}/min`} />
         <Row label="Rest day" value={`${settings.restDayRateMultiplier}×`} />
