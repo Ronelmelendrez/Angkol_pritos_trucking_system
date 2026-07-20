@@ -94,8 +94,10 @@ export function AttendanceLog({ records, employees, isLoading }: Props) {
                 <td className="px-4 py-3">
                   {r.clockOut ? (
                     <span className="text-ink-soft">{formatTime(r.clockOut)}</span>
-                  ) : (
+                  ) : r.clockIn ? (
                     <Badge variant="success">In progress</Badge>
+                  ) : (
+                    <span className="text-ink-faint">—</span>
                   )}
                 </td>
                 <td className="px-4 py-3 text-right text-ink">
