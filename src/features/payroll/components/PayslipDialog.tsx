@@ -11,15 +11,17 @@ interface Props {
   row: PayrollRunDraftRow;
   advanceIds: string[];
   loanRepayAmount: number;
+  currentAdjustment: number;
+  currentAdjustmentNote: string;
 }
 
-export function PayslipDialog({ open, onOpenChange, row, advanceIds, loanRepayAmount }: Props) {
+export function PayslipDialog({ open, onOpenChange, row, advanceIds, loanRepayAmount, currentAdjustment, currentAdjustmentNote }: Props) {
   const advanceTotal = advanceIds.reduce((s, id) => {
     const a = row.pendingAdvances.find((pa) => pa.id === id);
     return s + (a?.amount ?? 0);
   }, 0);
 
-  const netPay = Math.max(0, row.grossPay - advanceTotal - loanRepayAmount + row.adjustments);
+  const netPay = Math.max(0, row.grossPay - advanceTotal - loanRepayAmount + currentAdjustment);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -79,10 +81,10 @@ export function PayslipDialog({ open, onOpenChange, row, advanceIds, loanRepayAm
               <span>-{formatCurrency(loanRepayAmount)}</span>
             </div>
           )}
-          {row.adjustments !== 0 && (
-            <div className="flex justify-between" style={{ color: row.adjustments > 0 ? "var(--color-success)" : "var(--color-danger)" }}>
-              <span>{row.adjustmentNote || "Adjustment"}</span>
-              <span>{row.adjustments > 0 ? "+" : ""}{formatCurrency(row.adjustments)}</span>
+          {currentAdjustment !== 0 && (
+            <div className="flex justify-between" style={{ color: currentAdjustment > 0 ? "var(--color-success)" : "var(--color-danger)" }}>
+              <span>{currentAdjustmentNote || "Adjustment"}</span>
+              <span>{currentAdjustment > 0 ? "+" : ""}{formatCurrency(currentAdjustment)}</span>
             </div>
           )}
           <hr className="border-line" />

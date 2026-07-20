@@ -42,8 +42,10 @@ function PayrollContent() {
   const handlePay = useCallback(async (row: PayrollRunDraftRow, paidAt: string) => {
     setPayingIds((prev) => [...prev, row.employeeId]);
     try {
+      const currentAdj = adjustments[row.employeeId] ?? 0;
+      const currentNote = adjustmentNotes[row.employeeId] ?? "";
       await payPayroll.mutateAsync({
-        row,
+        row: { ...row, adjustments: currentAdj, adjustmentNote: currentNote },
         advanceIds: selectedAdvances[row.employeeId] ?? [],
         loanRepayAmount: loanDeductions[row.employeeId] ?? 0,
         paidAt,
@@ -71,7 +73,7 @@ function PayrollContent() {
     } finally {
       setPayingIds((prev) => prev.filter((id) => id !== row.employeeId));
     }
-  }, [payPayroll, selectedAdvances, loanDeductions]);
+  }, [payPayroll, selectedAdvances, loanDeductions, adjustments, adjustmentNotes]);
 
   const paidEmployeeIds = useMemo(() => {
     return draftRows
@@ -109,6 +111,9 @@ function PayrollContent() {
         <PayrollRunTable
           paidEmployeeIds={paidEmployeeIds}
           selectedAdvances={selectedAdvances}
+          loanDeductions={loanDeductions}
+          adjustments={adjustments}
+          adjustmentNotes={adjustmentNotes}
           onAdvanceToggle={handleAdvanceToggle}
           onLoanDeductionChange={(empId, val) => setLoanDeductions((p) => ({ ...p, [empId]: val }))}
           onAdjustmentChange={(empId, val) => setAdjustments((p) => ({ ...p, [empId]: val }))}

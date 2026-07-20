@@ -8,6 +8,9 @@ const PAGE_SIZE = 10;
 interface Props {
   paidEmployeeIds: string[];
   selectedAdvances: Record<string, string[]>;
+  loanDeductions: Record<string, number>;
+  adjustments: Record<string, number>;
+  adjustmentNotes: Record<string, string>;
   onAdvanceToggle: (employeeId: string, advanceId: string) => void;
   onLoanDeductionChange: (employeeId: string, val: number) => void;
   onAdjustmentChange: (employeeId: string, val: number) => void;
@@ -19,6 +22,9 @@ interface Props {
 export function PayrollRunTable({
   paidEmployeeIds,
   selectedAdvances,
+  loanDeductions,
+  adjustments,
+  adjustmentNotes,
   onAdvanceToggle,
   onLoanDeductionChange,
   onAdjustmentChange,
@@ -45,6 +51,9 @@ export function PayrollRunTable({
             key={row.employeeId}
             row={row}
             selectedAdvanceIds={selectedAdvances[row.employeeId] ?? []}
+            currentLoanDeduction={loanDeductions[row.employeeId] ?? 0}
+            currentAdjustment={adjustments[row.employeeId] ?? 0}
+            currentAdjustmentNote={adjustmentNotes[row.employeeId] ?? ""}
             onAdvanceToggle={(id) => onAdvanceToggle(row.employeeId, id)}
             onLoanDeductionChange={(val) => onLoanDeductionChange(row.employeeId, val)}
             onAdjustmentChange={(val) => onAdjustmentChange(row.employeeId, val)}

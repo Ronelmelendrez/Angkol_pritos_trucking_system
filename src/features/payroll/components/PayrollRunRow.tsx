@@ -13,6 +13,9 @@ import type { PayrollRunDraftRow } from "../hooks/usePayrollRun";
 interface Props {
   row: PayrollRunDraftRow;
   selectedAdvanceIds: string[];
+  currentLoanDeduction: number;
+  currentAdjustment: number;
+  currentAdjustmentNote: string;
   onAdvanceToggle: (id: string) => void;
   onLoanDeductionChange: (val: number) => void;
   onAdjustmentChange: (val: number) => void;
@@ -31,6 +34,9 @@ function periodDays(periodStart: string, periodEnd: string) {
 export function PayrollRunRow({
   row,
   selectedAdvanceIds,
+  currentLoanDeduction,
+  currentAdjustment,
+  currentAdjustmentNote,
   onAdvanceToggle,
   onLoanDeductionChange,
   onAdjustmentChange,
@@ -47,7 +53,7 @@ export function PayrollRunRow({
     return s + (a?.amount ?? 0);
   }, 0);
 
-  const netPay = Math.max(0, row.grossPay - advanceTotal - row.loanDeduction + row.adjustments);
+  const netPay = Math.max(0, row.grossPay - advanceTotal - currentLoanDeduction + currentAdjustment);
 
   return (
     <>
@@ -112,7 +118,7 @@ export function PayrollRunRow({
                   min="0"
                   max={row.loanRemaining}
                   step="0.01"
-                  value={row.loanDeduction || ""}
+                  value={currentLoanDeduction || ""}
                   onChange={(e) => onLoanDeductionChange(Number(e.target.value) || 0)}
                   placeholder="0"
                   className="h-8 w-32"
@@ -126,7 +132,7 @@ export function PayrollRunRow({
                 <Input
                   type="number"
                   step="0.01"
-                  value={row.adjustments || ""}
+                  value={currentAdjustment || ""}
                   onChange={(e) => onAdjustmentChange(Number(e.target.value) || 0)}
                   placeholder="0"
                   className="h-8 w-full"
@@ -135,7 +141,7 @@ export function PayrollRunRow({
               <div>
                 <p className="mb-1 text-xs font-medium text-ink-faint">Note</p>
                 <Input
-                  value={row.adjustmentNote}
+                  value={currentAdjustmentNote}
                   onChange={(e) => onAdjustmentNoteChange(e.target.value)}
                   placeholder="e.g. Bonus"
                   className="h-8 w-full"
@@ -170,7 +176,9 @@ export function PayrollRunRow({
         onOpenChange={setShowPayslip}
         row={row}
         advanceIds={selectedAdvanceIds}
-        loanRepayAmount={row.loanDeduction}
+        loanRepayAmount={currentLoanDeduction}
+        currentAdjustment={currentAdjustment}
+        currentAdjustmentNote={currentAdjustmentNote}
       />
       <PayConfirmationDialog
         open={showConfirmPay}
