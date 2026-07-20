@@ -1,4 +1,3 @@
-export { PayPeriodPicker } from "./components/PayPeriodPicker";
 export { PayrollRunTable } from "./components/PayrollRunTable";
 export { PayrollRunRow } from "./components/PayrollRunRow";
 export { PayslipDialog } from "./components/PayslipDialog";

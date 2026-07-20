@@ -2,7 +2,6 @@ import { useState, useCallback, useMemo } from "react";
 import { format } from "date-fns";
 import { Clock, AlertTriangle } from "lucide-react";
 import { ErrorBoundary } from "@/components/layout/ErrorBoundary";
-import { PayPeriodPicker } from "@/features/payroll/components/PayPeriodPicker";
 import { PayrollRunTable } from "@/features/payroll/components/PayrollRunTable";
 import { PayrollHistory } from "@/features/payroll/components/PayrollHistory";
 import { usePayPayroll } from "@/features/payroll/hooks/usePayPayroll";
@@ -11,17 +10,15 @@ import { usePayrollRun } from "@/features/payroll/hooks/usePayrollRun";
 import { getCurrentPeriod } from "@/features/payroll/utils/payPeriods";
 import { getScheduledPayday } from "@/features/payroll/utils/paydays";
 import { usePayRuleSettings } from "@/features/settings/hooks/usePayRuleSettings";
+import { useEmployees } from "@/features/employees/hooks/useEmployees";
 import { formatCurrency } from "@/utils/currency";
 import { Badge } from "@/components/ui/Badge";
-import type { PayFrequencyFilter } from "@/features/payroll/utils/payPeriods";
 import type { PayrollRunDraftRow } from "@/features/payroll/hooks/usePayrollRun";
 
 function PayrollContent() {
-  const [frequency, setFrequency] = useState<PayFrequencyFilter>("semi_monthly");
-  const isAll = frequency === "all";
-
   const { data: history = [] } = usePayrollHistory();
   const { data: settings } = usePayRuleSettings();
+  const { data: employees = [] } = useEmployees();
   const draftRows = usePayrollRun();
 
   const [selectedAdvances, setSelectedAdvances] = useState<Record<string, string[]>>({});
@@ -79,7 +76,6 @@ function PayrollContent() {
   const paidEmployeeIds = useMemo(() => {
     return draftRows
       .filter((row) => {
-        if (isAll) return false;
         return history.some(
           (r) =>
             r.employeeId === row.employeeId &&
@@ -89,7 +85,7 @@ function PayrollContent() {
         );
       })
       .map((r) => r.employeeId);
-  }, [draftRows, history, isAll, frequency]);
+  }, [draftRows, history]);
 
   const readyRuns = useMemo(() => {
     return history
@@ -99,35 +95,19 @@ function PayrollContent() {
 
   const todayStr = new Date().toISOString().slice(0, 10);
 
-  const FREQ_LABELS: Record<string, string> = {
-    weekly: "Weekly",
-    semi_monthly: "Semi-monthly",
-    monthly: "Monthly",
-  };
-
   return (
     <div className="flex flex-col gap-5">
-      <div className="flex items-center justify-between">
+      <div>
         <h2 className="font-display text-lg font-semibold text-char-900 md:text-xl">Payroll</h2>
-        <PayPeriodPicker
-          periodLabel=""
-          frequency={frequency}
-          onFrequencyChange={setFrequency}
-          onPrev={() => {}}
-          onNext={() => {}}
-          canGoNext={false}
-        />
       </div>
 
       <div>
         <div className="mb-3 flex items-center gap-2">
           <Clock className="h-4 w-4 text-ink-faint" />
           <h3 className="text-sm font-semibold text-ink">Upcoming</h3>
-          {!isAll && <Badge variant="neutral">{FREQ_LABELS[frequency]} period</Badge>}
         </div>
         <PayrollRunTable
           paidEmployeeIds={paidEmployeeIds}
-          frequencyFilter={isAll ? undefined : (frequency as "weekly" | "semi_monthly" | "monthly")}
           selectedAdvances={selectedAdvances}
           onAdvanceToggle={handleAdvanceToggle}
           onLoanDeductionChange={(empId, val) => setLoanDeductions((p) => ({ ...p, [empId]: val }))}
@@ -147,8 +127,10 @@ function PayrollContent() {
           </div>
           <div className="space-y-2">
             {readyRuns.map((run) => {
-              const rule = settings?.paydayRules?.find((r) => r.frequency === "semi_monthly");
-              const period = getCurrentPeriod("semi_monthly", new Date(run.periodStart + "T00:00:00"));
+              const emp = employees.find((e) => e.id === run.employeeId);
+              const freq = emp?.payFrequency ?? "semi_monthly";
+              const rule = settings?.paydayRules?.find((r) => r.frequency === freq);
+              const period = getCurrentPeriod(freq, new Date(run.periodStart + "T00:00:00"));
               const scheduledPayday = rule ? getScheduledPayday(period, rule) : run.periodEnd;
               const isOverdue = scheduledPayday < todayStr;
               const daysOverdue = isOverdue ? Math.ceil((new Date(todayStr).getTime() - new Date(scheduledPayday).getTime()) / (1000 * 60 * 60 * 24)) : 0;
