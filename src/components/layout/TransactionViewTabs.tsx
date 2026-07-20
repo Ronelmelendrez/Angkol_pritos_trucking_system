@@ -22,6 +22,7 @@ interface TransactionViewTabsProps<T> {
   getGroupLabel?: (key: string) => string;
   getGroupColor?: (key: string) => string;
   emptyMessage?: string;
+  filters?: ReactNode;
 }
 
 function CalendarHeatmap<T>({
@@ -150,6 +151,7 @@ export function TransactionViewTabs<T>({
   getGroupLabel,
   getGroupColor,
   emptyMessage,
+  filters,
 }: TransactionViewTabsProps<T>) {
   const [activeTab, setActiveTab] = useState("table");
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
@@ -226,12 +228,15 @@ export function TransactionViewTabs<T>({
       )}
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList>
-          <TabsTrigger value="table">Table</TabsTrigger>
-          <TabsTrigger value="grid">Grid</TabsTrigger>
-          <TabsTrigger value="calendar">Calendar</TabsTrigger>
-          <TabsTrigger value="grouped">{groupedTabLabel}</TabsTrigger>
-        </TabsList>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <TabsList>
+            <TabsTrigger value="table">Table</TabsTrigger>
+            <TabsTrigger value="grid">Grid</TabsTrigger>
+            <TabsTrigger value="calendar">Calendar</TabsTrigger>
+            <TabsTrigger value="grouped">{groupedTabLabel}</TabsTrigger>
+          </TabsList>
+          {filters && <div className="flex flex-wrap items-center gap-3">{filters}</div>}
+        </div>
 
         <TabsContent value="table">
           {renderTable(filteredData)}
