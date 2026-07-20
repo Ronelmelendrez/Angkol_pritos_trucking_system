@@ -3,6 +3,7 @@ import { Package, TrendingDown } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { useAllProductStock } from "../hooks/useAllProductStock";
 import { usePayRuleSettings } from "@/features/settings/hooks/usePayRuleSettings";
+import { formatQty } from "@/utils/currency";
 
 export function LowStockTab() {
   const stockData = useAllProductStock();
@@ -51,9 +52,9 @@ export function LowStockTab() {
                   </span>
                 </td>
                 <td className="whitespace-nowrap px-4 py-3 text-right font-semibold text-danger">
-                  {item.closingQty} {item.unit}
+                  {formatQty(item.closingQty)} {item.unit}
                 </td>
-                <td className="whitespace-nowrap px-4 py-3 text-right text-ink-soft">{item.soldQty}</td>
+                <td className="whitespace-nowrap px-4 py-3 text-right text-ink-soft">{formatQty(item.soldQty)}</td>
               </tr>
             ))}
           </tbody>

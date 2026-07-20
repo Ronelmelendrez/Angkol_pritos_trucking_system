@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { AlertTriangle } from "lucide-react";
 import { Pagination } from "@/components/ui/Pagination";
+import { formatQty } from "@/utils/currency";
 import type { InventoryLedgerEntry } from "../types";
 
 const PAGE_SIZE = 20;
@@ -62,12 +63,12 @@ export function InventoryLedgerTable({ entries, unit, isLoading }: Props) {
                   className={`bg-surface hover:bg-primary/[0.03] ${isNegative ? "bg-danger-bg/20" : ""}`}
                 >
                   <td className="whitespace-nowrap px-4 py-3 text-ink-soft">{entry.date}</td>
-                  <td className="whitespace-nowrap px-4 py-3 text-right text-ink">{entry.openingQty}</td>
+                  <td className="whitespace-nowrap px-4 py-3 text-right text-ink">{formatQty(entry.openingQty)}</td>
                   <td className="whitespace-nowrap px-4 py-3 text-right text-ink">
-                    {entry.purchasedQty > 0 ? entry.purchasedQty : "—"}
+                    {entry.purchasedQty > 0 ? formatQty(entry.purchasedQty) : "—"}
                   </td>
                   <td className="whitespace-nowrap px-4 py-3 text-right text-ink">
-                    {entry.soldQty > 0 ? entry.soldQty : "—"}
+                    {entry.soldQty > 0 ? formatQty(entry.soldQty) : "—"}
                   </td>
                   <td className="whitespace-nowrap px-4 py-3 text-right">
                     {entry.adjustmentQty !== 0 ? (
@@ -76,7 +77,7 @@ export function InventoryLedgerTable({ entries, unit, isLoading }: Props) {
                         title={entry.adjustmentNote}
                       >
                         {entry.adjustmentQty > 0 ? "+" : ""}
-                        {entry.adjustmentQty}
+                        {formatQty(entry.adjustmentQty)}
                       </span>
                     ) : (
                       "—"
@@ -88,7 +89,7 @@ export function InventoryLedgerTable({ entries, unit, isLoading }: Props) {
                     }`}
                   >
                     {isNegative && <AlertTriangle className="h-3.5 w-3.5" />}
-                    {entry.closingQty}
+                    {formatQty(entry.closingQty)}
                   </td>
                 </tr>
               );

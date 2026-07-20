@@ -1,5 +1,6 @@
 import { Package } from "lucide-react";
 import { useAllProductStock, type ProductStockInfo } from "../hooks/useAllProductStock";
+import { formatQty } from "@/utils/currency";
 
 export function InventoryOverviewTab() {
   const stockData = useAllProductStock();
@@ -36,15 +37,15 @@ function ProductOverviewCard({ item }: { item: ProductStockInfo }) {
           isNegative ? "text-danger" : isLow ? "text-warning" : "text-success"
         }`}
       >
-        {item.closingQty}{" "}
+        {formatQty(item.closingQty)}{" "}
         <span className="text-sm font-normal text-ink-faint">{item.unit}</span>
       </p>
       <div className="mt-2 flex items-center gap-3 text-xs text-ink-faint">
         <span className={item.purchasedQty > 0 ? "text-success" : ""}>
-          +{item.purchasedQty} today
+          +{formatQty(item.purchasedQty)} today
         </span>
         <span className={item.soldQty > 0 ? "text-danger" : ""}>
-          -{item.soldQty} sold
+          -{formatQty(item.soldQty)} sold
         </span>
       </div>
       <p className="mt-1 text-xs font-medium">

@@ -1,5 +1,6 @@
 import { ClipboardList } from "lucide-react";
 import { useAdjustmentsLog } from "../hooks/useAdjustmentsLog";
+import { formatQty } from "@/utils/currency";
 
 export function InventoryAdjustmentsTab() {
   const adjustments = useAdjustmentsLog();
@@ -32,7 +33,7 @@ export function InventoryAdjustmentsTab() {
                 <td className="whitespace-nowrap px-4 py-3 text-ink-soft">{adj.date}</td>
                 <td className="px-4 py-3 font-medium text-ink">{adj.productName}</td>
                 <td className={`whitespace-nowrap px-4 py-3 text-right font-semibold ${adj.quantity < 0 ? "text-danger" : "text-success"}`}>
-                  {adj.quantity > 0 ? "+" : ""}{adj.quantity}
+                  {adj.quantity > 0 ? "+" : ""}{formatQty(adj.quantity)}
                 </td>
                 <td className="px-4 py-3 text-ink-soft">{adj.note}</td>
               </tr>

@@ -1,6 +1,7 @@
 import { Skeleton } from "@/components/ui/Skeleton";
 import { useInventoryLedger } from "../hooks/useInventoryLedger";
 import { todayISO } from "@/utils/date";
+import { formatQty } from "@/utils/currency";
 
 interface Props {
   productId: string;
@@ -33,7 +34,7 @@ export function ProductStockCard({ productId, productName, unit }: Props) {
           isOut ? "text-danger" : isLow ? "text-warning" : "text-ink"
         }`}
       >
-        {currentEntry.closingQty}{" "}
+        {formatQty(currentEntry.closingQty)}{" "}
         <span className="text-sm font-normal text-ink-faint">{unit}</span>
       </p>
       <p className="text-xs text-ink-faint">
