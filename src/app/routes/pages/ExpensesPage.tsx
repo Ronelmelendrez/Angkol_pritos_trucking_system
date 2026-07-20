@@ -24,6 +24,8 @@ export function ExpensesPage() {
       if (filters.category && filters.category !== "All" && e.category !== filters.category) return false;
       if (filters.paymentMethod && filters.paymentMethod !== "All" && e.paymentMethod !== filters.paymentMethod)
         return false;
+      if (filters.dateFrom && e.date < filters.dateFrom) return false;
+      if (filters.dateTo && e.date > filters.dateTo) return false;
       if (filters.search) {
         const q = filters.search.toLowerCase();
         if (!e.description.toLowerCase().includes(q) && !(e.supplier ?? "").toLowerCase().includes(q)) {
