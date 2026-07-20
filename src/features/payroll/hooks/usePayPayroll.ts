@@ -38,7 +38,7 @@ export function usePayPayroll() {
         status: "paid",
         paidAt,
         advanceIds,
-        ...(row.loanId && loanRepayAmount > 0 ? { loanId: row.loanId } : {}),
+        ...(row.loanIds.length > 0 && loanRepayAmount > 0 ? { loanId: row.loanIds[0] } : {}),
       });
 
       await expensesTable.create({
@@ -53,11 +53,17 @@ export function usePayPayroll() {
         await markAdvanceDeducted.mutateAsync(id);
       }
 
-      if (row.loanId && loanRepayAmount > 0) {
+      if (row.loanIds.length > 0 && loanRepayAmount > 0) {
         const loans = loansTable.list();
-        const loan = loans.find((l) => l.id === row.loanId);
-        if (loan) {
-          await repayLoan.mutateAsync({ loan, loanId: loan.id, amount: loanRepayAmount, date: new Date().toISOString().slice(0, 10) });
+        let remaining = loanRepayAmount;
+        for (const lid of row.loanIds) {
+          if (remaining <= 0) break;
+          const loan = loans.find((l) => l.id === lid);
+          if (loan && loan.remainingBalance > 0) {
+            const amount = Math.min(remaining, loan.remainingBalance);
+            await repayLoan.mutateAsync({ loan, loanId: loan.id, amount, date: new Date().toISOString().slice(0, 10) });
+            remaining -= amount;
+          }
         }
       }
     },

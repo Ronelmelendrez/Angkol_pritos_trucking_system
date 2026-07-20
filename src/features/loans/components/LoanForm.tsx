@@ -25,14 +25,14 @@ export function LoanForm({ onDone }: { onDone?: () => void }) {
     formState: { errors },
   } = useForm<LoanFormValues>({
     resolver: zodResolver(loanSchema) as unknown as Resolver<LoanFormValues>,
-    defaultValues: { employeeId: "", principal: 0, interestRate: 0, dateIssued: todayISO(), notes: "" },
+    defaultValues: { employeeId: "", principal: 0, dateIssued: todayISO(), notes: "" },
   });
 
   async function onSubmit(values: LoanFormValues) {
     try {
       await addLoan.mutateAsync(values);
       toast({ title: "Loan recorded", variant: "success" });
-      reset({ employeeId: "", principal: 0, interestRate: 0, dateIssued: todayISO(), notes: "" });
+      reset({ employeeId: "", principal: 0, dateIssued: todayISO(), notes: "" });
       onDone?.();
     } catch {
       toast({ title: "Couldn't save loan", variant: "error" });
@@ -63,16 +63,10 @@ export function LoanForm({ onDone }: { onDone?: () => void }) {
         />
         {errors.employeeId && <p className="mt-1 text-xs text-danger">{errors.employeeId.message}</p>}
       </div>
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <Label htmlFor="principal">Loan amount (₱)</Label>
-          <Input id="principal" type="number" step="0.01" min="0" {...register("principal")} />
-          {errors.principal && <p className="mt-1 text-xs text-danger">{errors.principal.message}</p>}
-        </div>
-        <div>
-          <Label htmlFor="interestRate">Interest (%)</Label>
-          <Input id="interestRate" type="number" step="0.1" min="0" {...register("interestRate")} />
-        </div>
+      <div>
+        <Label htmlFor="principal">Loan amount (₱)</Label>
+        <Input id="principal" type="number" step="0.01" min="0" {...register("principal")} />
+        {errors.principal && <p className="mt-1 text-xs text-danger">{errors.principal.message}</p>}
       </div>
       <div>
         <Label htmlFor="dateIssued">Date issued</Label>

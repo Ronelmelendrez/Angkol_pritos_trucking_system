@@ -1,34 +1,48 @@
-import { Plus } from "lucide-react"
-import { Button } from "@/components/ui/Button"
-import { ErrorBoundary } from "@/components/layout/ErrorBoundary"
-import { Card, CardContent } from "@/components/ui/Card"
-
-function LoansContent() {
-  return (
-    <div className="flex flex-col gap-5">
-      <div className="flex items-center justify-between">
-        <h2 className="font-display text-lg font-semibold text-char-900 md:text-xl">
-          Loans (Utang)
-        </h2>
-        <Button className="gap-1.5">
-          <Plus className="size-4" />
-          <span className="hidden sm:inline">New loan</span>
-        </Button>
-      </div>
-
-      <Card className="shadow-ticket">
-        <CardContent className="py-8 text-center text-sm text-muted-foreground">
-          No loans recorded yet.
-        </CardContent>
-      </Card>
-    </div>
-  )
-}
+import { useState } from "react";
+import { Plus } from "lucide-react";
+import { Button } from "@/components/ui/Button";
+import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/Dialog";
+import { useLoans } from "@/features/loans/hooks/useLoans";
+import { useEmployees } from "@/features/employees/hooks/useEmployees";
+import { LoanForm } from "@/features/loans/components/LoanForm";
+import { LoansList } from "@/features/loans/components/LoansList";
 
 export function LoansPage() {
+  const { data: loans = [], isLoading } = useLoans();
+  const { data: employees = [] } = useEmployees();
+  const [dialogOpen, setDialogOpen] = useState(false);
+
+  const activeCount = loans.filter((l) => l.status === "active").length;
+  const totalOutstanding = loans
+    .filter((l) => l.status === "active")
+    .reduce((s, l) => s + l.remainingBalance, 0);
+
   return (
-    <ErrorBoundary section="Loans">
-      <LoansContent />
-    </ErrorBoundary>
-  )
+    <Card>
+      <CardHeader>
+        <div>
+          <CardTitle>Loans (Utang)</CardTitle>
+          <CardDescription>
+            {activeCount} active · ₱{totalOutstanding.toLocaleString()} outstanding
+          </CardDescription>
+        </div>
+        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+          <DialogTrigger asChild>
+            <Button>
+              <Plus className="h-4 w-4" /> New loan
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Record loan</DialogTitle>
+            </DialogHeader>
+            <LoanForm onDone={() => setDialogOpen(false)} />
+          </DialogContent>
+        </Dialog>
+      </CardHeader>
+
+      <LoansList loans={loans} employees={employees} isLoading={isLoading} />
+    </Card>
+  );
 }

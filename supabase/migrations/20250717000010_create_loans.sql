@@ -4,7 +4,6 @@ CREATE TABLE loans (
   id                uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   employee_id       uuid NOT NULL REFERENCES employees(id) ON DELETE CASCADE,
   principal         numeric(12,2) NOT NULL,
-  interest_rate     numeric(5,2) NOT NULL DEFAULT 0,
   remaining_balance numeric(12,2) NOT NULL,
   date_issued       date NOT NULL,
   status            loan_status NOT NULL DEFAULT 'active',

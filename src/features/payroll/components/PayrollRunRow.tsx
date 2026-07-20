@@ -110,7 +110,7 @@ export function PayrollRunRow({
               </div>
             )}
 
-            {row.loanRemaining > 0 && (
+            {row.loanIds.length > 0 && (
               <div>
                 <p className="mb-1 text-xs font-medium text-ink-faint">Loan deduction (balance: {formatCurrency(row.loanRemaining)})</p>
                 <Input
@@ -119,7 +119,10 @@ export function PayrollRunRow({
                   max={row.loanRemaining}
                   step="0.01"
                   value={currentLoanDeduction || ""}
-                  onChange={(e) => onLoanDeductionChange(Number(e.target.value) || 0)}
+                  onChange={(e) => {
+                    const val = Math.min(Number(e.target.value) || 0, row.loanRemaining);
+                    onLoanDeductionChange(val);
+                  }}
                   placeholder="0"
                   className="h-8 w-32"
                 />

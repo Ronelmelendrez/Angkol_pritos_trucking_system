@@ -55,29 +55,6 @@ export interface CashAdvance {
 
 export type LoanStatus = "active" | "paid"
 
-export interface Loan {
-  id: UUID
-  employee_id: UUID
-  principal_amount: number
-  remaining_balance: number
-  interest_rate: number // percentage, e.g. 0 or 5 for 5%
-  status: LoanStatus
-  loan_date: string // YYYY-MM-DD
-  notes: string | null
-  created_at: string
-  updated_at: string
-  employee?: Pick<Employee, "id" | "name">
-}
-
-export interface LoanRepayment {
-  id: UUID
-  loan_id: UUID
-  amount: number
-  repayment_date: string // YYYY-MM-DD
-  notes: string | null
-  created_at: string
-}
-
 export interface DailySummary {
   id: UUID
   summary_date: string // YYYY-MM-DD

@@ -41,7 +41,6 @@ export type AdvanceFormValues = z.infer<typeof advanceSchema>;
 export const loanSchema = z.object({
   employeeId: z.string().min(1, "Choose an employee"),
   principal: z.coerce.number().positive("Amount must be greater than ₱0"),
-  interestRate: z.coerce.number().min(0, "Cannot be negative"),
   dateIssued: z.string().min(1, "Date is required"),
   notes: z.string().optional(),
 });

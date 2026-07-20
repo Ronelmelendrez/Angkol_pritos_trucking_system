@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Landmark, PhilippinePeso } from "lucide-react";
+import { Landmark, PhilippinePeso, ChevronDown, ChevronUp } from "lucide-react";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { formatCurrency } from "@/utils/currency";
 import { formatDate } from "@/utils/date";
 import { RepaymentForm } from "./RepaymentForm";
+import { useRepayments } from "../hooks/useLoans";
 import type { Loan } from "../types";
 import type { Employee } from "@/features/employees/types";
 
@@ -21,7 +22,9 @@ interface Props {
 
 export function LoansList({ loans, employees, isLoading }: Props) {
   const [activeLoan, setActiveLoan] = useState<Loan | null>(null);
+  const [expandedLoan, setExpandedLoan] = useState<string | null>(null);
   const [page, setPage] = useState(1);
+  const { data: repayments = [] } = useRepayments();
 
   const totalPages = Math.max(1, Math.ceil(loans.length / PAGE_SIZE));
   const safePage = Math.min(page, totalPages);
@@ -85,6 +88,33 @@ export function LoansList({ loans, employees, isLoading }: Props) {
                 <Button variant="outline" size="sm" className="mt-3" onClick={() => setActiveLoan(loan)}>
                   <PhilippinePeso className="h-3.5 w-3.5" /> Record repayment
                 </Button>
+              )}
+
+              <Button
+                variant="ghost"
+                size="sm"
+                className="mt-2 h-7 text-xs text-ink-faint"
+                onClick={() => setExpandedLoan(expandedLoan === loan.id ? null : loan.id)}
+              >
+                {expandedLoan === loan.id ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+                Repayment history
+              </Button>
+              {expandedLoan === loan.id && (
+                <div className="mt-2 space-y-1 border-t border-line pt-2">
+                  {repayments.filter((r) => r.loanId === loan.id).length === 0 ? (
+                    <p className="text-xs text-ink-faint">No repayments recorded</p>
+                  ) : (
+                    repayments
+                      .filter((r) => r.loanId === loan.id)
+                      .sort((a, b) => b.date.localeCompare(a.date))
+                      .map((r) => (
+                        <div key={r.id} className="flex justify-between text-xs">
+                          <span className="text-ink-soft">{formatDate(r.date)}</span>
+                          <span className="font-medium text-ink">{formatCurrency(r.amount)}</span>
+                        </div>
+                      ))
+                  )}
+                </div>
               )}
             </div>
           );

@@ -21,7 +21,7 @@ export interface PayrollRunDraftRow {
   grossPay: number;
   pendingAdvances: { id: string; amount: number; reason?: string }[];
   advanceDeductions: number;
-  loanId?: string;
+  loanIds: string[];
   loanRemaining: number;
   loanDeduction: number;
   adjustments: number;
@@ -97,7 +97,9 @@ export function usePayrollRun() {
         .filter((a) => a.employeeId === emp.id && a.status === "pending")
         .map((a) => ({ id: a.id, amount: a.amount, reason: a.reason }));
 
-      const activeLoan = loans.find((l) => l.employeeId === emp.id && l.status === "active");
+      const activeLoans = loans.filter((l) => l.employeeId === emp.id && l.status === "active");
+      const loanIds = activeLoans.map((l) => l.id);
+      const loanRemaining = activeLoans.reduce((s, l) => s + l.remainingBalance, 0);
 
       return {
         employeeId: emp.id,
@@ -112,8 +114,8 @@ export function usePayrollRun() {
         grossPay,
         pendingAdvances,
         advanceDeductions: pendingAdvances.reduce((s, a) => s + a.amount, 0),
-        loanId: activeLoan?.id,
-        loanRemaining: activeLoan?.remainingBalance ?? 0,
+        loanIds,
+        loanRemaining,
         loanDeduction: 0,
         adjustments: 0,
         adjustmentNote: "",

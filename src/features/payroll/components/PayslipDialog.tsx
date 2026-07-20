@@ -81,6 +81,12 @@ export function PayslipDialog({ open, onOpenChange, row, advanceIds, loanRepayAm
               <span>-{formatCurrency(loanRepayAmount)}</span>
             </div>
           )}
+          {row.loanRemaining > 0 && loanRepayAmount > 0 && (
+            <div className="flex justify-between text-xs text-ink-faint">
+              <span>Remaining loan balance</span>
+              <span>{formatCurrency(row.loanRemaining - loanRepayAmount)}</span>
+            </div>
+          )}
           {currentAdjustment !== 0 && (
             <div className="flex justify-between" style={{ color: currentAdjustment > 0 ? "var(--color-success)" : "var(--color-danger)" }}>
               <span>{currentAdjustmentNote || "Adjustment"}</span>

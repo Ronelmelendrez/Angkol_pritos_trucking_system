@@ -4,7 +4,6 @@ import type { LoanStatus } from "@/lib/constants";
 export interface Loan extends BaseRecord {
   employeeId: string;
   principal: number;
-  interestRate: number; // percent, e.g. 5 = 5%
   remainingBalance: number;
   dateIssued: string; // YYYY-MM-DD
   status: LoanStatus;

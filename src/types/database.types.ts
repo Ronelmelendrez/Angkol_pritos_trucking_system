@@ -273,7 +273,6 @@ export type Database = {
           id: string;
           employee_id: string;
           principal: number;
-          interest_rate: number;
           remaining_balance: number;
           date_issued: string;
           status: "active" | "paid";
@@ -285,7 +284,6 @@ export type Database = {
           id?: string;
           employee_id: string;
           principal: number;
-          interest_rate?: number;
           remaining_balance: number;
           date_issued: string;
           status?: "active" | "paid";
@@ -297,7 +295,6 @@ export type Database = {
           id?: string;
           employee_id?: string;
           principal?: number;
-          interest_rate?: number;
           remaining_balance?: number;
           date_issued?: string;
           status?: "active" | "paid";
