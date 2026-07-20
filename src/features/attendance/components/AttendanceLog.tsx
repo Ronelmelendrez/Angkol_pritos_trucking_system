@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { CalendarClock } from "lucide-react";
+import { CalendarClock, CheckCircle, XCircle } from "lucide-react";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { Badge } from "@/components/ui/Badge";
 import { Pagination } from "@/components/ui/Pagination";
@@ -19,7 +19,7 @@ export function AttendanceLog({ records, employees, isLoading }: Props) {
   const [page, setPage] = useState(1);
 
   const sorted = useMemo(
-    () => [...records].sort((a, b) => (a.clockIn ?? "") < (b.clockIn ?? "") ? 1 : -1),
+    () => [...records].sort((a, b) => (a.date + (a.clockIn ?? "")) < (b.date + (b.clockIn ?? "")) ? 1 : -1),
     [records],
   );
 
@@ -56,6 +56,7 @@ export function AttendanceLog({ records, employees, isLoading }: Props) {
             <tr>
               <th className="px-4 py-3 font-medium">Employee</th>
               <th className="px-4 py-3 font-medium">Date</th>
+              <th className="px-4 py-3 font-medium">Status</th>
               <th className="px-4 py-3 font-medium">Shift</th>
               <th className="px-4 py-3 font-medium">Clock in</th>
               <th className="px-4 py-3 font-medium">Clock out</th>
@@ -67,6 +68,19 @@ export function AttendanceLog({ records, employees, isLoading }: Props) {
               <tr key={r.id} className="bg-surface">
                 <td className="px-4 py-3 font-medium text-ink">{employeeName(r.employeeId)}</td>
                 <td className="px-4 py-3 text-ink-soft">{formatDate(r.date)}</td>
+                <td className="px-4 py-3">
+                  {r.status === "present" ? (
+                    <Badge variant="success" className="gap-1">
+                      <CheckCircle className="h-3 w-3" /> Present
+                    </Badge>
+                  ) : r.status === "absent" ? (
+                    <Badge variant="danger" className="gap-1">
+                      <XCircle className="h-3 w-3" /> Absent
+                    </Badge>
+                  ) : (
+                    <span className="text-ink-faint">—</span>
+                  )}
+                </td>
                 <td className="px-4 py-3">
                   {r.shift ? (
                     <Badge variant={r.shift === "half" ? "warning" : "success"}>
