@@ -1,11 +1,13 @@
 import { useMemo } from "react";
-import { Phone, Wallet, Calendar, Clock, CircleDollarSign, Pencil } from "lucide-react";
+import { Phone, Wallet, Calendar, Clock, CircleDollarSign, Landmark, History, Pencil } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/Dialog";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { useAttendance } from "@/features/attendance/hooks/useAttendance";
 import { useAdvances } from "@/features/advances/hooks/useAdvances";
+import { useLoans, useRepayments } from "@/features/loans/hooks/useLoans";
+import { usePayrollHistory } from "@/features/payroll/hooks/usePayrollHistory";
 import { formatCurrency } from "@/utils/currency";
 import { formatDate, formatTime } from "@/utils/date";
 import { cn } from "@/utils/cn";
@@ -30,6 +32,9 @@ function initials(name: string) {
 export function EmployeeDetailModal({ employee, open, onOpenChange, onEdit }: Props) {
   const { data: attendance = [] } = useAttendance();
   const { data: advances = [] } = useAdvances();
+  const { data: loans = [] } = useLoans();
+  const { data: repayments = [] } = useRepayments();
+  const { data: payrollRuns = [] } = usePayrollHistory();
 
   const employeeAttendance = useMemo(
     () =>
@@ -47,6 +52,23 @@ export function EmployeeDetailModal({ employee, open, onOpenChange, onEdit }: Pr
         .sort((a, b) => b.date.localeCompare(a.date))
         .slice(0, 10),
     [advances, employee?.id],
+  );
+
+  const employeeLoans = useMemo(
+    () =>
+      loans
+        .filter((l) => l.employeeId === employee?.id)
+        .sort((a, b) => b.dateIssued.localeCompare(a.dateIssued)),
+    [loans, employee?.id],
+  );
+
+  const employeePayrollRuns = useMemo(
+    () =>
+      payrollRuns
+        .filter((r) => r.employeeId === employee?.id && r.status === "paid")
+        .sort((a, b) => b.periodStart.localeCompare(a.periodStart))
+        .slice(0, 10),
+    [payrollRuns, employee?.id],
   );
 
   return (
@@ -149,6 +171,87 @@ export function EmployeeDetailModal({ employee, open, onOpenChange, onEdit }: Pr
                       <Badge variant={advance.status === "deducted" ? "success" : "warning"} className="capitalize">
                         {advance.status}
                       </Badge>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="mt-2">
+              <div className="mb-2 flex items-center gap-1.5 text-sm font-medium text-ink">
+                <Landmark className="h-4 w-4 text-ink-faint" />
+                Loans
+              </div>
+              {employeeLoans.length === 0 ? (
+                <p className="text-sm text-ink-faint">No loans recorded.</p>
+              ) : (
+                <div className="divide-y divide-dashed divide-line rounded-lg border border-line">
+                  {employeeLoans.map((loan) => {
+                    const loanRepayments = repayments
+                      .filter((r) => r.loanId === loan.id)
+                      .sort((a, b) => b.date.localeCompare(a.date));
+                    const paid = loan.principal - loan.remainingBalance;
+                    const progress = loan.principal > 0 ? paid / loan.principal : 1;
+                    return (
+                      <div key={loan.id} className="px-4 py-2 text-sm">
+                        <div className="flex items-center justify-between">
+                          <span className="text-ink">{formatDate(loan.dateIssued)}</span>
+                          <Badge variant={loan.status === "paid" ? "success" : "warning"}>
+                            {loan.status === "paid" ? "Paid off" : "Active"}
+                          </Badge>
+                        </div>
+                        <div className="mt-1 flex items-center justify-between text-xs text-ink-soft">
+                          <span>{formatCurrency(paid)} paid of {formatCurrency(loan.principal)}</span>
+                          <span className="font-medium text-ink">{formatCurrency(loan.remainingBalance)} left</span>
+                        </div>
+                        <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-ink/6">
+                          <div
+                            className="h-full rounded-full bg-primary transition-all"
+                            style={{ width: `${Math.round(progress * 100)}%` }}
+                          />
+                        </div>
+                        {loanRepayments.length > 0 && (
+                          <div className="mt-1.5 space-y-0.5">
+                            {loanRepayments.slice(0, 3).map((r) => (
+                              <div key={r.id} className="flex justify-between text-xs text-ink-faint">
+                                <span>{formatDate(r.date)}</span>
+                                <span>{formatCurrency(r.amount)}</span>
+                              </div>
+                            ))}
+                            {loanRepayments.length > 3 && (
+                              <p className="text-xs text-ink-faint">+{loanRepayments.length - 3} more repayments</p>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            <div className="mt-2">
+              <div className="mb-2 flex items-center gap-1.5 text-sm font-medium text-ink">
+                <History className="h-4 w-4 text-ink-faint" />
+                Payroll history
+              </div>
+              {employeePayrollRuns.length === 0 ? (
+                <p className="text-sm text-ink-faint">No payroll records yet.</p>
+              ) : (
+                <div className="divide-y divide-dashed divide-line rounded-lg border border-line">
+                  {employeePayrollRuns.map((run) => (
+                    <div key={run.id} className="flex items-center justify-between px-4 py-2 text-sm">
+                      <span className="text-ink">
+                        {formatDate(run.periodStart)} — {formatDate(run.periodEnd)}
+                      </span>
+                      <div className="flex items-center gap-3">
+                        {(run.advanceDeductions + run.loanDeductions) > 0 && (
+                          <span className="text-xs text-danger">
+                            -{formatCurrency(run.advanceDeductions + run.loanDeductions)}
+                          </span>
+                        )}
+                        <span className="font-bold text-primary-dark">{formatCurrency(run.netPay)}</span>
+                      </div>
                     </div>
                   ))}
                 </div>
