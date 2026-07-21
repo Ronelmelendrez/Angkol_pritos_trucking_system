@@ -58,11 +58,33 @@ export function ExpenseForm({ onDone }: { onDone?: () => void }) {
 
   function updateItem(index: number, field: "productId" | "quantityPurchased", value: string | number) {
     const current = watch("items") ?? [];
-    const updated = current.map((item, i) => (i === index ? { ...item, [field]: value } : item));
+    const updated = current.map((item, i) => {
+      if (i !== index) return item;
+      if (field === "quantityPurchased") {
+        const str = String(value);
+        if (str === "" || str.endsWith(".")) {
+          return { ...item, quantityPurchased: str === "" ? 0 : parseFloat(str) || 0, _raw: str };
+        }
+        const parsed = parseFloat(str);
+        return { ...item, quantityPurchased: isNaN(parsed) ? 0 : parsed, _raw: str };
+      }
+      return { ...item, [field]: value };
+    });
     setValue("items", updated, { shouldValidate: true });
   }
 
   async function onSubmit(values: ExpenseFormValues) {
+    if (isStock) {
+      const validItems = (values.items ?? []).filter(
+        (i) => i.productId && i.productId !== "" && i.quantityPurchased > 0
+      );
+      if (validItems.length === 0) {
+        toast({ title: "Add at least one product with quantity", description: "Stock expenses require a product and quantity.", variant: "error" });
+        return;
+      }
+      values.items = validItems;
+    }
+
     try {
       await addExpense.mutateAsync(values);
       toast({ title: "Expense recorded", description: `${values.description} — added.`, variant: "success" });
@@ -144,11 +166,11 @@ export function ExpenseForm({ onDone }: { onDone?: () => void }) {
               <div className="w-32">
                 <Label className="text-xs">Quantity</Label>
                 <Input
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  value={item.quantityPurchased || ""}
-                  onChange={(e) => updateItem(index, "quantityPurchased", parseFloat(e.target.value) || 0)}
+                  type="text"
+                  inputMode="decimal"
+                  pattern="[0-9]*\.?[0-9]*"
+                  value={(item as any)._raw ?? (item.quantityPurchased || "")}
+                  onChange={(e) => updateItem(index, "quantityPurchased", e.target.value)}
                   placeholder="0"
                 />
               </div>

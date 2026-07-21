@@ -1,9 +1,9 @@
 import { z } from "zod";
-import { EXPENSE_CATEGORIES, PAYMENT_METHODS } from "@/lib/constants";
+import { EXPENSE_CATEGORIES, PAYMENT_METHODS, STOCK_CATEGORIES } from "@/lib/constants";
 
 export const expenseItemSchema = z.object({
   productId: z.string().min(1, "Choose a product"),
-  quantityPurchased: z.coerce.number().positive("Qty must be greater than 0"),
+  quantityPurchased: z.coerce.number().min(0.01, "Qty must be at least 0.01"),
 });
 
 export const expenseSchema = z.object({
@@ -20,7 +20,18 @@ export const expenseSchema = z.object({
   productId: z.string().optional().or(z.literal("")),
   quantityPurchased: z.coerce.number().positive("Qty must be greater than 0").optional(),
   items: z.array(expenseItemSchema).optional(),
-});
+}).refine(
+  (data) => {
+    if (STOCK_CATEGORIES.includes(data.category as any)) {
+      const validItems = (data.items ?? []).filter(
+        (i) => i.productId && i.productId !== "" && i.quantityPurchased > 0
+      );
+      return validItems.length > 0;
+    }
+    return true;
+  },
+  { message: "Stock expenses require at least one product with quantity", path: ["items"] }
+);
 export type ExpenseFormValues = z.infer<typeof expenseSchema>;
 
 export const employeeSchema = z.object({
