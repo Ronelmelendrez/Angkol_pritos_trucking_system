@@ -1,5 +1,7 @@
 import { z } from "zod";
 import { EXPENSE_CATEGORIES, PAYMENT_METHODS, STOCK_CATEGORIES } from "@/lib/constants";
+import { EXPENSE_CATEGORIES, PAYMENT_METHODS, isStockCategory } from "@/lib/constants";
+import { EXPENSE_CATEGORIES, PAYMENT_METHODS, STOCK_CATEGORIES } from "@/lib/constants";
 
 export const expenseItemSchema = z.object({
   productId: z.string().min(1, "Choose a product"),
@@ -22,6 +24,8 @@ export const expenseSchema = z.object({
   items: z.array(expenseItemSchema).optional(),
 }).refine(
   (data) => {
+    if (STOCK_CATEGORIES.includes(data.category as any)) {
+    if (isStockCategory(data.category)) {
     if (STOCK_CATEGORIES.includes(data.category as any)) {
       const validItems = (data.items ?? []).filter(
         (i) => i.productId && i.productId !== "" && i.quantityPurchased > 0
