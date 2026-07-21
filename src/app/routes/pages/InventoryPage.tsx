@@ -11,7 +11,6 @@ import { InventoryOverviewTab } from "@/features/inventory/components/InventoryO
 import { InventoryAdjustmentsTab } from "@/features/inventory/components/InventoryAdjustmentsTab";
 import { LowStockTab } from "@/features/inventory/components/LowStockTab";
 import { InventoryReportsTab } from "@/features/inventory/components/InventoryReportsTab";
-import { formatCurrency } from "@/utils/currency";
 import { subDays, format as formatDateFns } from "date-fns";
 
 const RANGE_PRESETS = { "7d": 6, "14d": 13, "30d": 29 } as const;
