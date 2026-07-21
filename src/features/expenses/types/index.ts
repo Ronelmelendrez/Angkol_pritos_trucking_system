@@ -1,6 +1,11 @@
 import type { BaseRecord } from "@/types";
 import type { ExpenseCategory, PaymentMethod } from "@/lib/constants";
 
+export interface ExpenseItem {
+  productId: string;
+  quantityPurchased: number;
+}
+
 export interface Expense extends BaseRecord {
   date: string; // YYYY-MM-DD
   category: ExpenseCategory;
@@ -10,6 +15,7 @@ export interface Expense extends BaseRecord {
   paymentMethod: PaymentMethod;
   productId?: string;
   quantityPurchased?: number;
+  items?: ExpenseItem[];
 }
 
 export type NewExpense = Omit<Expense, "id" | "createdAt" | "updatedAt">;
