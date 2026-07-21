@@ -1,4 +1,4 @@
-import { cn } from "@/utils/currency";
+import { cn } from "@/utils/cn";
 
 interface BarItem {
   label: string;
