@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { TrendingUp, TrendingDown, Users, Receipt, ArrowRight, Wallet, PiggyBank, Medal } from "lucide-react";
+import { TrendingUp, TrendingDown, Users, Receipt, ArrowRight, Wallet, PiggyBank, Medal, CircleDollarSign, CalendarClock } from "lucide-react";
 import { Link } from "react-router-dom";
 import {
   AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend,
@@ -7,12 +7,19 @@ import {
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
-import { subDays, format as formatDateFns } from "date-fns";
+import { subDays, format as formatDateFns, differenceInCalendarDays } from "date-fns";
 import { useExpenses } from "@/features/expenses/hooks/useExpenses";
 import { useEmployees } from "@/features/employees/hooks/useEmployees";
 import { useAttendance } from "@/features/attendance/hooks/useAttendance";
 import { useSales } from "@/features/sales/hooks/useSales";
+import { useAdvances } from "@/features/advances/hooks/useAdvances";
+import { useLoans } from "@/features/loans/hooks/useLoans";
+import { usePayRuleSettings } from "@/features/settings/hooks/usePayRuleSettings";
 import { useReports } from "@/features/reports/hooks/useReports";
+import { Sparkline } from "@/components/charts/Sparkline";
+import { TrendBadge } from "@/components/charts/TrendBadge";
+import { CalendarHeatmap } from "@/components/charts/CalendarHeatmap";
+import { comparePeriods } from "@/utils/periodComparison";
 import { formatCurrency, formatCurrencyCompact } from "@/utils/currency";
 import { formatDate, isDateToday } from "@/utils/date";
 import { CATEGORY_COLORS } from "@/lib/constants";
@@ -22,9 +29,14 @@ export function DashboardPage() {
   const { data: employees = [], isLoading: employeesLoading } = useEmployees();
   const { data: attendance = [], isLoading: attendanceLoading } = useAttendance();
   const { data: sales = [], isLoading: salesLoading } = useSales();
+  const { data: advances = [] } = useAdvances();
+  const { data: loans = [] } = useLoans();
+  const { data: settings } = usePayRuleSettings();
   const dateTo = formatDateFns(new Date(), "yyyy-MM-dd");
   const dateFrom = formatDateFns(subDays(new Date(), 29), "yyyy-MM-dd");
   const { dailyProfit, isLoading: reportsLoading } = useReports(dateFrom, dateTo);
+
+  const yesterday = formatDateFns(subDays(new Date(), 1), "yyyy-MM-dd");
 
   const todaysSales = sales.filter((s) => isDateToday(s.date));
   const todaysSalesTotal = todaysSales.reduce((sum, s) => sum + s.amount, 0);
@@ -36,6 +48,75 @@ export function DashboardPage() {
   const recentExpenses = [...expenses]
     .sort((a, b) => (a.date < b.date ? 1 : -1))
     .slice(0, 5);
+
+  // Yesterday comparison
+  const yesterdaysSales = sales.filter((s) => s.date === yesterday);
+  const yesterdaysSalesTotal = yesterdaysSales.reduce((sum, s) => sum + s.amount, 0);
+  const yesterdaysExpenses = expenses.filter((e) => e.date === yesterday);
+  const yesterdaysExpensesTotal = yesterdaysExpenses.reduce((sum, e) => sum + e.amount, 0);
+  const yesterdaysProfit = yesterdaysSalesTotal - yesterdaysExpensesTotal;
+
+  const salesComparison = comparePeriods(todaysSalesTotal, yesterdaysSalesTotal);
+  const expensesComparison = comparePeriods(totalToday, yesterdaysExpensesTotal);
+  const profitComparison = comparePeriods(netProfitToday, yesterdaysProfit);
+
+  // 7-day sparkline data
+  const last7 = useMemo(() => {
+    const days = Array.from({ length: 7 }, (_, i) => {
+      const d = subDays(new Date(), 6 - i);
+      const key = formatDateFns(d, "yyyy-MM-dd");
+      return key;
+    });
+    return {
+      sales: days.map((d) => sales.filter((s) => s.date === d).reduce((sum, s) => sum + s.amount, 0)),
+      expenses: days.map((d) => expenses.filter((e) => e.date === d).reduce((sum, e) => sum + e.amount, 0)),
+      profit: days.map((d) => {
+        const s = sales.filter((sa) => sa.date === d).reduce((sum, sa) => sum + sa.amount, 0);
+        const e = expenses.filter((ex) => ex.date === d).reduce((sum, ex) => sum + ex.amount, 0);
+        return s - e;
+      }),
+    };
+  }, [sales, expenses]);
+
+  // Busiest days heatmap (expense amounts per day, last 60 days)
+  const expenseHeatmap = useMemo(() => {
+    const map = new Map<string, number>();
+    const start = subDays(new Date(), 59);
+    expenses
+      .filter((e) => e.date >= formatDateFns(start, "yyyy-MM-dd"))
+      .forEach((e) => map.set(e.date, (map.get(e.date) ?? 0) + e.amount));
+    return Array.from(map.entries()).map(([date, value]) => ({ date, value }));
+  }, [expenses]);
+
+  // Cash flow health
+  const pendingAdvances = advances
+    .filter((a) => a.status === "pending")
+    .reduce((sum, a) => sum + a.amount, 0);
+  const activeLoanBalance = loans
+    .filter((l) => l.status === "active")
+    .reduce((sum, l) => sum + l.remainingBalance, 0);
+  const totalOutstanding = pendingAdvances + activeLoanBalance;
+
+  // Payroll due soon
+  const payrollDue = useMemo(() => {
+    if (!settings?.paydayRules?.length) return null;
+    const today = new Date();
+    let nearest: { date: Date; daysAway: number; freq: string } | null = null;
+    for (const rule of settings.paydayRules) {
+      // Simple: check next 14 days for a matching weekday
+      for (let i = 0; i <= 14; i++) {
+        const d = subDays(today, -i);
+        if (rule.fixedWeekday != null && d.getDay() === rule.fixedWeekday) {
+          const daysAway = differenceInCalendarDays(d, today);
+          if (!nearest || daysAway < nearest.daysAway) {
+            nearest = { date: d, daysAway, freq: rule.frequency };
+          }
+          break;
+        }
+      }
+    }
+    return nearest;
+  }, [settings]);
 
   const crewRanking = useMemo(() => {
     const thirtyDaysAgo = formatDateFns(subDays(new Date(), 29), "yyyy-MM-dd");
@@ -59,7 +140,6 @@ export function DashboardPage() {
 
   const isLoading = expensesLoading || employeesLoading || attendanceLoading || salesLoading;
 
-  // 30-day rollups for the sales vs expenses summary strip
   const periodSales = dailyProfit.reduce((sum, d) => sum + d.sales, 0);
   const periodExpenses = dailyProfit.reduce((sum, d) => sum + d.expenses, 0);
   const periodProfit = periodSales - periodExpenses;
@@ -75,6 +155,9 @@ export function DashboardPage() {
           icon={TrendingUp}
           tone="accent"
           hint={`${todaysSales.length} transaction${todaysSales.length === 1 ? "" : "s"}`}
+          trend={salesComparison}
+          sparkline={last7.sales}
+          sparkColor="#F1C40F"
           isLoading={isLoading}
         />
         <StatCard
@@ -83,6 +166,9 @@ export function DashboardPage() {
           icon={Receipt}
           tone="secondary"
           hint={`${todaysExpenses.length} transactions`}
+          trend={expensesComparison}
+          sparkline={last7.expenses}
+          sparkColor="#C0392B"
           isLoading={isLoading}
         />
         <StatCard
@@ -91,6 +177,9 @@ export function DashboardPage() {
           icon={netProfitToday >= 0 ? TrendingUp : TrendingDown}
           tone={netProfitToday >= 0 ? "success" : "danger"}
           hint="Sales minus expenses"
+          trend={profitComparison}
+          sparkline={last7.profit}
+          sparkColor="#E67E22"
           isLoading={isLoading}
         />
         <StatCard
@@ -111,7 +200,6 @@ export function DashboardPage() {
           </div>
         </CardHeader>
 
-        {/* Summary strip */}
         {reportsLoading ? (
           <div className="mb-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
             {Array.from({ length: 4 }).map((_, i) => (
@@ -120,30 +208,10 @@ export function DashboardPage() {
           </div>
         ) : (
           <div className="mb-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
-            <SummaryPill
-              icon={PiggyBank}
-              label="Total sales"
-              value={formatCurrency(periodSales)}
-              tone="accent"
-            />
-            <SummaryPill
-              icon={Receipt}
-              label="Total expenses"
-              value={formatCurrency(periodExpenses)}
-              tone="secondary"
-            />
-            <SummaryPill
-              icon={Wallet}
-              label="Net profit"
-              value={formatCurrency(periodProfit)}
-              tone={periodProfit >= 0 ? "success" : "danger"}
-            />
-            <SummaryPill
-              icon={periodProfit >= 0 ? TrendingUp : TrendingDown}
-              label="Margin"
-              value={`${margin.toFixed(1)}%`}
-              tone={margin >= 0 ? "primary" : "danger"}
-            />
+            <SummaryPill icon={PiggyBank} label="Total sales" value={formatCurrency(periodSales)} tone="accent" />
+            <SummaryPill icon={Receipt} label="Total expenses" value={formatCurrency(periodExpenses)} tone="secondary" />
+            <SummaryPill icon={Wallet} label="Net profit" value={formatCurrency(periodProfit)} tone={periodProfit >= 0 ? "success" : "danger"} />
+            <SummaryPill icon={periodProfit >= 0 ? TrendingUp : TrendingDown} label="Margin" value={`${margin.toFixed(1)}%`} tone={margin >= 0 ? "primary" : "danger"} />
           </div>
         )}
 
@@ -172,73 +240,105 @@ export function DashboardPage() {
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--color-line)" vertical={false} />
-                <XAxis
-                  dataKey="label"
-                  tick={{ fontSize: 11, fill: "var(--color-ink-soft)" }}
-                  axisLine={{ stroke: "var(--color-line)" }}
-                  tickLine={false}
-                  interval="preserveStartEnd"
-                  minTickGap={24}
-                />
-                <YAxis
-                  tickFormatter={(v) => formatCurrencyCompact(v)}
-                  tick={{ fontSize: 11, fill: "var(--color-ink-soft)" }}
-                  axisLine={false}
-                  tickLine={false}
-                  width={68}
-                />
-                <Tooltip
-                  formatter={(value) => formatCurrency(Number(value ?? 0))}
-                  labelFormatter={(label) => label}
-                  contentStyle={{
-                    borderRadius: 12,
-                    border: "1px solid var(--color-line)",
-                    boxShadow: "0 6px 20px rgba(62,39,35,0.12)",
-                    fontSize: 13,
-                  }}
-                />
-                <Legend
-                  verticalAlign="top"
-                  height={32}
-                  iconType="circle"
-                  iconSize={8}
-                  formatter={(value) => <span className="text-xs text-ink-soft">{value}</span>}
-                />
-                <Area
-                  type="monotone"
-                  dataKey="sales"
-                  name="Sales"
-                  stroke="#F1C40F"
-                  strokeWidth={2.5}
-                  fill="url(#salesGradient)"
-                  dot={false}
-                  activeDot={{ r: 4 }}
-                />
-                <Area
-                  type="monotone"
-                  dataKey="expenses"
-                  name="Expenses"
-                  stroke="#C0392B"
-                  strokeWidth={2.5}
-                  fill="url(#expensesGradient)"
-                  dot={false}
-                  activeDot={{ r: 4 }}
-                />
-                <Area
-                  type="monotone"
-                  dataKey="profit"
-                  name="Profit"
-                  stroke="#E67E22"
-                  strokeWidth={2.5}
-                  fill="url(#profitGradient)"
-                  dot={false}
-                  activeDot={{ r: 4 }}
-                />
+                <XAxis dataKey="label" tick={{ fontSize: 11, fill: "var(--color-ink-soft)" }} axisLine={{ stroke: "var(--color-line)" }} tickLine={false} interval="preserveStartEnd" minTickGap={24} />
+                <YAxis tickFormatter={(v) => formatCurrencyCompact(v)} tick={{ fontSize: 11, fill: "var(--color-ink-soft)" }} axisLine={false} tickLine={false} width={68} />
+                <Tooltip formatter={(value) => formatCurrency(Number(value ?? 0))} labelFormatter={(label) => label} contentStyle={{ borderRadius: 12, border: "1px solid var(--color-line)", boxShadow: "0 6px 20px rgba(62,39,35,0.12)", fontSize: 13 }} />
+                <Legend verticalAlign="top" height={32} iconType="circle" iconSize={8} formatter={(value) => <span className="text-xs text-ink-soft">{value}</span>} />
+                <Area type="monotone" dataKey="sales" name="Sales" stroke="#F1C40F" strokeWidth={2.5} fill="url(#salesGradient)" dot={false} activeDot={{ r: 4 }} />
+                <Area type="monotone" dataKey="expenses" name="Expenses" stroke="#C0392B" strokeWidth={2.5} fill="url(#expensesGradient)" dot={false} activeDot={{ r: 4 }} />
+                <Area type="monotone" dataKey="profit" name="Profit" stroke="#E67E22" strokeWidth={2.5} fill="url(#profitGradient)" dot={false} activeDot={{ r: 4 }} />
               </AreaChart>
             </ResponsiveContainer>
           </div>
         )}
       </Card>
+
+      {/* New row: Busiest days + Cash flow + Payroll due */}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <Card className="ticket">
+          <CardHeader>
+            <div>
+              <CardTitle>Busiest days</CardTitle>
+              <CardDescription>Expense volume by day</CardDescription>
+            </div>
+          </CardHeader>
+          {isLoading ? (
+            <Skeleton className="h-48 w-full" />
+          ) : (
+            <CalendarHeatmap data={expenseHeatmap} color="#C0392B" />
+          )}
+        </Card>
+
+        <Card className="ticket">
+          <CardHeader>
+            <div>
+              <CardTitle>Cash flow health</CardTitle>
+              <CardDescription>Outstanding balances</CardDescription>
+            </div>
+          </CardHeader>
+          {isLoading ? (
+            <div className="space-y-3">
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-10 w-full" />
+            </div>
+          ) : (
+            <div className="space-y-3">
+              <div className="flex items-center justify-between rounded-lg bg-ink/[0.03] px-4 py-3">
+                <span className="flex items-center gap-2 text-sm text-ink-soft">
+                  <CircleDollarSign className="h-4 w-4" /> Pending advances
+                </span>
+                <span className="text-sm font-semibold text-ink">{formatCurrency(pendingAdvances)}</span>
+              </div>
+              <div className="flex items-center justify-between rounded-lg bg-ink/[0.03] px-4 py-3">
+                <span className="flex items-center gap-2 text-sm text-ink-soft">
+                  <Wallet className="h-4 w-4" /> Active loan balance
+                </span>
+                <span className="text-sm font-semibold text-ink">{formatCurrency(activeLoanBalance)}</span>
+              </div>
+              <div className="border-t border-line pt-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium text-ink">Total outstanding</span>
+                  <span className="text-lg font-bold text-ink">{formatCurrency(totalOutstanding)}</span>
+                </div>
+              </div>
+            </div>
+          )}
+        </Card>
+
+        <Card className="ticket">
+          <CardHeader>
+            <div>
+              <CardTitle>Payroll due soon</CardTitle>
+              <CardDescription>Next scheduled payday</CardDescription>
+            </div>
+          </CardHeader>
+          {isLoading ? (
+            <Skeleton className="h-20 w-full" />
+          ) : payrollDue ? (
+            <div className="space-y-3">
+              <div className="flex items-center gap-3 rounded-lg bg-ink/[0.03] px-4 py-3">
+                <CalendarClock className="h-5 w-5 text-primary" />
+                <div>
+                  <p className="text-sm font-medium text-ink">
+                    {formatDateFns(payrollDue.date, "EEEE, MMM d")}
+                  </p>
+                  <p className="text-xs text-ink-faint">
+                    {payrollDue.daysAway === 0
+                      ? "Today"
+                      : payrollDue.daysAway === 1
+                        ? "Tomorrow"
+                        : `In ${payrollDue.daysAway} days`}
+                    {" · "}
+                    <span className="capitalize">{payrollDue.freq.replace("_", " ")}</span> cycle
+                  </p>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <p className="py-6 text-center text-sm text-ink-faint">No payday rules configured.</p>
+          )}
+        </Card>
+      </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <Card className="lg:col-span-2">
@@ -247,10 +347,7 @@ export function DashboardPage() {
               <CardTitle>Recent expenses</CardTitle>
               <CardDescription>Latest transactions logged</CardDescription>
             </div>
-            <Link
-              to="/dashboard/expenses"
-              className="flex items-center gap-1 text-sm font-medium text-primary hover:underline"
-            >
+            <Link to="/dashboard/expenses" className="flex items-center gap-1 text-sm font-medium text-primary hover:underline">
               View all <ArrowRight className="h-3.5 w-3.5" />
             </Link>
           </CardHeader>
@@ -271,13 +368,7 @@ export function DashboardPage() {
                     <p className="text-xs text-ink-faint">{formatDate(exp.date)}</p>
                   </div>
                   <div className="flex shrink-0 items-center gap-2">
-                    <Badge
-                      className="border-0"
-                      style={{
-                        backgroundColor: `${CATEGORY_COLORS[exp.category]}1a`,
-                        color: CATEGORY_COLORS[exp.category],
-                      }}
-                    >
+                    <Badge className="border-0" style={{ backgroundColor: `${CATEGORY_COLORS[exp.category]}1a`, color: CATEGORY_COLORS[exp.category] }}>
                       {exp.category}
                     </Badge>
                     <span className="text-sm font-semibold text-ink">{formatCurrency(exp.amount)}</span>
@@ -294,10 +385,7 @@ export function DashboardPage() {
               <CardTitle>Crew ranking</CardTitle>
               <CardDescription>Attendance rate (last 30 days)</CardDescription>
             </div>
-            <Link
-              to="/dashboard/employees"
-              className="flex items-center gap-1 text-sm font-medium text-primary hover:underline"
-            >
+            <Link to="/dashboard/employees" className="flex items-center gap-1 text-sm font-medium text-primary hover:underline">
               View all <ArrowRight className="h-3.5 w-3.5" />
             </Link>
           </CardHeader>
@@ -316,10 +404,7 @@ export function DashboardPage() {
                   <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-ink/5 text-[10px] font-bold text-ink-soft">
                     {idx + 1}
                   </span>
-                  <div
-                    className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white"
-                    style={{ backgroundColor: emp.avatarColor }}
-                  >
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white" style={{ backgroundColor: emp.avatarColor }}>
                     {emp.name.split(" ").map((p) => p[0]).slice(0, 2).join("")}
                   </div>
                   <div className="min-w-0 flex-1">
@@ -351,6 +436,9 @@ function StatCard({
   icon: Icon,
   tone,
   hint,
+  trend,
+  sparkline,
+  sparkColor,
   isLoading,
 }: {
   label: string;
@@ -358,6 +446,9 @@ function StatCard({
   icon: React.ComponentType<{ className?: string }>;
   tone: "primary" | "secondary" | "accent" | "success" | "danger";
   hint: string;
+  trend?: { current: number; previous: number; percentChange: number };
+  sparkline?: number[];
+  sparkColor?: string;
   isLoading: boolean;
 }) {
   const toneClasses: Record<typeof tone, string> = {
@@ -371,12 +462,15 @@ function StatCard({
   return (
     <Card className="ticket-hover ticket-perf">
       <div className="flex items-start justify-between">
-        <div>
+        <div className="min-w-0 flex-1">
           <p className="text-xs font-medium uppercase tracking-wide text-ink-faint">{label}</p>
           {isLoading ? (
             <Skeleton className="mt-2 h-7 w-24" />
           ) : (
-            <p className="stamp mt-1 text-2xl font-semibold text-ink">{value}</p>
+            <div className="mt-1 flex items-baseline gap-2">
+              <p className="stamp text-2xl font-semibold text-ink">{value}</p>
+              {trend && <TrendBadge current={trend.current} previous={trend.previous} />}
+            </div>
           )}
           <p className="mt-1 text-xs text-ink-faint">{hint}</p>
         </div>
@@ -384,6 +478,11 @@ function StatCard({
           <Icon className="h-5 w-5" />
         </div>
       </div>
+      {sparkline && sparkline.length > 0 && (
+        <div className="mt-2 -mx-1">
+          <Sparkline data={sparkline} color={sparkColor} height={32} />
+        </div>
+      )}
     </Card>
   );
 }

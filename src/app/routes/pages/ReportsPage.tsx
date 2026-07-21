@@ -1,22 +1,32 @@
 import { useMemo, useState } from "react";
-import { ErrorBoundary } from "@/components/layout/ErrorBoundary"
-import { useReports } from "@/features/reports/hooks/useReports"
-import { ExpensePieChart } from "@/features/reports/components/ExpensesPieChart"
-import { ProfitLineChart } from "@/features/reports/components/profitLineChart"
-import { SalesByProductPieChart } from "@/features/reports/components/SalesByProductPieChart"
-import { PayrollSummary } from "@/features/reports/components/PayrollSummary"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card"
-import { Skeleton } from "@/components/ui/Skeleton"
-import { Input } from "@/components/ui/Input"
-import { Button } from "@/components/ui/Button"
-import { Label } from "@/components/ui/Label"
-import { formatCurrency } from "@/utils/currency"
-import { format, startOfMonth, endOfMonth } from "date-fns"
-import { startOfWeek } from "date-fns/startOfWeek"
-import { endOfWeek } from "date-fns/endOfWeek"
-import { useProducts } from "@/features/products/hooks/useProducts"
-import type { RevenueByProduct } from "@/features/reports/types"
-import type { Sale } from "@/features/sales/types"
+import { ErrorBoundary } from "@/components/layout/ErrorBoundary";
+import { useReports } from "@/features/reports/hooks/useReports";
+import { ExpensePieChart } from "@/features/reports/components/ExpensesPieChart";
+import { ProfitLineChart } from "@/features/reports/components/profitLineChart";
+import { SalesByProductPieChart } from "@/features/reports/components/SalesByProductPieChart";
+import { PayrollSummary } from "@/features/reports/components/PayrollSummary";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card";
+import { Skeleton } from "@/components/ui/Skeleton";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/Tabs";
+import { Input } from "@/components/ui/Input";
+import { Button } from "@/components/ui/Button";
+import { Label } from "@/components/ui/Label";
+import { HorizontalBarList } from "@/components/charts/HorizontalBarList";
+import {
+  AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend,
+} from "recharts";
+import {
+  BarChart, Bar,
+} from "recharts";
+import { formatCurrency, formatCurrencyCompact } from "@/utils/currency";
+import { format, startOfMonth, endOfMonth } from "date-fns";
+import { startOfWeek } from "date-fns/startOfWeek";
+import { endOfWeek } from "date-fns/endOfWeek";
+import { useProducts } from "@/features/products/hooks/useProducts";
+import { useExpenses } from "@/features/expenses/hooks/useExpenses";
+import { groupByWeekday } from "@/utils/groupByWeekday";
+import type { RevenueByProduct } from "@/features/reports/types";
+import type { Sale } from "@/features/sales/types";
 
 function RevenueByProductCard({ sales }: { sales: Sale[] }) {
   const { data: products = [] } = useProducts();
@@ -70,10 +80,7 @@ function RevenueByProductCard({ sales }: { sales: Sale[] }) {
               </div>
               <div className="flex items-center gap-2 text-xs text-ink-faint">
                 <div className="h-2 flex-1 overflow-hidden rounded-full bg-ink/5">
-                  <div
-                    className="h-full rounded-full bg-accent transition-all"
-                    style={{ width: `${share}%` }}
-                  />
+                  <div className="h-full rounded-full bg-accent transition-all" style={{ width: `${share}%` }} />
                 </div>
                 <span className="shrink-0 w-10 text-right">{share.toFixed(0)}%</span>
               </div>
@@ -89,7 +96,7 @@ function RevenueByProductCard({ sales }: { sales: Sale[] }) {
 type Preset = "today" | "this-week" | "this-month" | "custom";
 
 function ReportsContent() {
-  const today = new Date();
+  const today = useMemo(() => new Date(), []);
   const todayStr = format(today, "yyyy-MM-dd");
 
   const [preset, setPreset] = useState<Preset>("this-month");
@@ -103,7 +110,7 @@ function ReportsContent() {
       case "this-month": return format(startOfMonth(today), "yyyy-MM-dd");
       case "custom": return customFrom;
     }
-  }, [preset, customFrom, todayStr]);
+  }, [preset, customFrom, todayStr, today]);
 
   const dateTo = useMemo(() => {
     switch (preset) {
@@ -112,14 +119,77 @@ function ReportsContent() {
       case "this-month": return format(endOfMonth(today), "yyyy-MM-dd");
       case "custom": return customTo;
     }
-  }, [preset, customTo, todayStr]);
+  }, [preset, customTo, todayStr, today]);
 
   const rangeLabel = useMemo(() => {
     if (dateFrom === dateTo) return dateFrom;
-    return `${dateFrom} \u2013 ${dateTo}`;
+    return `${dateFrom} – ${dateTo}`;
   }, [dateFrom, dateTo]);
 
-  const { categoryBreakdown, dailyProfit, filteredSales, isLoading } = useReports(dateFrom, dateTo);
+  const { categoryBreakdown, dailyProfit, filteredSales, totals, payroll, isLoading } = useReports(dateFrom, dateTo);
+  const { data: allExpenses = [] } = useExpenses();
+  const { data: products = [] } = useProducts();
+
+  // KPI summary
+  const avgDailyExpense = dailyProfit.length > 0
+    ? dailyProfit.reduce((s, d) => s + d.expenses, 0) / dailyProfit.length
+    : 0;
+  const totalPayrollPaid = payroll.reduce((s, p) => s + p.grossPay, 0);
+
+  // Employee cost chart data
+  const employeeCostData = useMemo(() => {
+    return payroll
+      .filter((p) => p.hoursWorked > 0)
+      .sort((a, b) => b.grossPay - a.grossPay)
+      .map((p) => ({
+        label: p.name,
+        value: p.grossPay,
+        color: "#E67E22",
+      }));
+  }, [payroll]);
+
+  // Expense stacked area data by category
+  const expenseStackedData = useMemo(() => {
+    const categories = categoryBreakdown.map((c) => c.category);
+    return dailyProfit.map((d) => {
+      const dayExpenses = allExpenses.filter((e) => e.date === d.date);
+      const row: Record<string, string | number> = { label: d.label };
+      for (const cat of categories) {
+        row[cat] = dayExpenses
+          .filter((e) => e.category === cat)
+          .reduce((sum, e) => sum + e.amount, 0);
+      }
+      return row;
+    });
+  }, [dailyProfit, allExpenses, categoryBreakdown]);
+
+  // Day-of-week expense pattern
+  const weekdayData = useMemo(() => {
+    const records = allExpenses
+      .filter((e) => e.date >= dateFrom && e.date <= dateTo)
+      .map((e) => ({ date: e.date, amount: e.amount }));
+    return groupByWeekday(records);
+  }, [allExpenses, dateFrom, dateTo]);
+
+  // Product leaderboard
+  const productLeaderboard = useMemo(() => {
+    const map = new Map<string, { revenue: number; quantity: number }>();
+    filteredSales.forEach((s) => {
+      const cur = map.get(s.productId) ?? { revenue: 0, quantity: 0 };
+      cur.revenue += s.amount;
+      cur.quantity += s.quantitySold;
+      map.set(s.productId, cur);
+    });
+    const productMap = new Map(products.map((p) => [p.id, p.name]));
+    return Array.from(map.entries())
+      .map(([id, data]) => ({
+        label: productMap.get(id) ?? "Unknown",
+        value: data.revenue,
+        quantity: data.quantity,
+        color: "#F1C40F",
+      }))
+      .sort((a, b) => b.value - a.value);
+  }, [filteredSales, products]);
 
   function handlePreset(p: Preset) {
     setPreset(p);
@@ -129,9 +199,7 @@ function ReportsContent() {
     <div className="flex flex-col gap-5">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h2 className="font-display text-lg font-semibold text-char-900 md:text-xl">
-            Reports
-          </h2>
+          <h2 className="font-display text-lg font-semibold text-char-900 md:text-xl">Reports</h2>
           <p className="text-xs text-ink-faint">{rangeLabel}</p>
         </div>
         <div className="flex flex-wrap items-end gap-3">
@@ -154,35 +222,180 @@ function ReportsContent() {
               </div>
             </div>
           ) : (
-            <Button variant="outline" size="sm" onClick={() => setPreset("custom")}>
-              Custom range
-            </Button>
+            <Button variant="outline" size="sm" onClick={() => setPreset("custom")}>Custom range</Button>
           )}
         </div>
       </div>
 
+      {/* KPI summary strip */}
       {isLoading ? (
-        <div className="grid gap-4 md:grid-cols-2">
-          <Skeleton className="h-64 w-full" />
-          <Skeleton className="h-64 w-full" />
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
+          {Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-16 w-full" />)}
         </div>
       ) : (
-        <div className="grid gap-4 md:grid-cols-2">
-          <ExpensePieChart data={categoryBreakdown} />
-          <SalesByProductPieChart sales={filteredSales} />
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
+          <KpiPill label="Total sales" value={formatCurrency(totals.totalSales)} />
+          <KpiPill label="Total expenses" value={formatCurrency(totals.totalExpenses)} />
+          <KpiPill label="Net margin" value={`${totals.totalSales > 0 ? (((totals.totalSales - totals.totalExpenses) / totals.totalSales) * 100).toFixed(1) : 0}%`} />
+          <KpiPill label="Avg. daily expense" value={formatCurrency(avgDailyExpense)} />
+          <KpiPill label="Total payroll" value={formatCurrency(totalPayrollPaid)} />
         </div>
       )}
 
-      {isLoading ? (
-        <Skeleton className="h-64 w-full" />
-      ) : (
-        <ProfitLineChart data={dailyProfit} />
-      )}
+      <Tabs defaultValue="overview">
+        <div className="border-b border-line px-1">
+          <TabsList className="mb-2">
+            <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="expenses">Expenses</TabsTrigger>
+            <TabsTrigger value="sales">Sales</TabsTrigger>
+            <TabsTrigger value="payroll">Payroll</TabsTrigger>
+          </TabsList>
+        </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
-        <RevenueByProductCard sales={filteredSales} />
-        <PayrollSummary />
-      </div>
+        <TabsContent value="overview">
+          <div className="space-y-4">
+            {isLoading ? (
+              <div className="grid gap-4 md:grid-cols-2">
+                <Skeleton className="h-64 w-full" />
+                <Skeleton className="h-64 w-full" />
+              </div>
+            ) : (
+              <div className="grid gap-4 md:grid-cols-2">
+                <ExpensePieChart data={categoryBreakdown} />
+                <SalesByProductPieChart sales={filteredSales} />
+              </div>
+            )}
+            {isLoading ? <Skeleton className="h-64 w-full" /> : <ProfitLineChart data={dailyProfit} />}
+          </div>
+        </TabsContent>
+
+        <TabsContent value="expenses">
+          <div className="space-y-4">
+            {isLoading ? (
+              <Skeleton className="h-64 w-full" />
+            ) : (
+              <Card>
+                <CardHeader>
+                  <div>
+                    <CardTitle>Expense trend by category</CardTitle>
+                    <CardDescription>Stacked area over time</CardDescription>
+                  </div>
+                </CardHeader>
+                {categoryBreakdown.length === 0 ? (
+                  <p className="py-10 text-center text-sm text-ink-faint">No expenses yet.</p>
+                ) : (
+                  <div className="h-72 -mx-2">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <AreaChart data={expenseStackedData} margin={{ left: -10, right: 10, top: 10, bottom: 0 }}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="var(--color-line)" vertical={false} />
+                        <XAxis dataKey="label" tick={{ fontSize: 11, fill: "var(--color-ink-soft)" }} axisLine={{ stroke: "var(--color-line)" }} tickLine={false} interval="preserveStartEnd" minTickGap={24} />
+                        <YAxis tickFormatter={(v) => formatCurrencyCompact(v)} tick={{ fontSize: 11, fill: "var(--color-ink-soft)" }} axisLine={false} tickLine={false} width={68} />
+                        <Tooltip formatter={(value) => formatCurrency(Number(value ?? 0))} contentStyle={{ borderRadius: 12, border: "1px solid var(--color-line)", fontSize: 13 }} />
+                        <Legend verticalAlign="top" height={32} iconType="circle" iconSize={8} formatter={(value) => <span className="text-[10px] text-ink-soft">{value}</span>} />
+                        {categoryBreakdown.map((cat) => (
+                          <Area key={cat.category} type="monotone" dataKey={cat.category} name={cat.category} stackId="1" stroke={cat.color} fill={cat.color} fillOpacity={0.3} dot={false} />
+                        ))}
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  </div>
+                )}
+              </Card>
+            )}
+
+            {isLoading ? (
+              <Skeleton className="h-48 w-full" />
+            ) : (
+              <Card>
+                <CardHeader>
+                  <div>
+                    <CardTitle>Average expense by day of week</CardTitle>
+                    <CardDescription>Which days cost the most</CardDescription>
+                  </div>
+                </CardHeader>
+                <div className="h-56">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={weekdayData} margin={{ left: -10, right: 10, top: 10, bottom: 0 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="var(--color-line)" vertical={false} />
+                      <XAxis dataKey="day" tick={{ fontSize: 11, fill: "var(--color-ink-soft)" }} axisLine={{ stroke: "var(--color-line)" }} tickLine={false} />
+                      <YAxis tickFormatter={(v) => formatCurrencyCompact(v)} tick={{ fontSize: 11, fill: "var(--color-ink-soft)" }} axisLine={false} tickLine={false} width={68} />
+                      <Tooltip formatter={(value) => formatCurrency(Number(value ?? 0))} contentStyle={{ borderRadius: 12, border: "1px solid var(--color-line)", fontSize: 13 }} />
+                      <Bar dataKey="average" name="Avg. expense" fill="#C0392B" radius={[4, 4, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </Card>
+            )}
+          </div>
+        </TabsContent>
+
+        <TabsContent value="sales">
+          <div className="space-y-4">
+            {isLoading ? (
+              <div className="grid gap-4 md:grid-cols-2">
+                <Skeleton className="h-64 w-full" />
+                <Skeleton className="h-64 w-full" />
+              </div>
+            ) : (
+              <>
+                <SalesByProductPieChart sales={filteredSales} />
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-base font-semibold">Product leaderboard</CardTitle>
+                    <CardDescription>Ranked by revenue</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    {productLeaderboard.length === 0 ? (
+                      <p className="py-6 text-center text-sm text-ink-faint">No sales data yet.</p>
+                    ) : (
+                      <HorizontalBarList
+                        items={productLeaderboard}
+                        formatValue={(v) => formatCurrency(v)}
+                      />
+                    )}
+                  </CardContent>
+                </Card>
+                <RevenueByProductCard sales={filteredSales} />
+              </>
+            )}
+          </div>
+        </TabsContent>
+
+        <TabsContent value="payroll">
+          <div className="space-y-4">
+            {isLoading ? (
+              <Skeleton className="h-64 w-full" />
+            ) : (
+              <>
+                <Card>
+                  <CardHeader>
+                    <div>
+                      <CardTitle>Employee cost comparison</CardTitle>
+                      <CardDescription>Gross pay for the selected period</CardDescription>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    {employeeCostData.length === 0 ? (
+                      <p className="py-6 text-center text-sm text-ink-faint">No payroll data for this period.</p>
+                    ) : (
+                      <HorizontalBarList items={employeeCostData} formatValue={(v) => formatCurrency(v)} />
+                    )}
+                  </CardContent>
+                </Card>
+                <PayrollSummary />
+              </>
+            )}
+          </div>
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+}
+
+function KpiPill({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-xl border border-line bg-bg/60 px-3 py-2.5">
+      <p className="truncate text-[11px] text-ink-faint">{label}</p>
+      <p className="truncate text-sm font-bold text-ink">{value}</p>
     </div>
   );
 }
