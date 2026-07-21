@@ -283,13 +283,13 @@ export function DashboardPage() {
             </div>
           ) : (
             <div className="space-y-3">
-              <div className="flex items-center justify-between rounded-lg bg-ink/[0.03] px-4 py-3">
+              <div className="flex items-center justify-between rounded-lg bg-ink/3 px-4 py-3">
                 <span className="flex items-center gap-2 text-sm text-ink-soft">
                   <CircleDollarSign className="h-4 w-4" /> Pending advances
                 </span>
                 <span className="text-sm font-semibold text-ink">{formatCurrency(pendingAdvances)}</span>
               </div>
-              <div className="flex items-center justify-between rounded-lg bg-ink/[0.03] px-4 py-3">
+              <div className="flex items-center justify-between rounded-lg bg-ink/3 px-4 py-3">
                 <span className="flex items-center gap-2 text-sm text-ink-soft">
                   <Wallet className="h-4 w-4" /> Active loan balance
                 </span>
@@ -316,7 +316,7 @@ export function DashboardPage() {
             <Skeleton className="h-20 w-full" />
           ) : payrollDue ? (
             <div className="space-y-3">
-              <div className="flex items-center gap-3 rounded-lg bg-ink/[0.03] px-4 py-3">
+              <div className="flex items-center gap-3 rounded-lg bg-ink/3 px-4 py-3">
                 <CalendarClock className="h-5 w-5 text-primary" />
                 <div>
                   <p className="text-sm font-medium text-ink">

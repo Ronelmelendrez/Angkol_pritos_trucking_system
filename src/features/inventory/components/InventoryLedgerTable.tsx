@@ -44,7 +44,7 @@ export function InventoryLedgerTable({ entries, unit, isLoading }: Props) {
     <div>
       <div className="overflow-hidden rounded-xl border border-line">
         <table className="w-full text-sm">
-          <thead className="bg-ink/[0.03] text-left text-xs uppercase tracking-wide text-ink-soft">
+          <thead className="bg-ink/3 text-left text-xs uppercase tracking-wide text-ink-soft">
             <tr>
               <th className="px-4 py-3 font-medium">Date</th>
               <th className="px-4 py-3 text-right font-medium">Opening ({unit})</th>

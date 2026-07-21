@@ -69,7 +69,7 @@ function EditStockForm({
         </DialogDescription>
       </DialogHeader>
 
-      <div className="rounded-lg bg-ink/[0.03] px-4 py-3 text-sm">
+      <div className="rounded-lg bg-ink/3 px-4 py-3 text-sm">
         <p className="text-ink-faint">Current stock</p>
         <p className="text-lg font-bold text-ink">
           {formatQty(currentQty)}{" "}
