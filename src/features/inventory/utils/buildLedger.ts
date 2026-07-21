@@ -19,8 +19,17 @@ export function buildLedger(
   let runningOpening = 0;
   return dateRange.map((date) => {
     const purchasedQty = expenses
-      .filter((e) => e.productId === productId && e.date === date)
-      .reduce((sum, e) => sum + (e.quantityPurchased ?? 0), 0);
+      .filter((e) => e.date === date)
+      .reduce((sum, e) => {
+        if (e.items && e.items.length > 0) {
+          const matched = e.items.filter((i) => i.productId === productId);
+          return sum + matched.reduce((s, i) => s + (i.quantityPurchased ?? 0), 0);
+        }
+        if (e.productId === productId) {
+          return sum + (e.quantityPurchased ?? 0);
+        }
+        return sum;
+      }, 0);
 
     const soldQty = sales
       .filter((s) => s.productId === productId && s.date === date)
