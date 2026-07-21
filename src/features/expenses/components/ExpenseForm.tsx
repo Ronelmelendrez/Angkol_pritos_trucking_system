@@ -1,6 +1,6 @@
 import { useForm, Controller, useWatch, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2 } from "lucide-react";
+import { Loader2, Plus, Trash2 } from "lucide-react";
 import { expenseSchema, type ExpenseFormValues } from "@/utils/validators";
 import { EXPENSE_CATEGORIES, PAYMENT_METHODS, isStockCategory } from "@/lib/constants";
 import { useProducts } from "@/features/products/hooks/useProducts";
@@ -26,6 +26,7 @@ export function ExpenseForm({ onDone }: { onDone?: () => void }) {
     control,
     reset,
     setValue,
+    watch,
     formState: { errors },
   } = useForm<ExpenseFormValues>({
     resolver: zodResolver(expenseSchema) as unknown as Resolver<ExpenseFormValues>,
@@ -37,19 +38,35 @@ export function ExpenseForm({ onDone }: { onDone?: () => void }) {
       supplier: "",
       paymentMethod: "Cash",
       productId: "",
+      items: [],
     },
   });
 
   const selectedCategory = useWatch({ control, name: "category" });
-  const selectedProductId = useWatch({ control, name: "productId" });
   const isStock = isStockCategory(selectedCategory);
-  const selectedProduct = activeProducts.find((p) => p.id === selectedProductId);
+  const items = watch("items") ?? [];
+
+  function addItem() {
+    const current = watch("items") ?? [];
+    setValue("items", [...current, { productId: "", quantityPurchased: 0 }], { shouldValidate: true });
+  }
+
+  function removeItem(index: number) {
+    const current = watch("items") ?? [];
+    setValue("items", current.filter((_, i) => i !== index), { shouldValidate: true });
+  }
+
+  function updateItem(index: number, field: "productId" | "quantityPurchased", value: string | number) {
+    const current = watch("items") ?? [];
+    const updated = current.map((item, i) => (i === index ? { ...item, [field]: value } : item));
+    setValue("items", updated, { shouldValidate: true });
+  }
 
   async function onSubmit(values: ExpenseFormValues) {
     try {
       await addExpense.mutateAsync(values);
       toast({ title: "Expense recorded", description: `${values.description} — added.`, variant: "success" });
-      reset({ date: todayISO(), category: values.category, description: "", amount: 0, supplier: "", paymentMethod: "Cash", productId: "" });
+      reset({ date: todayISO(), category: values.category, description: "", amount: 0, supplier: "", paymentMethod: "Cash", productId: "", items: [] });
       onDone?.();
     } catch {
       toast({ title: "Couldn't save expense", description: "Please try again.", variant: "error" });
@@ -96,15 +113,23 @@ export function ExpenseForm({ onDone }: { onDone?: () => void }) {
 
       {isStock && (
         <div className="rounded-lg border border-line bg-bg/40 p-4 space-y-4">
-          <p className="text-xs font-medium uppercase tracking-wide text-ink-faint">Stock tracking</p>
-          <div>
-            <Label htmlFor="expense-product">Product</Label>
-            <Controller
-              control={control}
-              name="productId"
-              render={({ field }) => (
-                <Select value={field.value ?? ""} onValueChange={field.onChange}>
-                  <SelectTrigger id="expense-product">
+          <div className="flex items-center justify-between">
+            <p className="text-xs font-medium uppercase tracking-wide text-ink-faint">Stock tracking</p>
+            <Button type="button" variant="outline" size="sm" onClick={addItem} className="gap-1.5">
+              <Plus className="h-3.5 w-3.5" /> Add product
+            </Button>
+          </div>
+
+          {items.length === 0 && (
+            <p className="text-xs text-ink-faint">No products added. Click "Add product" to track stock.</p>
+          )}
+
+          {items.map((item, index) => (
+            <div key={index} className="flex items-end gap-3 rounded-lg border border-line bg-surface p-3">
+              <div className="flex-1">
+                <Label className="text-xs">Product</Label>
+                <Select value={item.productId} onValueChange={(v) => updateItem(index, "productId", v)}>
+                  <SelectTrigger>
                     <SelectValue placeholder="Choose product" />
                   </SelectTrigger>
                   <SelectContent>
@@ -115,15 +140,30 @@ export function ExpenseForm({ onDone }: { onDone?: () => void }) {
                     ))}
                   </SelectContent>
                 </Select>
-              )}
-            />
-            {errors.productId && <p className="mt-1 text-xs text-danger">{errors.productId.message}</p>}
-          </div>
-          <div>
-            <Label htmlFor="expense-qty">Quantity purchased ({selectedProduct?.unit ?? "units"})</Label>
-            <Input id="expense-qty" type="number" step="0.01" min="0" {...register("quantityPurchased")} placeholder="0" />
-            {errors.quantityPurchased && <p className="mt-1 text-xs text-danger">{errors.quantityPurchased.message}</p>}
-          </div>
+              </div>
+              <div className="w-32">
+                <Label className="text-xs">Quantity</Label>
+                <Input
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={item.quantityPurchased || ""}
+                  onChange={(e) => updateItem(index, "quantityPurchased", parseFloat(e.target.value) || 0)}
+                  placeholder="0"
+                />
+              </div>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="h-9 w-9 shrink-0 text-ink-faint hover:text-danger"
+                onClick={() => removeItem(index)}
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </div>
+          ))}
+          {errors.items && <p className="text-xs text-danger">{errors.items.message}</p>}
         </div>
       )}
 
