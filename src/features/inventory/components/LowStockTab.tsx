@@ -1,6 +1,5 @@
 import { useMemo } from "react";
 import { Package, TrendingDown } from "lucide-react";
-import { Button } from "@/components/ui/Button";
 import { useAllProductStock } from "../hooks/useAllProductStock";
 import { usePayRuleSettings } from "@/features/settings/hooks/usePayRuleSettings";
 import { formatQty } from "@/utils/currency";

@@ -1,5 +1,8 @@
 export { InventoryLedgerTable } from "./components/InventoryLedgerTable";
 export { StockAdjustmentForm } from "./components/StockAdjustmentForm";
+export { StockAdjustmentDialog } from "./components/StockAdjustmentDialog";
+export { EditStockDialog } from "./components/EditStockDialog";
+export { BatchStockEntryForm } from "./components/BatchStockEntryForm";
 export { ProductStockCard } from "./components/ProductStockCard";
 
 export { InventoryFilters } from "./components/InventoryFilters";
@@ -9,6 +12,8 @@ export { LowStockTab } from "./components/LowStockTab";
 export { InventoryReportsTab } from "./components/InventoryReportsTab";
 export { useInventoryLedger } from "./hooks/useInventoryLedger";
 export { useAddStockAdjustment } from "./hooks/useAddStockAdjustment";
+export { useDeleteStockAdjustment } from "./hooks/useDeleteStockAdjustment";
+export { useSetStock, useCurrentStock } from "./hooks/useEditStock";
 export { useAllProductStock } from "./hooks/useAllProductStock";
 export { useAdjustmentsLog } from "./hooks/useAdjustmentsLog";
 export { buildLedger } from "./utils/buildLedger";
