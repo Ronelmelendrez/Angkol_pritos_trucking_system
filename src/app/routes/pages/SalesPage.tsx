@@ -1,13 +1,16 @@
 import { useState, useMemo, useCallback } from "react";
-import { Plus, Search } from "lucide-react";
+import { Plus } from "lucide-react";
+import { format, startOfMonth, endOfMonth } from "date-fns";
+import { startOfWeek } from "date-fns/startOfWeek";
+import { endOfWeek } from "date-fns/endOfWeek";
 import { Button } from "@/components/ui/Button";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/Dialog";
-import { Input } from "@/components/ui/Input";
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/Select";
 import { SalesList } from "@/features/sales/components/SalesList";
 import { SaleGridCard } from "@/features/sales/components/SaleGridCard";
 import { SaleForm } from "@/features/sales/components/SaleForm";
+import { SalesFiltersBar, SalesDatePresets } from "@/features/sales/components/SalesFilters";
+import type { DatePreset } from "@/features/sales/components/SalesFilters";
 import { useSales } from "@/features/sales/hooks/useSales";
 import { TransactionViewTabs } from "@/components/layout/TransactionViewTabs";
 import { useProducts } from "@/features/products/hooks/useProducts";
@@ -26,6 +29,30 @@ export function SalesPage() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [productFilter, setProductFilter] = useState("All");
+  const [datePreset, setDatePreset] = useState<DatePreset>("this-month");
+  const [customFrom, setCustomFrom] = useState(format(new Date(), "yyyy-MM-dd"));
+  const [customTo, setCustomTo] = useState(format(new Date(), "yyyy-MM-dd"));
+
+  const today = new Date();
+  const todayStr = format(today, "yyyy-MM-dd");
+
+  const dateFrom = useMemo(() => {
+    switch (datePreset) {
+      case "today": return todayStr;
+      case "this-week": return format(startOfWeek(today, { weekStartsOn: 1 }), "yyyy-MM-dd");
+      case "this-month": return format(startOfMonth(today), "yyyy-MM-dd");
+      case "custom": return customFrom;
+    }
+  }, [datePreset, customFrom, todayStr]);
+
+  const dateTo = useMemo(() => {
+    switch (datePreset) {
+      case "today": return todayStr;
+      case "this-week": return format(endOfWeek(today, { weekStartsOn: 1 }), "yyyy-MM-dd");
+      case "this-month": return format(endOfMonth(today), "yyyy-MM-dd");
+      case "custom": return customTo;
+    }
+  }, [datePreset, customTo, todayStr]);
 
   const productMap = useMemo(() => {
     return new Map(products.map((p) => [p.id, p]));
@@ -33,6 +60,8 @@ export function SalesPage() {
 
   const filtered = useMemo(() => {
     return sales.filter((s) => {
+      if (dateFrom && s.date < dateFrom) return false;
+      if (dateTo && s.date > dateTo) return false;
       if (productFilter !== "All" && s.productId !== productFilter) return false;
       if (search) {
         const q = search.toLowerCase();
@@ -42,7 +71,7 @@ export function SalesPage() {
       }
       return true;
     });
-  }, [sales, productFilter, search, productMap]);
+  }, [sales, dateFrom, dateTo, productFilter, search, productMap]);
 
   const totalSales = filtered.reduce((sum, s) => sum + s.amount, 0);
 
@@ -88,29 +117,14 @@ export function SalesPage() {
           </Dialog>
         </CardHeader>
 
-        <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center">
-          <div className="relative flex-1">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-faint" />
-            <Input
-              placeholder="Search products..."
-              className="pl-9"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-          </div>
-          <Select value={productFilter} onValueChange={setProductFilter}>
-            <SelectTrigger className="sm:w-44">
-              <SelectValue placeholder="Product" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="All">All products</SelectItem>
-              {products.filter((p) => p.isActive).map((p) => (
-                <SelectItem key={p.id} value={p.id}>
-                  {p.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+        <div className="mb-4">
+          <SalesFiltersBar
+            search={search}
+            onSearchChange={setSearch}
+            productFilter={productFilter}
+            onProductChange={setProductFilter}
+            products={products}
+          />
         </div>
 
         <TransactionViewTabs
@@ -125,6 +139,16 @@ export function SalesPage() {
           getGroupLabel={(key) => productMap.get(key)?.name ?? "Unknown"}
           getGroupColor={(key) => productColors.get(key) ?? "#888"}
           emptyMessage="No sales match these filters"
+          filters={
+            <SalesDatePresets
+              datePreset={datePreset}
+              onPresetChange={setDatePreset}
+              customFrom={customFrom}
+              customTo={customTo}
+              onCustomFromChange={setCustomFrom}
+              onCustomToChange={setCustomTo}
+            />
+          }
         />
       </Card>
     </div>
