@@ -7,7 +7,7 @@ import {
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
-import { subDays, format as formatDateFns, differenceInCalendarDays } from "date-fns";
+import { subDays, format as formatDateFns } from "date-fns";
 import { useExpenses } from "@/features/expenses/hooks/useExpenses";
 import { useEmployees } from "@/features/employees/hooks/useEmployees";
 import { useAttendance } from "@/features/attendance/hooks/useAttendance";
@@ -107,7 +107,7 @@ export function DashboardPage() {
       for (let i = 0; i <= 14; i++) {
         const d = subDays(today, -i);
         if (rule.fixedWeekday != null && d.getDay() === rule.fixedWeekday) {
-          const daysAway = differenceInCalendarDays(d, today);
+          const daysAway = Math.round((d.getTime() - today.getTime()) / 86400000);
           if (!nearest || daysAway < nearest.daysAway) {
             nearest = { date: d, daysAway, freq: rule.frequency };
           }
