@@ -61,7 +61,7 @@ export function InventoryAdjustmentsTab() {
               </thead>
               <tbody className="divide-y divide-line">
                 {pageItems.map((adj) => (
-                  <tr key={adj.id} className="bg-surface hover:bg-primary/[0.03]">
+                  <tr key={adj.id} className="bg-surface hover:bg-primary/3">
                     <td className="whitespace-nowrap px-4 py-3 text-ink-soft">{adj.date}</td>
                     <td className="px-4 py-3 font-medium text-ink">{adj.productName}</td>
                     <td className={`whitespace-nowrap px-4 py-3 text-right font-semibold ${adj.quantity < 0 ? "text-danger" : "text-success"}`}>
