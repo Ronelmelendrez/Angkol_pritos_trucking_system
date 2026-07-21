@@ -1,6 +1,11 @@
 import { z } from "zod";
 import { EXPENSE_CATEGORIES, PAYMENT_METHODS } from "@/lib/constants";
 
+export const expenseItemSchema = z.object({
+  productId: z.string().min(1, "Choose a product"),
+  quantityPurchased: z.coerce.number().positive("Qty must be greater than 0"),
+});
+
 export const expenseSchema = z.object({
   date: z.string().min(1, "Date is required"),
   category: z.enum(EXPENSE_CATEGORIES, {
@@ -14,6 +19,7 @@ export const expenseSchema = z.object({
   }),
   productId: z.string().optional().or(z.literal("")),
   quantityPurchased: z.coerce.number().positive("Qty must be greater than 0").optional(),
+  items: z.array(expenseItemSchema).optional(),
 });
 export type ExpenseFormValues = z.infer<typeof expenseSchema>;
 
