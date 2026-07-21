@@ -1,4 +1,5 @@
-import { TrendingUp, TrendingDown, Users, Receipt, ArrowRight, Wallet, PiggyBank } from "lucide-react";
+import { useMemo } from "react";
+import { TrendingUp, TrendingDown, Users, Receipt, ArrowRight, Wallet, PiggyBank, Medal } from "lucide-react";
 import { Link } from "react-router-dom";
 import {
   AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend,
@@ -35,6 +36,26 @@ export function DashboardPage() {
   const recentExpenses = [...expenses]
     .sort((a, b) => (a.date < b.date ? 1 : -1))
     .slice(0, 5);
+
+  const crewRanking = useMemo(() => {
+    const thirtyDaysAgo = formatDateFns(subDays(new Date(), 29), "yyyy-MM-dd");
+    const today = formatDateFns(new Date(), "yyyy-MM-dd");
+
+    return activeEmployees
+      .map((emp) => {
+        const records = attendance.filter(
+          (a) => a.employeeId === emp.id && a.date >= thirtyDaysAgo && a.date <= today,
+        );
+        const present = records.filter(
+          (a) => a.status === "present" || a.clockIn !== null,
+        ).length;
+        const absent = records.filter((a) => a.status === "absent").length;
+        const total = present + absent;
+        const rate = total > 0 ? (present / total) * 100 : 0;
+        return { ...emp, present, absent, total, rate };
+      })
+      .sort((a, b) => b.rate - a.rate || b.present - a.present);
+  }, [activeEmployees, attendance]);
 
   const isLoading = expensesLoading || employeesLoading || attendanceLoading || salesLoading;
 
@@ -270,8 +291,8 @@ export function DashboardPage() {
         <Card>
           <CardHeader>
             <div>
-              <CardTitle>Active crew</CardTitle>
-              <CardDescription>Currently employed</CardDescription>
+              <CardTitle>Crew ranking</CardTitle>
+              <CardDescription>Attendance rate (last 30 days)</CardDescription>
             </div>
             <Link
               to="/dashboard/employees"
@@ -286,25 +307,36 @@ export function DashboardPage() {
                 <Skeleton key={i} className="h-10 w-full" />
               ))}
             </div>
+          ) : crewRanking.length === 0 ? (
+            <p className="py-8 text-center text-sm text-ink-faint">No active employees yet.</p>
           ) : (
             <div className="space-y-3">
-              {activeEmployees.slice(0, 5).map((emp) => {
-                const clockedIn = clockedInNow.some((a) => a.employeeId === emp.id);
-                return (
-                  <div key={emp.id} className="flex items-center gap-3">
-                    <div
-                      className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white"
-                      style={{ backgroundColor: emp.avatarColor }}
-                    >
-                      {emp.name.split(" ").map((p) => p[0]).slice(0, 2).join("")}
-                    </div>
-                    <span className="flex-1 truncate text-sm text-ink">{emp.name}</span>
-                    <Badge variant={clockedIn ? "success" : "neutral"}>
-                      {clockedIn ? "On shift" : "Off"}
-                    </Badge>
+              {crewRanking.slice(0, 5).map((emp, idx) => (
+                <div key={emp.id} className="flex items-center gap-3">
+                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-ink/5 text-[10px] font-bold text-ink-soft">
+                    {idx + 1}
+                  </span>
+                  <div
+                    className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white"
+                    style={{ backgroundColor: emp.avatarColor }}
+                  >
+                    {emp.name.split(" ").map((p) => p[0]).slice(0, 2).join("")}
                   </div>
-                );
-              })}
+                  <div className="min-w-0 flex-1">
+                    <span className="block truncate text-sm text-ink">{emp.name}</span>
+                    <span className="text-[11px] text-ink-faint">
+                      {emp.present} present · {emp.absent} absent
+                    </span>
+                  </div>
+                  {idx === 0 && emp.total > 0 ? (
+                    <Badge variant="default" className="gap-1">
+                      <Medal className="h-3 w-3" /> {emp.rate.toFixed(0)}%
+                    </Badge>
+                  ) : (
+                    <Badge variant="neutral">{emp.rate.toFixed(0)}%</Badge>
+                  )}
+                </div>
+              ))}
             </div>
           )}
         </Card>
