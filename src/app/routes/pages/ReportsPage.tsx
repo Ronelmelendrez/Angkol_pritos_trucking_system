@@ -5,6 +5,7 @@ import { ExpensePieChart } from "@/features/reports/components/ExpensesPieChart"
 import { ProfitLineChart } from "@/features/reports/components/profitLineChart";
 import { SalesByProductPieChart } from "@/features/reports/components/SalesByProductPieChart";
 import { PayrollSummary } from "@/features/reports/components/PayrollSummary";
+import { TrendingUp, Receipt, Percent, CalendarDays, Wallet } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/Tabs";
@@ -234,11 +235,11 @@ function ReportsContent() {
         </div>
       ) : (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
-          <KpiPill label="Total sales" value={formatCurrency(totals.totalSales)} />
-          <KpiPill label="Total expenses" value={formatCurrency(totals.totalExpenses)} />
-          <KpiPill label="Net margin" value={`${totals.totalSales > 0 ? (((totals.totalSales - totals.totalExpenses) / totals.totalSales) * 100).toFixed(1) : 0}%`} />
-          <KpiPill label="Avg. daily expense" value={formatCurrency(avgDailyExpense)} />
-          <KpiPill label="Total payroll" value={formatCurrency(totalPayrollPaid)} />
+          <KpiPill label="Total sales" value={formatCurrency(totals.totalSales)} icon={TrendingUp} tone="accent" />
+          <KpiPill label="Total expenses" value={formatCurrency(totals.totalExpenses)} icon={Receipt} tone="secondary" />
+          <KpiPill label="Net margin" value={`${totals.totalSales > 0 ? (((totals.totalSales - totals.totalExpenses) / totals.totalSales) * 100).toFixed(1) : 0}%`} icon={Percent} tone="primary" />
+          <KpiPill label="Avg. daily expense" value={formatCurrency(avgDailyExpense)} icon={CalendarDays} tone="danger" />
+          <KpiPill label="Total payroll" value={formatCurrency(totalPayrollPaid)} icon={Wallet} tone="success" />
         </div>
       )}
 
@@ -391,11 +392,34 @@ function ReportsContent() {
   );
 }
 
-function KpiPill({ label, value }: { label: string; value: string }) {
+function KpiPill({
+  label,
+  value,
+  icon: Icon,
+  tone,
+}: {
+  label: string;
+  value: string;
+  icon: React.ComponentType<{ className?: string }>;
+  tone: "primary" | "secondary" | "accent" | "success" | "danger";
+}) {
+  const toneClasses: Record<typeof tone, string> = {
+    primary: "bg-primary/10 text-primary-dark",
+    secondary: "bg-secondary/10 text-secondary-dark",
+    accent: "bg-accent/20 text-accent-dark",
+    success: "bg-success-bg text-success",
+    danger: "bg-danger-bg text-danger",
+  };
+
   return (
-    <div className="rounded-xl border border-line bg-bg/60 px-3 py-2.5">
-      <p className="truncate text-[11px] text-ink-faint">{label}</p>
-      <p className="truncate text-sm font-bold text-ink">{value}</p>
+    <div className="flex items-start justify-between rounded-xl border border-line bg-surface px-3 py-2.5">
+      <div className="min-w-0">
+        <p className="truncate text-[11px] font-medium uppercase tracking-wide text-ink-faint">{label}</p>
+        <p className="stamp mt-0.5 text-lg font-semibold text-ink">{value}</p>
+      </div>
+      <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${toneClasses[tone]}`}>
+        <Icon className="h-4 w-4" />
+      </div>
     </div>
   );
 }
