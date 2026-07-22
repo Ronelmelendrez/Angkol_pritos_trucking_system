@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { TrendingUp, TrendingDown, Users, Receipt, ArrowRight, Wallet, PiggyBank, Medal, CircleDollarSign, CalendarClock } from "lucide-react";
 import { Link } from "react-router-dom";
 import {
@@ -78,7 +78,9 @@ export function DashboardPage() {
     };
   }, [sales, expenses]);
 
-  // Busiest days heatmap (expense amounts per day, last 60 days)
+  // Busiest days heatmap (last 60 days)
+  const [heatmapMode, setHeatmapMode] = useState<"expenses" | "sales">("expenses");
+
   const expenseHeatmap = useMemo(() => {
     const map = new Map<string, number>();
     const start = subDays(new Date(), 59);
@@ -87,6 +89,15 @@ export function DashboardPage() {
       .forEach((e) => map.set(e.date, (map.get(e.date) ?? 0) + e.amount));
     return Array.from(map.entries()).map(([date, value]) => ({ date, value }));
   }, [expenses]);
+
+  const salesHeatmap = useMemo(() => {
+    const map = new Map<string, number>();
+    const start = subDays(new Date(), 59);
+    sales
+      .filter((s) => s.date >= formatDateFns(start, "yyyy-MM-dd"))
+      .forEach((s) => map.set(s.date, (map.get(s.date) ?? 0) + s.amount));
+    return Array.from(map.entries()).map(([date, value]) => ({ date, value }));
+  }, [sales]);
 
   // Cash flow health
   const pendingAdvances = advances
@@ -259,13 +270,40 @@ export function DashboardPage() {
           <CardHeader>
             <div>
               <CardTitle>Busiest days</CardTitle>
-              <CardDescription>Expense volume by day</CardDescription>
+              <CardDescription>
+                {heatmapMode === "expenses" ? "Expense" : "Sales"} volume by day
+              </CardDescription>
+            </div>
+            <div className="flex gap-1">
+              <button
+                onClick={() => setHeatmapMode("expenses")}
+                className={`rounded-lg px-2.5 py-1 text-xs font-medium transition-colors ${
+                  heatmapMode === "expenses"
+                    ? "bg-secondary/10 text-secondary-dark"
+                    : "text-ink-faint hover:bg-ink/5"
+                }`}
+              >
+                Expenses
+              </button>
+              <button
+                onClick={() => setHeatmapMode("sales")}
+                className={`rounded-lg px-2.5 py-1 text-xs font-medium transition-colors ${
+                  heatmapMode === "sales"
+                    ? "bg-accent/20 text-accent-dark"
+                    : "text-ink-faint hover:bg-ink/5"
+                }`}
+              >
+                Sales
+              </button>
             </div>
           </CardHeader>
           {isLoading ? (
             <Skeleton className="h-48 w-full" />
           ) : (
-            <CalendarHeatmap data={expenseHeatmap} color="#C0392B" />
+            <CalendarHeatmap
+              data={heatmapMode === "expenses" ? expenseHeatmap : salesHeatmap}
+              color={heatmapMode === "expenses" ? "#C0392B" : "#F1C40F"}
+            />
           )}
         </Card>
 
