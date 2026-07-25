@@ -24,26 +24,25 @@ export function ExpensesPage() {
   const [datePreset, setDatePreset] = useState<DatePreset>("this-month");
   const [dialogOpen, setDialogOpen] = useState(false);
 
-  const today = new Date();
-  const todayStr = format(today, "yyyy-MM-dd");
-
   const effectiveDateFrom = useMemo(() => {
+    const now = new Date();
     switch (datePreset) {
-      case "today": return todayStr;
-      case "this-week": return format(startOfWeek(today, { weekStartsOn: 1 }), "yyyy-MM-dd");
-      case "this-month": return format(startOfMonth(today), "yyyy-MM-dd");
+      case "today": return format(now, "yyyy-MM-dd");
+      case "this-week": return format(startOfWeek(now, { weekStartsOn: 1 }), "yyyy-MM-dd");
+      case "this-month": return format(startOfMonth(now), "yyyy-MM-dd");
       case "custom": return filters.dateFrom;
     }
-  }, [datePreset, filters.dateFrom, todayStr]);
+  }, [datePreset, filters.dateFrom]);
 
   const effectiveDateTo = useMemo(() => {
+    const now = new Date();
     switch (datePreset) {
-      case "today": return todayStr;
-      case "this-week": return format(endOfWeek(today, { weekStartsOn: 1 }), "yyyy-MM-dd");
-      case "this-month": return format(endOfMonth(today), "yyyy-MM-dd");
+      case "today": return format(now, "yyyy-MM-dd");
+      case "this-week": return format(endOfWeek(now, { weekStartsOn: 1 }), "yyyy-MM-dd");
+      case "this-month": return format(endOfMonth(now), "yyyy-MM-dd");
       case "custom": return filters.dateTo;
     }
-  }, [datePreset, filters.dateTo, todayStr]);
+  }, [datePreset, filters.dateTo]);
 
   function handlePresetChange(preset: DatePreset) {
     setDatePreset(preset);
