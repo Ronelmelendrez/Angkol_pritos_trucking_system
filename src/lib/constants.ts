@@ -1,13 +1,17 @@
 export const EXPENSE_CATEGORIES = [
   "Raw Chicken",
-  "Lechon Manok",
+  "Ketchup",
   "Oil",
   "Spices",
   "Packaging",
   "Fuel",
   "Repairs",
   "Salaries",
-  "Misc",
+  "Flour",
+  "Gus",
+  "Charcoal",
+  "Vinegar",
+  "Ingredients",
 ] as const;
 export type ExpenseCategory = (typeof EXPENSE_CATEGORIES)[number];
 
@@ -16,17 +20,21 @@ export type PaymentMethod = (typeof PAYMENT_METHODS)[number];
 
 export const CATEGORY_COLORS: Record<ExpenseCategory, string> = {
   "Raw Chicken": "#E67E22",
-  "Lechon Manok": "#C0392B",
-  Oil: "#F1C40F",
-  Spices: "#D35400",
-  Packaging: "#8D6E63",
-  Fuel: "#6D4C41",
-  Repairs: "#B8860B",
-  Salaries: "#2ECC71",
-  Misc: "#A08D86",
+  "Ketchup": "#C0392B",
+  "Oil": "#F1C40F",
+  "Spices": "#D35400",
+  "Packaging": "#8D6E63",
+  "Fuel": "#6D4C41",
+  "Repairs": "#B8860B",
+  "Salaries": "#2ECC71",
+  "Flour": "#A08D86",
+  "Gus": "#3498DB",
+  "Charcoal": "#34495E",
+  "Vinegar": "#1ABC9C",
+  "Ingredients": "#9B59B6",
 };
 
-export const STOCK_CATEGORIES = ["Raw Chicken", "Lechon Manok"] as const;
+export const STOCK_CATEGORIES = ["Raw Chicken", "Oil", "Gus"] as const;
 export type StockCategory = (typeof STOCK_CATEGORIES)[number];
 
 export function isStockCategory(category: string): category is StockCategory {
