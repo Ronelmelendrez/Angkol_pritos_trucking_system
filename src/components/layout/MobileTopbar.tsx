@@ -37,46 +37,62 @@ export function MobileTopbar() {
 
   return (
     <div className="md:hidden">
-      {/* Collapsible nav panel */}
+      {/* Backdrop */}
       <div
         className={cn(
-          "overflow-hidden border-b border-line bg-surface transition-all duration-300 ease-out",
-          isSidebarOpen ? "max-h-[80vh]" : "max-h-0",
+          "fixed inset-0 z-40 bg-ink/40 backdrop-blur-[1px] transition-opacity duration-300",
+          isSidebarOpen
+            ? "opacity-100"
+            : "pointer-events-none opacity-0",
+        )}
+        onClick={closeSidebar}
+        aria-hidden
+      />
+
+      {/* Floating panel */}
+      <div
+        className={cn(
+          "fixed inset-x-0 top-0 z-50 origin-top transition-all duration-300 ease-out",
+          isSidebarOpen
+            ? "translate-y-0 opacity-100"
+            : "-translate-y-full opacity-0",
         )}
       >
-        <div className="flex items-center justify-between border-b border-line px-4 py-3">
-          <p className="text-sm font-medium text-ink">Navigation</p>
-          <button
-            onClick={closeSidebar}
-            className="rounded-lg p-1.5 text-ink-soft hover:bg-ink/5"
-            aria-label="Close menu"
-          >
-            <X className="h-4 w-4" />
-          </button>
-        </div>
-        <nav className="max-h-[calc(80vh-48px)] overflow-y-auto px-2 py-2">
-          <div className="grid grid-cols-3 gap-1">
-            {NAV_ITEMS.map((item) => (
-              <NavLink
-                key={item.to}
-                to={item.to}
-                end={item.end}
-                onClick={closeSidebar}
-                className={({ isActive }) =>
-                  cn(
-                    "flex flex-col items-center gap-1.5 rounded-xl px-2 py-3 text-center text-xs font-medium transition-colors",
-                    isActive
-                      ? "bg-primary/10 text-primary-dark"
-                      : "text-ink-soft hover:bg-ink/5 hover:text-ink",
-                  )
-                }
-              >
-                <item.icon className="h-5 w-5 shrink-0" />
-                <span className="leading-tight">{item.label}</span>
-              </NavLink>
-            ))}
+        <div className="mx-auto max-w-lg rounded-b-2xl border-b border-line bg-surface shadow-lg">
+          <div className="flex items-center justify-between border-b border-line px-4 py-3">
+            <p className="text-sm font-medium text-ink">Navigation</p>
+            <button
+              onClick={closeSidebar}
+              className="rounded-lg p-1.5 text-ink-soft hover:bg-ink/5"
+              aria-label="Close menu"
+            >
+              <X className="h-4 w-4" />
+            </button>
           </div>
-        </nav>
+          <nav className="max-h-[60vh] overflow-y-auto px-2 py-2">
+            <div className="grid grid-cols-3 gap-1">
+              {NAV_ITEMS.map((item) => (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  end={item.end}
+                  onClick={closeSidebar}
+                  className={({ isActive }) =>
+                    cn(
+                      "flex flex-col items-center gap-1.5 rounded-xl px-2 py-3 text-center text-xs font-medium transition-colors",
+                      isActive
+                        ? "bg-primary/10 text-primary-dark"
+                        : "text-ink-soft hover:bg-ink/5 hover:text-ink",
+                    )
+                  }
+                >
+                  <item.icon className="h-5 w-5 shrink-0" />
+                  <span className="leading-tight">{item.label}</span>
+                </NavLink>
+              ))}
+            </div>
+          </nav>
+        </div>
       </div>
     </div>
   );
