@@ -4,7 +4,6 @@ CREATE TABLE pay_rule_settings (
   standard_hours_per_day     numeric(4,2) NOT NULL DEFAULT 8,
   half_day_threshold_hours   numeric(4,2) NOT NULL DEFAULT 4,
   half_day_rate_multiplier   numeric(4,2) NOT NULL DEFAULT 0.5,
-  overtime_rate_multiplier   numeric(4,2) NOT NULL DEFAULT 1.25,
   late_grace_minutes         int NOT NULL DEFAULT 10,
   late_deduction_per_minute  numeric(6,2) NOT NULL DEFAULT 0,
   absence_deduction_mode     absence_deduction_mode NOT NULL DEFAULT 'full_day',

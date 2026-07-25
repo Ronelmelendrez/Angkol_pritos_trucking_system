@@ -523,7 +523,6 @@ export type Database = {
           standard_hours_per_day: number;
           half_day_threshold_hours: number;
           half_day_rate_multiplier: number;
-          overtime_rate_multiplier: number;
           late_grace_minutes: number;
           late_deduction_per_minute: number;
           absence_deduction_mode: "full_day" | "none";
@@ -541,7 +540,6 @@ export type Database = {
           standard_hours_per_day?: number;
           half_day_threshold_hours?: number;
           half_day_rate_multiplier?: number;
-          overtime_rate_multiplier?: number;
           late_grace_minutes?: number;
           late_deduction_per_minute?: number;
           absence_deduction_mode?: "full_day" | "none";
@@ -559,7 +557,6 @@ export type Database = {
           standard_hours_per_day?: number;
           half_day_threshold_hours?: number;
           half_day_rate_multiplier?: number;
-          overtime_rate_multiplier?: number;
           late_grace_minutes?: number;
           late_deduction_per_minute?: number;
           absence_deduction_mode?: "full_day" | "none";
@@ -578,7 +575,6 @@ export type Database = {
           id: string;
           employee_id: string;
           half_day_rate_multiplier: number | null;
-          overtime_rate_multiplier: number | null;
           late_deduction_per_minute: number | null;
           created_at: string;
           updated_at: string;
@@ -587,7 +583,6 @@ export type Database = {
           id?: string;
           employee_id: string;
           half_day_rate_multiplier?: number | null;
-          overtime_rate_multiplier?: number | null;
           late_deduction_per_minute?: number | null;
           created_at?: string;
           updated_at?: string;
@@ -596,7 +591,6 @@ export type Database = {
           id?: string;
           employee_id?: string;
           half_day_rate_multiplier?: number | null;
-          overtime_rate_multiplier?: number | null;
           late_deduction_per_minute?: number | null;
           created_at?: string;
           updated_at?: string;
