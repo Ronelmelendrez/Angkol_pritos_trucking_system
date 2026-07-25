@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
-import { Menu, LogOut, Settings, Search, Bell, Command, ChevronRight } from "lucide-react";
+import { LogOut, Settings, Search, Bell, Command, ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useUiStore } from "@/app/store/useUiStore";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { CommandSearch } from "@/components/layout/CommandSearch";
 import { NotificationPanel } from "@/components/layout/NotificationPanel";
@@ -14,7 +13,6 @@ import {
 import { useToast } from "@/components/ui/useToast";
 
 export function Header({ title }: { title: string }) {
-  const { toggleSidebar } = useUiStore();
   const { user, logout } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -42,15 +40,8 @@ export function Header({ title }: { title: string }) {
   return (
     <>
       <header className="sticky top-0 z-30 flex items-center justify-between border-b border-line bg-bg/90 px-4 py-3 backdrop-blur sm:px-6">
-        {/* Left: hamburger + breadcrumb */}
+        {/* Left: breadcrumb */}
         <div className="flex items-center gap-3">
-          <button
-            onClick={toggleSidebar}
-            className="rounded-lg p-2 text-ink-soft hover:bg-ink/5 md:hidden"
-            aria-label="Open menu"
-          >
-            <Menu className="h-5 w-5" />
-          </button>
           <div className="flex items-center gap-1.5 text-sm text-ink-faint">
             <span className="hidden sm:inline">Dashboard</span>
             <ChevronRight className="hidden h-3 w-3 sm:inline" />

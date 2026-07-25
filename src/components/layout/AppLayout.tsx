@@ -1,13 +1,14 @@
 import { Outlet, useLocation } from "react-router-dom"
 import { Sidebar } from "@/components/layout/Sidebar"
 import { Header } from "@/components/layout/Header"
+import { MobileTopbar } from "@/components/layout/MobileTopbar"
 import { MobileBottomNav } from "@/components/layout/MobileBottomNav"
 import { NAV_ITEMS } from "@/components/layout/navConfig"
 
 /**
  * Main application layout.
  * - Desktop (md+): Sidebar (left, sticky) + Header + content area
- * - Mobile (<md): Header + content area + BottomTabNav + slide-in sidebar
+ * - Mobile (<md): MobileTopbar + Header + content area + BottomTabNav
  * Content area has bottom padding on mobile to account for the fixed bottom nav.
  */
 export function AppLayout() {
@@ -16,11 +17,13 @@ export function AppLayout() {
 
   return (
     <div className="flex h-screen overflow-hidden bg-background">
-      {/* Sidebar — sticky on md+, overlay on mobile */}
+      {/* Sidebar — desktop only */}
       <Sidebar />
 
       {/* Main content column */}
       <div className="flex flex-1 flex-col overflow-hidden">
+        {/* Mobile topbar — hidden on md+ */}
+        <MobileTopbar />
         <Header title={title} />
 
         {/* Scrollable page content */}

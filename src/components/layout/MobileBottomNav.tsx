@@ -1,7 +1,4 @@
 import { NavLink } from "react-router-dom"
-import { MoreHorizontal } from "lucide-react"
-import { cn } from "@/utils/cn"
-import { useUiStore } from "@/app/store/useUiStore"
 import {
   LayoutDashboard,
   Receipt,
@@ -9,6 +6,7 @@ import {
   Users,
   HandCoins,
 } from "lucide-react"
+import { cn } from "@/utils/cn"
 
 const CORE_ITEMS = [
   { path: "/dashboard", label: "Home", icon: LayoutDashboard, end: true },
@@ -19,8 +17,6 @@ const CORE_ITEMS = [
 ]
 
 export function MobileBottomNav() {
-  const { toggleSidebar } = useUiStore()
-
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-line bg-surface/95 backdrop-blur-sm md:hidden safe-bottom">
       <ul className="flex items-stretch">
@@ -43,15 +39,6 @@ export function MobileBottomNav() {
             </NavLink>
           </li>
         ))}
-        <li className="flex-1 min-w-0">
-          <button
-            onClick={toggleSidebar}
-            className="flex flex-col items-center justify-center gap-0.5 py-2 text-[10px] font-medium text-ink-soft transition-colors min-h-[52px] w-full active:text-ink"
-          >
-            <MoreHorizontal className="h-5 w-5 shrink-0" />
-            <span className="truncate w-full text-center leading-tight">More</span>
-          </button>
-        </li>
       </ul>
     </nav>
   )
