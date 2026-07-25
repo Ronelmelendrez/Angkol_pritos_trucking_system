@@ -46,13 +46,16 @@ export const supabaseAuthProvider: AuthProvider = {
       throw new Error(error.message);
     }
 
-    const { data: profile } = await supabase
+    const { data: profile, error: profileError } = await supabase
       .from("profiles")
       .select("id, name, email, role")
       .eq("id", data.user.id)
       .single();
 
-    if (!profile) throw new Error("Profile not found. Please contact admin.");
+    if (profileError || !profile) {
+      console.error("[auth] Profile lookup failed:", profileError?.message ?? "row not found");
+      throw new Error("Profile not found. Please contact admin.");
+    }
 
     return {
       id: profile.id,
