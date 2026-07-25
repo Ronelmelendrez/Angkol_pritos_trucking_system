@@ -233,13 +233,7 @@ export function ExpenseForm({ onDone }: { onDone?: () => void }) {
             <p className="text-xs text-annatto-600">Click "Add product" to start tracking stock.</p>
           )}
 
-          {items.map((item, index) => {
-            const product = activeProducts.find((p) => p.id === item.productId);
-            const lineTotal = product && item.quantityPurchased
-              ? product.defaultPrice * item.quantityPurchased
-              : null;
-
-            return (
+          {items.map((item, index) => (
               <div key={index} className="flex items-end gap-2 rounded-lg border border-line bg-surface p-3">
                 <div className="flex-1 min-w-0">
                   <Label className="text-xs">Product</Label>
@@ -267,14 +261,6 @@ export function ExpenseForm({ onDone }: { onDone?: () => void }) {
                     placeholder="0"
                   />
                 </div>
-                {lineTotal !== null && lineTotal > 0 && (
-                  <div className="w-28 text-right">
-                    <Label className="text-xs">Subtotal</Label>
-                    <p className="h-9 flex items-center justify-end text-sm font-medium text-char-800">
-                      {formatCurrency(lineTotal)}
-                    </p>
-                  </div>
-                )}
                 <Button
                   type="button"
                   variant="ghost"
@@ -285,8 +271,7 @@ export function ExpenseForm({ onDone }: { onDone?: () => void }) {
                   <Trash2 className="h-4 w-4" />
                 </Button>
               </div>
-            );
-          })}
+            ))}
           {errors.items && <p className="text-xs text-danger">{errors.items.message}</p>}
         </div>
       )}
