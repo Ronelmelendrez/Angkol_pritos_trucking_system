@@ -42,9 +42,11 @@ export function ExpenseForm({ onDone }: { onDone?: () => void }) {
     },
   });
 
+  type ExpenseItem = NonNullable<ExpenseFormValues["items"]>[number] & { _raw?: string };
+
   const selectedCategory = useWatch({ control, name: "category" });
   const isStock = isStockCategory(selectedCategory);
-  const items = watch("items") ?? [];
+  const items = (watch("items") ?? []) as ExpenseItem[];
 
   function addItem() {
     const current = watch("items") ?? [];
@@ -169,7 +171,7 @@ export function ExpenseForm({ onDone }: { onDone?: () => void }) {
                   type="text"
                   inputMode="decimal"
                   pattern="[0-9]*\.?[0-9]*"
-                  value={(item as any)._raw ?? (item.quantityPurchased || "")}
+                  value={item._raw ?? (item.quantityPurchased || "")}
                   onChange={(e) => updateItem(index, "quantityPurchased", e.target.value)}
                   placeholder="0"
                 />
