@@ -1,18 +1,82 @@
-import { Drumstick } from "lucide-react";
+import { NavLink } from "react-router-dom";
+import {
+  LayoutDashboard,
+  Receipt,
+  ShoppingCart,
+  Package,
+  ClipboardList,
+  Users,
+  CalendarClock,
+  HandCoins,
+  Landmark,
+  DollarSign,
+  BarChart3,
+  Settings,
+  X,
+} from "lucide-react";
+import { cn } from "@/utils/cn";
+import { useUiStore } from "@/app/store/useUiStore";
+
+const NAV_ITEMS = [
+  { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard, end: true },
+  { to: "/dashboard/sales", label: "Sales", icon: ShoppingCart },
+  { to: "/dashboard/products", label: "Products", icon: Package },
+  { to: "/dashboard/expenses", label: "Expenses", icon: Receipt },
+  { to: "/dashboard/inventory", label: "Inventory", icon: ClipboardList },
+  { to: "/dashboard/employees", label: "Employees", icon: Users },
+  { to: "/dashboard/attendance", label: "Attendance", icon: CalendarClock },
+  { to: "/dashboard/advances", label: "Cash Advances", icon: HandCoins },
+  { to: "/dashboard/loans", label: "Loans (Utang)", icon: Landmark },
+  { to: "/dashboard/payroll", label: "Payroll", icon: DollarSign },
+  { to: "/dashboard/reports", label: "Reports", icon: BarChart3 },
+  { to: "/dashboard/settings", label: "Settings", icon: Settings },
+];
 
 export function MobileTopbar() {
+  const { isSidebarOpen, closeSidebar } = useUiStore();
+
   return (
-    <div className="flex items-center gap-2.5 border-b border-line bg-surface px-4 py-3 md:hidden">
-      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary text-white">
-        <Drumstick className="h-4 w-4" />
-      </div>
-      <div className="whitespace-nowrap">
-        <p className="stamp text-sm font-semibold leading-tight text-ink">
-          Angkol Prito"s
-        </p>
-        <p className="text-[10px] leading-tight text-ink-faint">
-          &amp; Lechon Manok
-        </p>
+    <div className="md:hidden">
+      {/* Collapsible nav panel */}
+      <div
+        className={cn(
+          "overflow-hidden border-b border-line bg-surface transition-all duration-300 ease-out",
+          isSidebarOpen ? "max-h-[80vh]" : "max-h-0",
+        )}
+      >
+        <div className="flex items-center justify-between border-b border-line px-4 py-3">
+          <p className="text-sm font-medium text-ink">Navigation</p>
+          <button
+            onClick={closeSidebar}
+            className="rounded-lg p-1.5 text-ink-soft hover:bg-ink/5"
+            aria-label="Close menu"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+        <nav className="max-h-[calc(80vh-48px)] overflow-y-auto px-2 py-2">
+          <div className="grid grid-cols-3 gap-1">
+            {NAV_ITEMS.map((item) => (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                end={item.end}
+                onClick={closeSidebar}
+                className={({ isActive }) =>
+                  cn(
+                    "flex flex-col items-center gap-1.5 rounded-xl px-2 py-3 text-center text-xs font-medium transition-colors",
+                    isActive
+                      ? "bg-primary/10 text-primary-dark"
+                      : "text-ink-soft hover:bg-ink/5 hover:text-ink",
+                  )
+                }
+              >
+                <item.icon className="h-5 w-5 shrink-0" />
+                <span className="leading-tight">{item.label}</span>
+              </NavLink>
+            ))}
+          </div>
+        </nav>
       </div>
     </div>
   );
