@@ -19,7 +19,7 @@ export function AppShell() {
 
   return (
     <div className="flex min-h-screen">
-      <Sidebar />
+      <Sidebar title={title} />
       <div className="flex min-w-0 flex-1 flex-col">
         <Header title={title} />
         <main className="flex-1 px-4 py-5 sm:px-6 sm:py-6">

@@ -1,31 +1,57 @@
 import { NavLink } from "react-router-dom"
+import { MoreHorizontal } from "lucide-react"
 import { cn } from "@/utils/cn"
-import { NAV_ITEMS } from "@/components/layout/navConfig"
+import { useUiStore } from "@/app/store/useUiStore"
+import {
+  LayoutDashboard,
+  Receipt,
+  CalendarClock,
+  Users,
+  HandCoins,
+} from "lucide-react"
+
+const CORE_ITEMS = [
+  { path: "/dashboard", label: "Home", icon: LayoutDashboard, end: true },
+  { path: "/dashboard/expenses", label: "Expenses", icon: Receipt },
+  { path: "/dashboard/attendance", label: "Attendance", icon: CalendarClock },
+  { path: "/dashboard/employees", label: "Crew", icon: Users },
+  { path: "/dashboard/advances", label: "Advances", icon: HandCoins },
+]
 
 export function MobileBottomNav() {
+  const { toggleSidebar } = useUiStore()
+
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-line bg-surface md:hidden">
-      <ul className="flex items-center justify-around">
-        {NAV_ITEMS.map((item) => (
-          <li key={item.path} className="flex-1">
+    <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-line bg-surface/95 backdrop-blur-sm md:hidden safe-bottom">
+      <ul className="flex items-stretch">
+        {CORE_ITEMS.map((item) => (
+          <li key={item.path} className="flex-1 min-w-0">
             <NavLink
               to={item.path}
-              end={item.path === "/dashboard"}
+              end={item.end}
               className={({ isActive }) =>
                 cn(
-                  "flex flex-col items-center gap-0.5 py-2 text-[10px] font-medium transition-colors",
-                  "min-h-[56px] justify-center",
+                  "flex flex-col items-center justify-center gap-0.5 py-2 text-[10px] font-medium transition-colors min-h-[52px]",
                   isActive
                     ? "text-primary-dark"
-                    : "text-ink-soft hover:text-ink"
+                    : "text-ink-soft active:text-ink",
                 )
               }
             >
               <item.icon className="h-5 w-5 shrink-0" />
-              <span className="truncate max-w-[64px]">{item.label}</span>
+              <span className="truncate w-full text-center px-0.5 leading-tight">{item.label}</span>
             </NavLink>
           </li>
         ))}
+        <li className="flex-1 min-w-0">
+          <button
+            onClick={toggleSidebar}
+            className="flex flex-col items-center justify-center gap-0.5 py-2 text-[10px] font-medium text-ink-soft transition-colors min-h-[52px] w-full active:text-ink"
+          >
+            <MoreHorizontal className="h-5 w-5 shrink-0" />
+            <span className="truncate w-full text-center leading-tight">More</span>
+          </button>
+        </li>
       </ul>
     </nav>
   )
