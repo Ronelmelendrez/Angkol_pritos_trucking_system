@@ -17,7 +17,7 @@ export function AppLayout() {
   return (
     <div className="flex h-screen overflow-hidden bg-background">
       {/* Sidebar — sticky on md+, overlay on mobile */}
-      <Sidebar title={title} />
+      <Sidebar />
 
       {/* Main content column */}
       <div className="flex flex-1 flex-col overflow-hidden">

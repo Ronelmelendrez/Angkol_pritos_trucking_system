@@ -33,7 +33,7 @@ const NAV_ITEMS = [
   { to: "/dashboard/settings", label: "Settings", icon: Settings },
 ];
 
-export function Sidebar({ title }: { title?: string }) {
+export function Sidebar() {
   const { isSidebarOpen, closeSidebar } = useUiStore();
 
   return (
@@ -70,20 +70,13 @@ export function Sidebar({ title }: { title?: string }) {
               <p className="text-[11px] leading-tight text-ink-faint">&amp; Lechon Manok</p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            {title && (
-              <span className="rounded-md bg-ink/5 px-2 py-0.5 text-xs font-medium text-ink-soft">
-                {title}
-              </span>
-            )}
-            <button
-              onClick={closeSidebar}
-              className="rounded-lg p-2 text-ink-soft hover:bg-ink/5 md:hidden"
-              aria-label="Close menu"
-            >
-              <X className="h-5 w-5" />
-            </button>
-          </div>
+          <button
+            onClick={closeSidebar}
+            className="rounded-lg p-2 text-ink-soft hover:bg-ink/5 md:hidden"
+            aria-label="Close menu"
+          >
+            <X className="h-5 w-5" />
+          </button>
         </div>
 
         {/* Nav items — icon + label always visible */}
