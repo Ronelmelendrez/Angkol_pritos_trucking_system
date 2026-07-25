@@ -84,6 +84,7 @@ export type Database = {
           clock_out: string | null;
           hours_worked: number | null;
           shift: "full" | "half" | null;
+          status: "present" | "absent" | null;
           created_at: string;
           updated_at: string;
         };
@@ -95,6 +96,7 @@ export type Database = {
           clock_out?: string | null;
           hours_worked?: number | null;
           shift?: "full" | "half" | null;
+          status?: "present" | "absent" | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -106,6 +108,7 @@ export type Database = {
           clock_out?: string | null;
           hours_worked?: number | null;
           shift?: "full" | "half" | null;
+          status?: "present" | "absent" | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -157,16 +160,22 @@ export type Database = {
           id: string;
           name: string;
           type: "expense" | "stock";
+          created_at: string;
+          updated_at: string;
         };
         Insert: {
           id?: string;
           name: string;
           type: "expense" | "stock";
+          created_at?: string;
+          updated_at?: string;
         };
         Update: {
           id?: string;
           name?: string;
           type?: "expense" | "stock";
+          created_at?: string;
+          updated_at?: string;
         };
         Relationships: [];
       };
@@ -514,6 +523,7 @@ export type Database = {
           standard_hours_per_day: number;
           half_day_threshold_hours: number;
           half_day_rate_multiplier: number;
+          overtime_rate_multiplier: number;
           late_grace_minutes: number;
           late_deduction_per_minute: number;
           absence_deduction_mode: "full_day" | "none";
@@ -531,6 +541,7 @@ export type Database = {
           standard_hours_per_day?: number;
           half_day_threshold_hours?: number;
           half_day_rate_multiplier?: number;
+          overtime_rate_multiplier?: number;
           late_grace_minutes?: number;
           late_deduction_per_minute?: number;
           absence_deduction_mode?: "full_day" | "none";
@@ -548,6 +559,7 @@ export type Database = {
           standard_hours_per_day?: number;
           half_day_threshold_hours?: number;
           half_day_rate_multiplier?: number;
+          overtime_rate_multiplier?: number;
           late_grace_minutes?: number;
           late_deduction_per_minute?: number;
           absence_deduction_mode?: "full_day" | "none";
@@ -566,6 +578,7 @@ export type Database = {
           id: string;
           employee_id: string;
           half_day_rate_multiplier: number | null;
+          overtime_rate_multiplier: number | null;
           late_deduction_per_minute: number | null;
           created_at: string;
           updated_at: string;
@@ -574,6 +587,7 @@ export type Database = {
           id?: string;
           employee_id: string;
           half_day_rate_multiplier?: number | null;
+          overtime_rate_multiplier?: number | null;
           late_deduction_per_minute?: number | null;
           created_at?: string;
           updated_at?: string;
@@ -582,6 +596,7 @@ export type Database = {
           id?: string;
           employee_id?: string;
           half_day_rate_multiplier?: number | null;
+          overtime_rate_multiplier?: number | null;
           late_deduction_per_minute?: number | null;
           created_at?: string;
           updated_at?: string;
@@ -603,6 +618,7 @@ export type Database = {
       user_role: "manager" | "staff";
       pay_frequency: "weekly" | "semi_monthly" | "monthly";
       shift_type: "full" | "half";
+      attendance_status: "present" | "absent";
       advance_status: "pending" | "deducted";
       loan_status: "active" | "paid";
       payroll_status: "upcoming" | "ready" | "paid";

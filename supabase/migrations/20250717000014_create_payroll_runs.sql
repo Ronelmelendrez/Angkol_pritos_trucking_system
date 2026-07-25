@@ -1,5 +1,3 @@
--- payroll_runs table
-
 CREATE TABLE payroll_runs (
   id                  uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   employee_id         uuid NOT NULL REFERENCES employees(id) ON DELETE CASCADE,
@@ -31,7 +29,11 @@ CREATE INDEX idx_payroll_period ON payroll_runs(period_start, period_end);
 
 ALTER TABLE payroll_runs ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Authenticated read" ON payroll_runs FOR SELECT USING (auth.role() = 'authenticated');
-CREATE POLICY "Authenticated insert" ON payroll_runs FOR INSERT WITH CHECK (auth.role() = 'authenticated');
-CREATE POLICY "Authenticated update" ON payroll_runs FOR UPDATE USING (auth.role() = 'authenticated');
-CREATE POLICY "Authenticated delete" ON payroll_runs FOR DELETE USING (auth.role() = 'authenticated');
+CREATE POLICY "Authenticated read" ON payroll_runs
+  FOR SELECT USING (auth.role() = 'authenticated');
+CREATE POLICY "Authenticated insert" ON payroll_runs
+  FOR INSERT WITH CHECK (auth.role() = 'authenticated');
+CREATE POLICY "Authenticated update" ON payroll_runs
+  FOR UPDATE USING (auth.role() = 'authenticated');
+CREATE POLICY "Authenticated delete" ON payroll_runs
+  FOR DELETE USING (auth.role() = 'authenticated');

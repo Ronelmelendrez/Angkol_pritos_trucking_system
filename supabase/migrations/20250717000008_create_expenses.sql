@@ -1,9 +1,7 @@
--- expenses table
-
 CREATE TABLE expenses (
   id                 uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   date               date NOT NULL,
-  category_id        uuid NOT NULL REFERENCES categories(id),
+  category_id        uuid NOT NULL REFERENCES categories(id) ON DELETE RESTRICT,
   description        text,
   amount             numeric(12,2) NOT NULL,
   supplier           text,
@@ -21,10 +19,15 @@ CREATE TRIGGER expenses_updated_at
 CREATE INDEX idx_expenses_date ON expenses(date);
 CREATE INDEX idx_expenses_category_id ON expenses(category_id);
 CREATE INDEX idx_expenses_product_id ON expenses(product_id);
+CREATE INDEX idx_expenses_date_category ON expenses(date, category_id);
 
 ALTER TABLE expenses ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Authenticated read" ON expenses FOR SELECT USING (auth.role() = 'authenticated');
-CREATE POLICY "Authenticated insert" ON expenses FOR INSERT WITH CHECK (auth.role() = 'authenticated');
-CREATE POLICY "Authenticated update" ON expenses FOR UPDATE USING (auth.role() = 'authenticated');
-CREATE POLICY "Authenticated delete" ON expenses FOR DELETE USING (auth.role() = 'authenticated');
+CREATE POLICY "Authenticated read" ON expenses
+  FOR SELECT USING (auth.role() = 'authenticated');
+CREATE POLICY "Authenticated insert" ON expenses
+  FOR INSERT WITH CHECK (auth.role() = 'authenticated');
+CREATE POLICY "Authenticated update" ON expenses
+  FOR UPDATE USING (auth.role() = 'authenticated');
+CREATE POLICY "Authenticated delete" ON expenses
+  FOR DELETE USING (auth.role() = 'authenticated');

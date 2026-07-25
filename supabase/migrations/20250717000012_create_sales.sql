@@ -1,5 +1,3 @@
--- sales table
-
 CREATE TABLE sales (
   id            uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   date          date NOT NULL,
@@ -18,10 +16,15 @@ CREATE TRIGGER sales_updated_at
 
 CREATE INDEX idx_sales_date ON sales(date);
 CREATE INDEX idx_sales_product_id ON sales(product_id);
+CREATE INDEX idx_sales_date_product ON sales(date, product_id);
 
 ALTER TABLE sales ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Authenticated read" ON sales FOR SELECT USING (auth.role() = 'authenticated');
-CREATE POLICY "Authenticated insert" ON sales FOR INSERT WITH CHECK (auth.role() = 'authenticated');
-CREATE POLICY "Authenticated update" ON sales FOR UPDATE USING (auth.role() = 'authenticated');
-CREATE POLICY "Authenticated delete" ON sales FOR DELETE USING (auth.role() = 'authenticated');
+CREATE POLICY "Authenticated read" ON sales
+  FOR SELECT USING (auth.role() = 'authenticated');
+CREATE POLICY "Authenticated insert" ON sales
+  FOR INSERT WITH CHECK (auth.role() = 'authenticated');
+CREATE POLICY "Authenticated update" ON sales
+  FOR UPDATE USING (auth.role() = 'authenticated');
+CREATE POLICY "Authenticated delete" ON sales
+  FOR DELETE USING (auth.role() = 'authenticated');

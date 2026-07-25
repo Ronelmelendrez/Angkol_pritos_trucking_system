@@ -1,5 +1,3 @@
--- employee_pay_overrides table
-
 CREATE TABLE employee_pay_overrides (
   id                        uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   employee_id               uuid NOT NULL UNIQUE REFERENCES employees(id) ON DELETE CASCADE,
@@ -16,7 +14,11 @@ CREATE TRIGGER employee_pay_overrides_updated_at
 
 ALTER TABLE employee_pay_overrides ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Authenticated read" ON employee_pay_overrides FOR SELECT USING (auth.role() = 'authenticated');
-CREATE POLICY "Authenticated insert" ON employee_pay_overrides FOR INSERT WITH CHECK (auth.role() = 'authenticated');
-CREATE POLICY "Authenticated update" ON employee_pay_overrides FOR UPDATE USING (auth.role() = 'authenticated');
-CREATE POLICY "Authenticated delete" ON employee_pay_overrides FOR DELETE USING (auth.role() = 'authenticated');
+CREATE POLICY "Authenticated read" ON employee_pay_overrides
+  FOR SELECT USING (auth.role() = 'authenticated');
+CREATE POLICY "Authenticated insert" ON employee_pay_overrides
+  FOR INSERT WITH CHECK (auth.role() = 'authenticated');
+CREATE POLICY "Authenticated update" ON employee_pay_overrides
+  FOR UPDATE USING (auth.role() = 'authenticated');
+CREATE POLICY "Authenticated delete" ON employee_pay_overrides
+  FOR DELETE USING (auth.role() = 'authenticated');

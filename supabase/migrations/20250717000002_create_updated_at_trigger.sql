@@ -1,5 +1,3 @@
--- Updated_at trigger function (reused by all tables)
-
 CREATE OR REPLACE FUNCTION update_updated_at()
 RETURNS TRIGGER AS $$
 BEGIN
