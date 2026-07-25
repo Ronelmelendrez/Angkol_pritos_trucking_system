@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useForm, Controller, type Resolver } from "react-hook-form";
+import { useForm, Controller, useWatch, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, Plus, Trash2, Package, PackagePlus } from "lucide-react";
 import { expenseSchema, type ExpenseFormValues } from "@/utils/validators";
@@ -46,7 +46,7 @@ export function ExpenseForm({ onDone }: { onDone?: () => void }) {
 
   type ExpenseItem = NonNullable<ExpenseFormValues["items"]>[number] & { _raw?: string };
 
-  const items = (watch("items") ?? []) as ExpenseItem[];
+  const items = (useWatch({ control, name: "items" }) ?? []) as ExpenseItem[];
 
   function toggleStock() {
     const next = !trackStock;
@@ -96,17 +96,6 @@ export function ExpenseForm({ onDone }: { onDone?: () => void }) {
     setValue("items", updated as ExpenseFormValues["items"], { shouldValidate: true });
   }
 
-  // Auto-calculate total from product prices × quantities
-  const computedAmount = trackStock
-    ? items.reduce((sum, item) => {
-        const product = activeProducts.find((p) => p.id === item.productId);
-        if (!product || !item.quantityPurchased) return sum;
-        return sum + product.defaultPrice * item.quantityPurchased;
-      }, 0)
-    : null;
-
-  // Keep amount field synced
-  const amountSource = computedAmount !== null && computedAmount > 0 ? "auto" : "manual";
 
   async function onSubmit(values: ExpenseFormValues) {
     if (trackStock) {
@@ -279,20 +268,13 @@ export function ExpenseForm({ onDone }: { onDone?: () => void }) {
       {/* Amount + Payment method */}
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <Label htmlFor="amount">
-            Amount (₱)
-            {amountSource === "auto" && (
-              <span className="ml-1 text-xs font-normal text-annatto-500">auto</span>
-            )}
-          </Label>
+          <Label htmlFor="amount">Amount (₱)</Label>
           <Input
             id="amount"
             type="number"
             step="0.01"
             min="0"
             {...register("amount")}
-            readOnly={amountSource === "auto"}
-            className={amountSource === "auto" ? "bg-muted" : ""}
           />
           {errors.amount && <p className="mt-1 text-xs text-danger">{errors.amount.message}</p>}
         </div>
