@@ -9,8 +9,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { SalesList } from "@/features/sales/components/SalesList";
 import { SaleGridCard } from "@/features/sales/components/SaleGridCard";
 import { SaleForm } from "@/features/sales/components/SaleForm";
-import { SalesFiltersBar, SalesDatePresets } from "@/features/sales/components/SalesFilters";
-import type { DatePreset } from "@/features/sales/components/SalesFilters";
+import { SalesFiltersBar } from "@/features/sales/components/SalesFilters";
+import { DatePresets, type DatePreset } from "@/components/ui/DatePresets";
 import { useSales } from "@/features/sales/hooks/useSales";
 import { TransactionViewTabs } from "@/components/layout/TransactionViewTabs";
 import { useProducts } from "@/features/products/hooks/useProducts";
@@ -140,9 +140,9 @@ export function SalesPage() {
           getGroupColor={(key) => productColors.get(key) ?? "#888"}
           emptyMessage="No sales match these filters"
           filters={
-            <SalesDatePresets
-              datePreset={datePreset}
-              onPresetChange={setDatePreset}
+            <DatePresets
+              value={datePreset}
+              onChange={setDatePreset}
               customFrom={customFrom}
               customTo={customTo}
               onCustomFromChange={setCustomFrom}
