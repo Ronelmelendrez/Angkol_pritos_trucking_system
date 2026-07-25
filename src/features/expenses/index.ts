@@ -1,7 +1,7 @@
 export { ExpenseForm } from "./components/ExpenseForm";
 export { ExpenseList } from "./components/ExpenseList";
 export { ExpenseDayList } from "./components/ExpenseDayList";
-export { ExpenseFilters } from "./components/ExpenseFilters";
+export { ExpenseFiltersBar as ExpenseFilters } from "./components/ExpenseFilters";
 export {
   useExpenses,
   useAddExpense,

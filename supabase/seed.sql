@@ -13,16 +13,18 @@ VALUES (
   ]'::jsonb
 );
 
--- ---- Expense & stock categories ----
+-- ---- Expense categories ----
 INSERT INTO categories (name, type) VALUES
   ('Raw Chicken',   'expense'),
-  ('Lechon Manok',  'expense'),
+  ('Ketchup',       'expense'),
   ('Oil',           'expense'),
   ('Spices',        'expense'),
   ('Packaging',     'expense'),
   ('Fuel',          'expense'),
   ('Repairs',       'expense'),
   ('Salaries',      'expense'),
-  ('Misc',          'expense'),
-  ('Raw Chicken',   'stock'),
-  ('Lechon Manok',  'stock');
+  ('Flour',         'expense'),
+  ('Gus',           'expense'),
+  ('Charcoal',      'expense'),
+  ('Vinegar',       'expense'),
+  ('Ingredients',   'expense');
