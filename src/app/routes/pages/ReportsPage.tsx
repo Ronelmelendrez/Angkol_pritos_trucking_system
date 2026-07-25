@@ -9,9 +9,7 @@ import { TrendingUp, Receipt, Percent, CalendarDays, Wallet } from "lucide-react
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/Tabs";
-import { Input } from "@/components/ui/Input";
-import { Button } from "@/components/ui/Button";
-import { Label } from "@/components/ui/Label";
+import { DatePresets, type DatePreset } from "@/components/ui/DatePresets";
 import { HorizontalBarList } from "@/components/charts/HorizontalBarList";
 import {
   AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend,
@@ -94,13 +92,11 @@ function RevenueByProductCard({ sales }: { sales: Sale[] }) {
   );
 }
 
-type Preset = "today" | "this-week" | "this-month" | "custom";
-
 function ReportsContent() {
   const today = useMemo(() => new Date(), []);
   const todayStr = format(today, "yyyy-MM-dd");
 
-  const [preset, setPreset] = useState<Preset>("this-month");
+  const [preset, setPreset] = useState<DatePreset>("this-month");
   const [customFrom, setCustomFrom] = useState(todayStr);
   const [customTo, setCustomTo] = useState(todayStr);
 
@@ -192,7 +188,7 @@ function ReportsContent() {
       .sort((a, b) => b.value - a.value);
   }, [filteredSales, products]);
 
-  function handlePreset(p: Preset) {
+  function handlePreset(p: DatePreset) {
     setPreset(p);
   }
 
@@ -203,29 +199,14 @@ function ReportsContent() {
           <h2 className="font-display text-lg font-semibold text-char-900 md:text-xl">Reports</h2>
           <p className="text-xs text-ink-faint">{rangeLabel}</p>
         </div>
-        <div className="flex flex-wrap items-end gap-3">
-          <div className="flex gap-1">
-            {(["today", "this-week", "this-month"] as const).map((p) => (
-              <Button key={p} variant={preset === p ? "default" : "outline"} size="sm" onClick={() => handlePreset(p)}>
-                {p === "today" ? "Today" : p === "this-week" ? "This week" : "This month"}
-              </Button>
-            ))}
-          </div>
-          {preset === "custom" ? (
-            <div className="flex items-end gap-2">
-              <div>
-                <Label className="text-xs text-ink-faint">From</Label>
-                <Input type="date" value={customFrom} onChange={(e) => { setPreset("custom"); setCustomFrom(e.target.value); }} className="w-36" />
-              </div>
-              <div>
-                <Label className="text-xs text-ink-faint">To</Label>
-                <Input type="date" value={customTo} onChange={(e) => { setPreset("custom"); setCustomTo(e.target.value); }} className="w-36" />
-              </div>
-            </div>
-          ) : (
-            <Button variant="outline" size="sm" onClick={() => setPreset("custom")}>Custom range</Button>
-          )}
-        </div>
+        <DatePresets
+          value={preset}
+          onChange={handlePreset}
+          customFrom={customFrom}
+          customTo={customTo}
+          onCustomFromChange={setCustomFrom}
+          onCustomToChange={setCustomTo}
+        />
       </div>
 
       {/* KPI summary strip */}
