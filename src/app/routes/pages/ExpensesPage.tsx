@@ -8,8 +8,8 @@ import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/Ca
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/Dialog";
 import { useExpenses } from "@/features/expenses/hooks/useExpenses";
 import { ExpenseForm } from "@/features/expenses/components/ExpenseForm";
-import { ExpenseFiltersBar, ExpenseDatePresets } from "@/features/expenses/components/ExpenseFilters";
-import type { DatePreset } from "@/features/expenses/components/ExpenseFilters";
+import { ExpenseFiltersBar } from "@/features/expenses/components/ExpenseFilters";
+import { DatePresets, type DatePreset } from "@/components/ui/DatePresets";
 import type { Expense } from "@/features/expenses/types";
 import { ExpenseList } from "@/features/expenses/components/ExpenseList";
 import { ExpenseGridCard } from "@/features/expenses/components/ExpenseGridCard";
@@ -22,6 +22,8 @@ export function ExpensesPage() {
   const { data: expenses = [], isLoading } = useExpenses();
   const [filters, setFilters] = useState<ExpenseFiltersType>({});
   const [datePreset, setDatePreset] = useState<DatePreset>("this-month");
+  const [customFrom, setCustomFrom] = useState(format(new Date(), "yyyy-MM-dd"));
+  const [customTo, setCustomTo] = useState(format(new Date(), "yyyy-MM-dd"));
   const [dialogOpen, setDialogOpen] = useState(false);
 
   const effectiveDateFrom = useMemo(() => {
@@ -30,9 +32,9 @@ export function ExpensesPage() {
       case "today": return format(now, "yyyy-MM-dd");
       case "this-week": return format(startOfWeek(now, { weekStartsOn: 1 }), "yyyy-MM-dd");
       case "this-month": return format(startOfMonth(now), "yyyy-MM-dd");
-      case "custom": return filters.dateFrom;
+      case "custom": return customFrom;
     }
-  }, [datePreset, filters.dateFrom]);
+  }, [datePreset, customFrom]);
 
   const effectiveDateTo = useMemo(() => {
     const now = new Date();
@@ -40,13 +42,9 @@ export function ExpensesPage() {
       case "today": return format(now, "yyyy-MM-dd");
       case "this-week": return format(endOfWeek(now, { weekStartsOn: 1 }), "yyyy-MM-dd");
       case "this-month": return format(endOfMonth(now), "yyyy-MM-dd");
-      case "custom": return filters.dateTo;
+      case "custom": return customTo;
     }
-  }, [datePreset, filters.dateTo]);
-
-  function handlePresetChange(preset: DatePreset) {
-    setDatePreset(preset);
-  }
+  }, [datePreset, customTo]);
 
   const filtered = useMemo(() => {
     return expenses.filter((e) => {
@@ -119,7 +117,14 @@ export function ExpensesPage() {
           getGroupColor={(key) => CATEGORY_COLORS[key as keyof typeof CATEGORY_COLORS] ?? "#888"}
           emptyMessage="No expenses match these filters"
           filters={
-            <ExpenseDatePresets filters={filters} onChange={setFilters} datePreset={datePreset} onPresetChange={handlePresetChange} />
+            <DatePresets
+              value={datePreset}
+              onChange={setDatePreset}
+              customFrom={customFrom}
+              customTo={customTo}
+              onCustomFromChange={setCustomFrom}
+              onCustomToChange={setCustomTo}
+            />
           }
         />
       </Card>
