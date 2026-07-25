@@ -63,14 +63,14 @@ export function ExpenseForm({ onDone }: { onDone?: () => void }) {
       if (field === "quantityPurchased") {
         const str = String(value);
         if (str === "" || str.endsWith(".")) {
-          return { ...item, quantityPurchased: str === "" ? 0 : parseFloat(str) || 0, _raw: str };
+          return { productId: item.productId, quantityPurchased: str === "" ? 0 : parseFloat(str) || 0, _raw: str };
         }
         const parsed = parseFloat(str);
-        return { ...item, quantityPurchased: isNaN(parsed) ? 0 : parsed, _raw: str };
+        return { productId: item.productId, quantityPurchased: isNaN(parsed) ? 0 : parsed, _raw: str };
       }
-      return { ...item, [field]: value };
+      return { ...item, productId: String(value) };
     });
-    setValue("items", updated, { shouldValidate: true });
+    setValue("items", updated as ExpenseFormValues["items"], { shouldValidate: true });
   }
 
   async function onSubmit(values: ExpenseFormValues) {
