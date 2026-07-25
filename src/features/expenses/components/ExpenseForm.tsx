@@ -182,28 +182,36 @@ export function ExpenseForm({ onDone }: { onDone?: () => void }) {
       </div>
 
       {/* Stock tracking toggle */}
-      {activeProducts.length > 0 && (
+      {!trackStock ? (
         <button
           type="button"
           onClick={toggleStock}
-          className={`w-full flex items-center justify-center gap-2 rounded-lg border-2 border-dashed px-4 py-2.5 text-sm font-medium transition-colors ${
-            trackStock
-              ? "border-annatto-400 bg-annatto-50/50 text-annatto-700"
-              : "border-line text-ink-faint hover:border-annatto-300 hover:text-annatto-600"
-          }`}
+          className="w-full flex items-center gap-3 rounded-lg border border-dashed border-annatto-300 bg-annatto-50/40 px-4 py-3 text-sm font-medium text-annatto-700 hover:border-annatto-400 hover:bg-annatto-50 transition-colors"
         >
-          {trackStock ? (
-            <>
-              <Package className="h-4 w-4" />
-              Tracking stock — click to remove
-            </>
-          ) : (
-            <>
-              <PackagePlus className="h-4 w-4" />
-              Track stock for this expense
-            </>
-          )}
+          <span className="flex h-8 w-8 items-center justify-center rounded-md bg-annatto-100 text-annatto-600">
+            <PackagePlus className="h-4 w-4" />
+          </span>
+          <span className="flex flex-col items-start">
+            <span className="leading-tight">Track stock for this expense</span>
+            <span className="text-xs font-normal text-annatto-500">Link purchased items to your inventory</span>
+          </span>
         </button>
+      ) : (
+        <div className="rounded-lg border border-annatto-200 bg-annatto-50/50 px-4 py-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2 text-sm font-medium text-annatto-700">
+              <Package className="h-4 w-4" />
+              Tracking stock
+            </div>
+            <button
+              type="button"
+              onClick={toggleStock}
+              className="text-xs text-ink-faint hover:text-danger transition-colors"
+            >
+              Remove
+            </button>
+          </div>
+        </div>
       )}
 
       {/* Stock product rows */}
