@@ -3,7 +3,7 @@ import {
   LayoutDashboard,
   Receipt,
   CalendarClock,
-  Users,
+  ShoppingCart,
   HandCoins,
 } from "lucide-react"
 import { cn } from "@/utils/cn"
@@ -12,7 +12,7 @@ const CORE_ITEMS = [
   { path: "/dashboard", label: "Home", icon: LayoutDashboard, end: true },
   { path: "/dashboard/expenses", label: "Expenses", icon: Receipt },
   { path: "/dashboard/attendance", label: "Attendance", icon: CalendarClock },
-  { path: "/dashboard/employees", label: "Crew", icon: Users },
+  { path: "/dashboard/sales", label: "Sales", icon: ShoppingCart },
   { path: "/dashboard/advances", label: "Advances", icon: HandCoins },
 ]
 
