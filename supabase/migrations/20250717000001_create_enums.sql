@@ -1,8 +1,7 @@
--- Create all enum types
-
 CREATE TYPE user_role AS ENUM ('manager', 'staff');
 CREATE TYPE pay_frequency AS ENUM ('weekly', 'semi_monthly', 'monthly');
 CREATE TYPE shift_type AS ENUM ('full', 'half');
+CREATE TYPE attendance_status AS ENUM ('present', 'absent');
 CREATE TYPE advance_status AS ENUM ('pending', 'deducted');
 CREATE TYPE loan_status AS ENUM ('active', 'paid');
 CREATE TYPE payroll_status AS ENUM ('upcoming', 'ready', 'paid');
