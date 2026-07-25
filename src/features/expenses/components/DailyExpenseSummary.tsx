@@ -1,5 +1,6 @@
 import { Card, CardContent } from "@/components/ui/Card"
 import { formatCurrency } from "@/utils/currency"
+import { todayISO } from "@/utils/date"
 import type { Expense } from "@/features/expenses/types"
 
 interface DailyExpenseSummaryProps {
@@ -8,7 +9,7 @@ interface DailyExpenseSummaryProps {
 
 export function DailyExpenseSummary({ expenses }: DailyExpenseSummaryProps) {
   const total = expenses.reduce((sum, e) => sum + e.amount, 0)
-  const todayStr = new Date().toISOString().slice(0, 10)
+  const todayStr = todayISO();
   const todayTotal = expenses
     .filter((e) => e.date === todayStr)
     .reduce((sum, e) => sum + e.amount, 0)

@@ -4,6 +4,7 @@ import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, A
 import { Input } from "@/components/ui/Input";
 import { Label } from "@/components/ui/Label";
 import { formatCurrency } from "@/utils/currency";
+import { todayISO } from "@/utils/date";
 import { usePayRuleSettings } from "@/features/settings/hooks/usePayRuleSettings";
 import { getScheduledPayday } from "../utils/paydays";
 import { getCurrentPeriod } from "../utils/payPeriods";
@@ -26,7 +27,7 @@ export function PayConfirmationDialog({ open, onOpenChange, row, onConfirm, isPa
 
   const [paidAt, setPaidAt] = useState(scheduledPayday);
 
-  const today = new Date().toISOString().slice(0, 10);
+  const today = todayISO();
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>

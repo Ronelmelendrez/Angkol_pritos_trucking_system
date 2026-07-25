@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { expensesTable, payrollRunsTable, loansTable } from "@/lib/mockData";
 import { useMarkAdvanceDeducted } from "@/features/advances/hooks/useAdvances";
 import { useRepayLoan } from "@/features/loans/hooks/useLoans";
+import { todayISO } from "@/utils/date";
 import { useToast } from "@/components/ui/useToast";
 import type { PayrollRunDraftRow } from "./usePayrollRun";
 
@@ -61,7 +62,7 @@ export function usePayPayroll() {
           const loan = loans.find((l) => l.id === lid);
           if (loan && loan.remainingBalance > 0) {
             const amount = Math.min(remaining, loan.remainingBalance);
-            await repayLoan.mutateAsync({ loan, loanId: loan.id, amount, date: new Date().toISOString().slice(0, 10) });
+            await repayLoan.mutateAsync({ loan, loanId: loan.id, amount, date: todayISO() });
             remaining -= amount;
           }
         }

@@ -23,7 +23,10 @@ export function buildDayTotals<T>(
   const result: DayTotal[] = [];
   const cursor = new Date(range.start);
   while (cursor <= range.end) {
-    const key = cursor.toISOString().slice(0, 10);
+    const year = cursor.getFullYear();
+    const month = String(cursor.getMonth() + 1).padStart(2, "0");
+    const day = String(cursor.getDate()).padStart(2, "0");
+    const key = `${year}-${month}-${day}`;
     const data = dayMap.get(key);
     result.push({
       date: key,
