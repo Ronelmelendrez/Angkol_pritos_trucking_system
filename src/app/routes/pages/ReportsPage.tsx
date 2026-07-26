@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Skeleton } from "@/components/ui/Skeleton";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/Tabs";
 import { DatePresets, type DatePreset } from "@/components/ui/DatePresets";
+import { CalendarHeatmap } from "@/components/charts/CalendarHeatmap";
 import { HorizontalBarList } from "@/components/charts/HorizontalBarList";
 import {
   AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend,
@@ -188,6 +189,20 @@ function ReportsContent() {
       .sort((a, b) => b.value - a.value);
   }, [filteredSales, products]);
 
+  const expenseHeatmap = useMemo(() => {
+    const map = new Map<string, number>();
+    allExpenses
+      .filter((e) => e.date >= dateFrom && e.date <= dateTo)
+      .forEach((e) => map.set(e.date, (map.get(e.date) ?? 0) + e.amount));
+    return Array.from(map.entries()).map(([date, value]) => ({ date, value }));
+  }, [allExpenses, dateFrom, dateTo]);
+
+  const salesHeatmap = useMemo(() => {
+    const map = new Map<string, number>();
+    filteredSales.forEach((s) => map.set(s.date, (map.get(s.date) ?? 0) + s.amount));
+    return Array.from(map.entries()).map(([date, value]) => ({ date, value }));
+  }, [filteredSales]);
+
   function handlePreset(p: DatePreset) {
     setPreset(p);
   }
@@ -307,6 +322,22 @@ function ReportsContent() {
                 </div>
               </Card>
             )}
+
+            {isLoading ? (
+              <Skeleton className="h-48 w-full" />
+            ) : (
+              <Card>
+                <CardHeader>
+                  <div>
+                    <CardTitle>Expense heatmap</CardTitle>
+                    <CardDescription>Daily expense volume</CardDescription>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <CalendarHeatmap data={expenseHeatmap} color="#C0392B" />
+                </CardContent>
+              </Card>
+            )}
           </div>
         </TabsContent>
 
@@ -337,6 +368,17 @@ function ReportsContent() {
                   </CardContent>
                 </Card>
                 <RevenueByProductCard sales={filteredSales} />
+                <Card>
+                  <CardHeader>
+                    <div>
+                      <CardTitle>Sales heatmap</CardTitle>
+                      <CardDescription>Daily sales volume</CardDescription>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <CalendarHeatmap data={salesHeatmap} color="#F1C40F" />
+                  </CardContent>
+                </Card>
               </>
             )}
           </div>
