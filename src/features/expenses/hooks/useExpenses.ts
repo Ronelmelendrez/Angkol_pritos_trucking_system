@@ -45,6 +45,20 @@ export function useAddExpense() {
         .select()
         .single();
       if (error) throw error;
+
+      if (input.items && input.items.length > 0) {
+        const adjustments = input.items.map((item) => ({
+          product_id: item.productId,
+          date: input.date,
+          quantity: item.quantityPurchased,
+          note: `Purchase: ${input.description}`,
+        }));
+        const { error: adjError } = await supabase
+          .from("stock_adjustments")
+          .insert(adjustments);
+        if (adjError) throw adjError;
+      }
+
       return expenseRowToApp({ ...data, categories: { name: input.category } });
     },
     onMutate: async (input) => {
@@ -62,7 +76,10 @@ export function useAddExpense() {
     onError: (_err, _input, context) => {
       if (context?.previous) queryClient.setQueryData(EXPENSES_KEY, context.previous);
     },
-    onSettled: () => queryClient.invalidateQueries({ queryKey: EXPENSES_KEY }),
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: EXPENSES_KEY });
+      queryClient.invalidateQueries({ queryKey: ["stockAdjustments"] });
+    },
   });
 }
 
