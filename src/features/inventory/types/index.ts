@@ -16,4 +16,5 @@ export interface StockAdjustment extends BaseRecord {
   date: string;
   quantity: number;
   note: string;
+  source: "purchase" | "adjustment";
 }

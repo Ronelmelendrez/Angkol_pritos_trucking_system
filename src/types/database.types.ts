@@ -407,6 +407,7 @@ export type Database = {
           date: string;
           quantity: number;
           note: string;
+          source: "purchase" | "adjustment";
           created_at: string;
           updated_at: string;
         };
@@ -416,6 +417,7 @@ export type Database = {
           date: string;
           quantity: number;
           note: string;
+          source?: "purchase" | "adjustment";
           created_at?: string;
           updated_at?: string;
         };
@@ -425,6 +427,7 @@ export type Database = {
           date?: string;
           quantity?: number;
           note?: string;
+          source?: "purchase" | "adjustment";
           created_at?: string;
           updated_at?: string;
         };

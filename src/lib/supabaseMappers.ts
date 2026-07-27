@@ -101,6 +101,7 @@ export function stockAdjRowToApp(row: StockAdjRow) {
     date: row.date,
     quantity: row.quantity,
     note: row.note,
+    source: row.source ?? "adjustment",
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
@@ -111,12 +112,14 @@ export function stockAdjAppToRow(input: {
   date: string;
   quantity: number;
   note: string;
+  source?: "purchase" | "adjustment";
 }) {
   return {
     product_id: input.productId,
     date: input.date,
     quantity: input.quantity,
     note: input.note,
+    source: input.source ?? "adjustment",
   };
 }
 

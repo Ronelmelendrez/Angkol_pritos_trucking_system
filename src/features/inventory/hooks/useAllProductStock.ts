@@ -3,7 +3,6 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabaseClient";
 import { stockAdjRowToApp } from "@/lib/supabaseMappers";
 import { useProducts } from "@/features/products/hooks/useProducts";
-import { useExpenses } from "@/features/expenses/hooks/useExpenses";
 import { useSales } from "@/features/sales/hooks/useSales";
 import { buildLedger } from "../utils/buildLedger";
 import { todayISO } from "@/utils/date";
@@ -23,7 +22,6 @@ export interface ProductStockInfo {
 
 export function useAllProductStock() {
   const { data: products = [] } = useProducts();
-  const { data: expenses = [] } = useExpenses();
   const { data: sales = [] } = useSales();
   const today = todayISO();
 
@@ -42,7 +40,7 @@ export function useAllProductStock() {
   return useMemo(() => {
     const active = products.filter((p) => p.isActive);
     return active.map((p) => {
-      const entries = buildLedger(p.id, [today], expenses, sales, adjustments);
+      const entries = buildLedger(p.id, [today], sales, adjustments);
       const current = entries[entries.length - 1];
       return {
         productId: p.id,
@@ -55,5 +53,5 @@ export function useAllProductStock() {
         adjustmentQty: current?.adjustmentQty ?? 0,
       } satisfies ProductStockInfo;
     });
-  }, [products, expenses, sales, adjustments, today]);
+  }, [products, sales, adjustments, today]);
 }

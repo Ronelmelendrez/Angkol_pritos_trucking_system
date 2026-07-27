@@ -2,14 +2,12 @@ import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabaseClient";
 import { stockAdjRowToApp } from "@/lib/supabaseMappers";
-import { useExpenses } from "@/features/expenses/hooks/useExpenses";
 import { useSales } from "@/features/sales/hooks/useSales";
 import { buildLedger } from "../utils/buildLedger";
 
 const ADJUSTMENTS_KEY = ["stockAdjustments"] as const;
 
 export function useInventoryLedger(productId: string, dateRange: string[]) {
-  const { data: expenses = [] } = useExpenses();
   const { data: sales = [] } = useSales();
 
   const { data: adjustments = [] } = useQuery({
@@ -25,7 +23,7 @@ export function useInventoryLedger(productId: string, dateRange: string[]) {
   });
 
   return useMemo(
-    () => buildLedger(productId, dateRange, expenses, sales, adjustments),
-    [productId, dateRange, expenses, sales, adjustments],
+    () => buildLedger(productId, dateRange, sales, adjustments),
+    [productId, dateRange, sales, adjustments],
   );
 }

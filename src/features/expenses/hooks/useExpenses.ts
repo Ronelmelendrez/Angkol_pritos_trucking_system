@@ -52,6 +52,7 @@ export function useAddExpense() {
           date: input.date,
           quantity: item.quantityPurchased,
           note: `Purchase: ${input.description}`,
+          source: "purchase" as const,
         }));
         const { error: adjError } = await supabase
           .from("stock_adjustments")

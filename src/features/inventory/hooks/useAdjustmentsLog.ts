@@ -15,6 +15,7 @@ export function useAdjustmentsLog() {
       const { data, error } = await supabase
         .from("stock_adjustments")
         .select("*")
+        .eq("source", "adjustment")
         .order("date", { ascending: false });
       if (error) throw error;
       return data.map(stockAdjRowToApp);
