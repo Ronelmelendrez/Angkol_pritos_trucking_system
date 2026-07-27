@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { adjustmentsTable } from "@/lib/mockData";
-import type { NewStockAdjustment } from "@/lib/mockData";
+import { supabase } from "@/lib/supabaseClient";
+import { stockAdjAppToRow } from "@/lib/supabaseMappers";
 import { useToast } from "@/components/ui/useToast";
 import { useAllProductStock } from "./useAllProductStock";
 
@@ -21,13 +21,20 @@ export function useSetStock() {
       const delta = input.targetQty - input.currentQty;
       if (delta === 0) return null;
 
-      const adjustment: NewStockAdjustment = {
-        productId: input.productId,
-        date: input.date,
-        quantity: delta,
-        note: input.note || `Stock set to ${input.targetQty}`,
-      };
-      return adjustmentsTable.create(adjustment);
+      const { data, error } = await supabase
+        .from("stock_adjustments")
+        .insert(
+          stockAdjAppToRow({
+            productId: input.productId,
+            date: input.date,
+            quantity: delta,
+            note: input.note || `Stock set to ${input.targetQty}`,
+          }),
+        )
+        .select()
+        .single();
+      if (error) throw error;
+      return data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ADJUSTMENTS_KEY });

@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { attendanceTable } from "@/lib/mockData";
+import { supabase } from "@/lib/supabaseClient";
+import { attendanceRowToApp } from "@/lib/supabaseMappers";
 import { hoursBetween, nowISO, todayISO } from "@/utils/date";
 import type { AttendanceRecord, AttendanceStatus, ShiftType } from "../types";
 
@@ -13,23 +14,34 @@ function detectShift(clockOut: string): ShiftType {
 export function useAttendance() {
   return useQuery({
     queryKey: ATTENDANCE_KEY,
-    queryFn: () => attendanceTable.list(),
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("attendance_records")
+        .select("*")
+        .order("date", { ascending: false });
+      if (error) throw error;
+      return data.map(attendanceRowToApp);
+    },
   });
 }
 
 export function useClockIn() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (employeeId: string) =>
-      attendanceTable.create({
-        employeeId,
-        date: todayISO(),
-        clockIn: nowISO(),
-        clockOut: null,
-        hoursWorked: null,
-        shift: null,
-        status: "present",
-      }),
+    mutationFn: async (employeeId: string) => {
+      const { data, error } = await supabase
+        .from("attendance_records")
+        .insert({
+          employee_id: employeeId,
+          date: todayISO(),
+          clock_in: nowISO(),
+          status: "present",
+        })
+        .select()
+        .single();
+      if (error) throw error;
+      return attendanceRowToApp(data);
+    },
     onSettled: () => queryClient.invalidateQueries({ queryKey: ATTENDANCE_KEY }),
   });
 }
@@ -39,11 +51,20 @@ export function useClockOut() {
   return useMutation({
     mutationFn: async (record: AttendanceRecord) => {
       const clockOut = nowISO();
-      return attendanceTable.update(record.id, {
-        clockOut,
-        hoursWorked: hoursBetween(record.clockIn!, clockOut),
-        shift: detectShift(clockOut),
-      });
+      const hoursWorked = hoursBetween(record.clockIn!, clockOut);
+      const shift = detectShift(clockOut);
+      const { data, error } = await supabase
+        .from("attendance_records")
+        .update({
+          clock_out: clockOut,
+          hours_worked: hoursWorked,
+          shift,
+        })
+        .eq("id", record.id)
+        .select()
+        .single();
+      if (error) throw error;
+      return attendanceRowToApp(data);
     },
     onSettled: () => queryClient.invalidateQueries({ queryKey: ATTENDANCE_KEY }),
   });
@@ -63,41 +84,58 @@ export function useManualAttendance() {
       status: AttendanceStatus;
       shift?: ShiftType;
     }) => {
-      const existing = attendanceTable
-        .list()
-        .find((r) => r.employeeId === employeeId && r.date === date);
-
       const isPresent = status === "present" && shift;
 
-      const patch: Partial<AttendanceRecord> = { status };
+      const patch: Record<string, unknown> = { status };
 
       if (isPresent) {
         const clockInTime = `${date}T05:00:00`;
         const clockOutTime = shift === "full" ? `${date}T19:00:00` : `${date}T12:00:00`;
-        patch.clockIn = clockInTime;
-        patch.clockOut = clockOutTime;
-        patch.hoursWorked = hoursBetween(clockInTime, clockOutTime);
+        patch.clock_in = clockInTime;
+        patch.clock_out = clockOutTime;
+        patch.hours_worked = hoursBetween(clockInTime, clockOutTime);
         patch.shift = shift;
       } else {
-        patch.clockIn = null;
-        patch.clockOut = null;
-        patch.hoursWorked = null;
+        patch.clock_in = null;
+        patch.clock_out = null;
+        patch.hours_worked = null;
         patch.shift = null;
       }
 
+      // Check for existing record
+      const { data: existing } = await supabase
+        .from("attendance_records")
+        .select("id")
+        .eq("employee_id", employeeId)
+        .eq("date", date)
+        .maybeSingle();
+
       if (existing) {
-        return attendanceTable.update(existing.id, patch);
+        const { data, error } = await supabase
+          .from("attendance_records")
+          .update(patch)
+          .eq("id", existing.id)
+          .select()
+          .single();
+        if (error) throw error;
+        return attendanceRowToApp(data);
       }
 
-      return attendanceTable.create({
-        employeeId,
-        date,
-        clockIn: patch.clockIn ?? null,
-        clockOut: patch.clockOut ?? null,
-        hoursWorked: patch.hoursWorked ?? null,
-        shift: patch.shift ?? null,
-        status,
-      });
+      const { data, error } = await supabase
+        .from("attendance_records")
+        .insert({
+          employee_id: employeeId,
+          date,
+          clock_in: (patch.clock_in as string) ?? null,
+          clock_out: (patch.clock_out as string) ?? null,
+          hours_worked: (patch.hours_worked as number) ?? null,
+          shift: (patch.shift as ShiftType) ?? null,
+          status,
+        })
+        .select()
+        .single();
+      if (error) throw error;
+      return attendanceRowToApp(data);
     },
     onSettled: () => queryClient.invalidateQueries({ queryKey: ATTENDANCE_KEY }),
   });

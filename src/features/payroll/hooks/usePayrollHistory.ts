@@ -1,25 +1,19 @@
 import { useQuery } from "@tanstack/react-query";
-import { payrollRunsTable } from "@/lib/mockData";
-import { useEmployees } from "@/features/employees/hooks/useEmployees";
-import { useMemo } from "react";
+import { supabase } from "@/lib/supabaseClient";
+import { payrollRunRowToApp } from "@/lib/supabaseMappers";
 
 export const PAYROLL_KEY = ["payroll_runs"] as const;
 
 export function usePayrollHistory() {
-  const { data: employees = [] } = useEmployees();
-
-  const query = useQuery({
+  return useQuery({
     queryKey: PAYROLL_KEY,
-    queryFn: () => payrollRunsTable.list(),
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("payroll_runs")
+        .select("*, employees!payroll_runs_employee_id_fkey(name)")
+        .order("period_end", { ascending: false });
+      if (error) throw error;
+      return data.map((row) => payrollRunRowToApp(row));
+    },
   });
-
-  const data = useMemo(() => {
-    const employeeMap = new Map(employees.map((e) => [e.id, e.name]));
-    return (query.data ?? []).map((run) => ({
-      ...run,
-      employeeName: employeeMap.get(run.employeeId) ?? "Unknown",
-    }));
-  }, [query.data, employees]);
-
-  return { ...query, data };
 }

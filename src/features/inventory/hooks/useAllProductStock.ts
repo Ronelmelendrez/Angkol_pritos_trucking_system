@@ -1,10 +1,14 @@
 import { useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/lib/supabaseClient";
+import { stockAdjRowToApp } from "@/lib/supabaseMappers";
 import { useProducts } from "@/features/products/hooks/useProducts";
 import { useExpenses } from "@/features/expenses/hooks/useExpenses";
 import { useSales } from "@/features/sales/hooks/useSales";
-import { adjustmentsTable } from "@/lib/mockData";
 import { buildLedger } from "../utils/buildLedger";
 import { todayISO } from "@/utils/date";
+
+const ADJUSTMENTS_KEY = ["stockAdjustments"] as const;
 
 export interface ProductStockInfo {
   productId: string;
@@ -20,8 +24,19 @@ export function useAllProductStock() {
   const { data: products = [] } = useProducts();
   const { data: expenses = [] } = useExpenses();
   const { data: sales = [] } = useSales();
-  const adjustments = adjustmentsTable.list();
   const today = todayISO();
+
+  const { data: adjustments = [] } = useQuery({
+    queryKey: ADJUSTMENTS_KEY,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("stock_adjustments")
+        .select("*")
+        .order("date", { ascending: false });
+      if (error) throw error;
+      return data.map(stockAdjRowToApp);
+    },
+  });
 
   return useMemo(() => {
     const active = products.filter((p) => p.isActive);

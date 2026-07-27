@@ -1,13 +1,28 @@
 import { useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/lib/supabaseClient";
+import { stockAdjRowToApp } from "@/lib/supabaseMappers";
 import { useExpenses } from "@/features/expenses/hooks/useExpenses";
 import { useSales } from "@/features/sales/hooks/useSales";
-import { adjustmentsTable } from "@/lib/mockData";
 import { buildLedger } from "../utils/buildLedger";
+
+const ADJUSTMENTS_KEY = ["stockAdjustments"] as const;
 
 export function useInventoryLedger(productId: string, dateRange: string[]) {
   const { data: expenses = [] } = useExpenses();
   const { data: sales = [] } = useSales();
-  const adjustments = adjustmentsTable.list();
+
+  const { data: adjustments = [] } = useQuery({
+    queryKey: ADJUSTMENTS_KEY,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("stock_adjustments")
+        .select("*")
+        .order("date", { ascending: false });
+      if (error) throw error;
+      return data.map(stockAdjRowToApp);
+    },
+  });
 
   return useMemo(
     () => buildLedger(productId, dateRange, expenses, sales, adjustments),

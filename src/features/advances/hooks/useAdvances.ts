@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { advancesTable } from "@/lib/mockData";
+import { supabase } from "@/lib/supabaseClient";
+import { advanceRowToApp } from "@/lib/supabaseMappers";
 import type { NewCashAdvance } from "../types";
 
 const ADVANCES_KEY = ["advances"] as const;
@@ -10,14 +11,34 @@ export const advancesKeys = {
 export function useAdvances() {
   return useQuery({
     queryKey: ADVANCES_KEY,
-    queryFn: () => advancesTable.list(),
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("cash_advances")
+        .select("*")
+        .order("date", { ascending: false });
+      if (error) throw error;
+      return data.map(advanceRowToApp);
+    },
   });
 }
 
 export function useAddAdvance() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (input: NewCashAdvance) => advancesTable.create({ ...input, status: "pending" }),
+    mutationFn: async (input: NewCashAdvance) => {
+      const { data, error } = await supabase
+        .from("cash_advances")
+        .insert({
+          employee_id: input.employeeId,
+          amount: input.amount,
+          date: input.date,
+          reason: input.reason ?? null,
+        })
+        .select()
+        .single();
+      if (error) throw error;
+      return advanceRowToApp(data);
+    },
     onSettled: () => queryClient.invalidateQueries({ queryKey: ADVANCES_KEY }),
   });
 }
@@ -25,7 +46,16 @@ export function useAddAdvance() {
 export function useMarkAdvanceDeducted() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (id: string) => advancesTable.update(id, { status: "deducted" }),
+    mutationFn: async (id: string) => {
+      const { data, error } = await supabase
+        .from("cash_advances")
+        .update({ status: "deducted" })
+        .eq("id", id)
+        .select()
+        .single();
+      if (error) throw error;
+      return advanceRowToApp(data);
+    },
     onSettled: () => queryClient.invalidateQueries({ queryKey: ADVANCES_KEY }),
   });
 }
@@ -33,7 +63,10 @@ export function useMarkAdvanceDeducted() {
 export function useDeleteAdvance() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (id: string) => advancesTable.remove(id),
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("cash_advances").delete().eq("id", id);
+      if (error) throw error;
+    },
     onSettled: () => queryClient.invalidateQueries({ queryKey: ADVANCES_KEY }),
   });
 }
