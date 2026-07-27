@@ -2,9 +2,8 @@ import { useState } from "react";
 import { ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Skeleton } from "@/components/ui/Skeleton";
-import { useInventoryLedger } from "../hooks/useInventoryLedger";
+import { useAllProductStock } from "../hooks/useAllProductStock";
 import { StockAdjustmentDialog } from "./StockAdjustmentDialog";
-import { todayISO } from "@/utils/date";
 import { formatQty } from "@/utils/currency";
 
 interface Props {
@@ -14,12 +13,11 @@ interface Props {
 }
 
 export function ProductStockCard({ productId, productName, unit }: Props) {
-  const dateRange = [todayISO()];
-  const entries = useInventoryLedger(productId, dateRange);
-  const currentEntry = entries[entries.length - 1];
+  const stockData = useAllProductStock();
+  const stock = stockData.find((s) => s.productId === productId);
   const [adjustOpen, setAdjustOpen] = useState(false);
 
-  if (!currentEntry) {
+  if (!stock) {
     return (
       <div className="rounded-lg border border-line bg-surface px-4 py-3">
         <p className="text-xs text-ink-faint">{productName}</p>
@@ -28,8 +26,9 @@ export function ProductStockCard({ productId, productName, unit }: Props) {
     );
   }
 
-  const isLow = currentEntry.closingQty > 0 && currentEntry.closingQty <= 5;
-  const isOut = currentEntry.closingQty <= 0;
+  const closingQty = stock.closingQty;
+  const isLow = closingQty > 0 && closingQty <= 5;
+  const isOut = closingQty <= 0;
 
   return (
     <>
@@ -45,7 +44,7 @@ export function ProductStockCard({ productId, productName, unit }: Props) {
             isOut ? "text-danger" : isLow ? "text-warning" : "text-ink"
           }`}
         >
-          {formatQty(currentEntry.closingQty)}{" "}
+          {formatQty(closingQty)}{" "}
           <span className="text-sm font-normal text-ink-faint">{unit}</span>
         </p>
         <div className="mt-1 flex items-center justify-between">
