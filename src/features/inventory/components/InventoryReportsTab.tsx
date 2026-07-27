@@ -20,9 +20,8 @@ export function InventoryReportsTab({ productId, dateRange }: Props) {
       entries.map((e) => ({
         label: format(new Date(e.date), "MMM d"),
         closing: e.closingQty,
-        purchased: e.purchasedQty,
+        purchased: e.purchasedQty + e.adjustmentQty,
         sold: e.soldQty,
-        adjustment: e.adjustmentQty,
       })),
     [entries],
   );
@@ -89,7 +88,6 @@ export function InventoryReportsTab({ productId, dateRange }: Props) {
             <Legend verticalAlign="top" height={28} iconType="circle" iconSize={8} />
             <Bar dataKey="purchased" name="Purchased" fill="#E67E22" radius={[3, 3, 0, 0]} />
             <Bar dataKey="sold" name="Sold" fill="#C0392B" radius={[3, 3, 0, 0]} />
-            <Bar dataKey="adjustment" name="Adjustments" fill="#2ECC71" radius={[3, 3, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </div>
