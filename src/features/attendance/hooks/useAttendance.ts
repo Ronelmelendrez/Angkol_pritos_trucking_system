@@ -193,3 +193,18 @@ export function useBulkAttendance() {
     onSettled: () => queryClient.invalidateQueries({ queryKey: ATTENDANCE_KEY }),
   });
 }
+
+export function useReopenDay() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ date }: { date: string }) => {
+      const { error } = await supabase
+        .from("attendance_records")
+        .delete()
+        .eq("date", date)
+        .eq("status", "closed");
+      if (error) throw error;
+    },
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ATTENDANCE_KEY }),
+  });
+}

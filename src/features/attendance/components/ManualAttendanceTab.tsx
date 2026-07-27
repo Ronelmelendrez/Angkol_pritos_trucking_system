@@ -1,9 +1,10 @@
 import { useState, useMemo } from "react";
 import { format } from "date-fns";
-import { ChevronLeft, ChevronRight, CheckCircle, XCircle, Loader2, Sun, Clock, Users, Store } from "lucide-react";
+import { ChevronLeft, ChevronRight, CheckCircle, XCircle, Loader2, Sun, Clock, Users, Store, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
-import { useManualAttendance, useBulkAttendance } from "../hooks/useAttendance";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/Dialog";
+import { useManualAttendance, useBulkAttendance, useReopenDay } from "../hooks/useAttendance";
 import { useToast } from "@/components/ui/useToast";
 import type { AttendanceRecord, AttendanceStatus, ShiftType } from "../types";
 import type { Employee } from "@/features/employees/types";
@@ -17,8 +18,10 @@ interface Props {
 export function ManualAttendanceTab({ records, employees }: Props) {
   const [selectedDate, setSelectedDate] = useState(() => format(new Date(), "yyyy-MM-dd"));
   const [shiftPickerId, setShiftPickerId] = useState<string | null>(null);
+  const [showCloseConfirm, setShowCloseConfirm] = useState(false);
   const manualAttendance = useManualAttendance();
   const bulkAttendance = useBulkAttendance();
+  const reopenDay = useReopenDay();
   const { toast } = useToast();
 
   const activeEmployees = useMemo(
@@ -83,6 +86,16 @@ export function ManualAttendanceTab({ records, employees }: Props) {
     }
   }
 
+  async function handleReopen() {
+    try {
+      await reopenDay.mutateAsync({ date: selectedDate });
+      toast({ title: `Store reopened for ${format(new Date(selectedDate), "MMM d")}`, variant: "success" });
+    } catch {
+      toast({ title: "Failed to reopen store", variant: "error" });
+    }
+    setShowCloseConfirm(false);
+  }
+
   return (
     <div className="space-y-4">
       {/* Date selector */}
@@ -129,10 +142,11 @@ export function ManualAttendanceTab({ records, employees }: Props) {
           <Button
             size="sm"
             variant="outline"
-            onClick={() => handleBulk("absent")}
-            disabled={bulkAttendance.isPending}
+            onClick={handleReopen}
+            disabled={reopenDay.isPending}
             className="gap-1.5 text-xs text-amber-700 border-amber-300 hover:bg-amber-100"
           >
+            {reopenDay.isPending ? <Loader2 className="h-3 w-3 animate-spin" /> : null}
             Reopen
           </Button>
         </div>
@@ -180,12 +194,12 @@ export function ManualAttendanceTab({ records, employees }: Props) {
         </div>
       )}
 
-      {/* Close store button — always visible when not already closed */}
+      {/* Close store button */}
       {!isStoreClosed && (
         <Button
           size="sm"
           variant="outline"
-          onClick={() => handleBulk("closed")}
+          onClick={() => setShowCloseConfirm(true)}
           disabled={bulkAttendance.isPending}
           className="gap-1.5 text-xs"
         >
@@ -193,6 +207,41 @@ export function ManualAttendanceTab({ records, employees }: Props) {
           Close store
         </Button>
       )}
+
+      {/* Close store confirmation */}
+      <Dialog open={showCloseConfirm} onOpenChange={setShowCloseConfirm}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-amber-500" />
+              Close store?
+            </DialogTitle>
+            <DialogDescription>
+              This will mark <strong>{activeEmployees.length} active employees</strong> as closed for{" "}
+              <strong>{format(new Date(selectedDate), "EEEE, MMM d, yyyy")}</strong>.
+              Closed records will not count toward payroll.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-end gap-2 mt-4">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => setShowCloseConfirm(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              size="sm"
+              onClick={() => { handleBulk("closed"); setShowCloseConfirm(false); }}
+              disabled={bulkAttendance.isPending}
+              className="gap-1.5"
+            >
+              {bulkAttendance.isPending ? <Loader2 className="h-3 w-3 animate-spin" /> : <Store className="h-3 w-3" />}
+              Yes, close store
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Employee list */}
       <div className="space-y-2">
