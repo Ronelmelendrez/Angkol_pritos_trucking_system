@@ -3,6 +3,8 @@ import { supabase } from "@/lib/supabaseClient";
 import { employeeRowToApp, employeeAppToRow } from "@/lib/supabaseMappers";
 import type { Employee, NewEmployee, UpdateEmployee } from "../types";
 
+import type { Database } from "@/types/database.types";
+
 const EMPLOYEES_KEY = ["employees"] as const;
 export const employeesKeys = {
   all: EMPLOYEES_KEY,
@@ -81,7 +83,13 @@ export function useUpdateEmployee() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({ id, ...patch }: UpdateEmployee) => {
-      const row = employeeAppToRow({ ...patch, phone: patch.phone ?? "", avatarColor: "", payFrequency: patch.payFrequency ?? "semi_monthly" });
+      const row: Database["public"]["Tables"]["employees"]["Update"] = {};
+      if (patch.name !== undefined) row.name = patch.name;
+      if (patch.phone !== undefined) row.phone = patch.phone;
+      if (patch.dailyRate !== undefined) row.daily_rate = patch.dailyRate;
+      if (patch.hireDate !== undefined) row.hire_date = patch.hireDate;
+      if (patch.isActive !== undefined) row.is_active = patch.isActive;
+      if (patch.payFrequency !== undefined) row.pay_frequency = patch.payFrequency as Database["public"]["Enums"]["pay_frequency"];
       const { data, error } = await supabase
         .from("employees")
         .update(row)
