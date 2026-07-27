@@ -19,7 +19,7 @@ export function AttendanceLog({ records, employees, isLoading }: Props) {
   const [page, setPage] = useState(1);
 
   const sorted = useMemo(
-    () => [...records].sort((a, b) => (a.date + (a.clockIn ?? "")) < (b.date + (b.clockIn ?? "")) ? 1 : -1),
+    () => [...records].filter((r) => r.status !== "closed").sort((a, b) => (a.date + (a.clockIn ?? "")) < (b.date + (b.clockIn ?? "")) ? 1 : -1),
     [records],
   );
 
@@ -37,7 +37,7 @@ export function AttendanceLog({ records, employees, isLoading }: Props) {
     );
   }
 
-  if (records.length === 0) {
+  if (sorted.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-line py-14 text-center">
         <CalendarClock className="mb-2 h-8 w-8 text-ink-faint" />

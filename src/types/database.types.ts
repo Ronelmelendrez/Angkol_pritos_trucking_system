@@ -615,7 +615,7 @@ export type Database = {
       user_role: "manager" | "staff";
       pay_frequency: "weekly" | "semi_monthly" | "monthly";
       shift_type: "full" | "half";
-      attendance_status: "present" | "absent";
+      attendance_status: "present" | "absent" | "closed";
       advance_status: "pending" | "deducted";
       loan_status: "active" | "paid";
       payroll_status: "upcoming" | "ready" | "paid";

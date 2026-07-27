@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { format } from "date-fns";
-import { ChevronLeft, ChevronRight, CheckCircle, XCircle, Loader2, Sun, Clock, Users } from "lucide-react";
+import { ChevronLeft, ChevronRight, CheckCircle, XCircle, Loader2, Sun, Clock, Users, Store } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { useManualAttendance, useBulkAttendance } from "../hooks/useAttendance";
@@ -46,11 +46,10 @@ export function ManualAttendanceTab({ records, employees }: Props) {
           description: timeLabel,
           variant: "success",
         });
+      } else if (status === "closed") {
+        toast({ title: `${emp?.name ?? "Employee"} marked as store closed`, variant: "success" });
       } else {
-        toast({
-          title: `${emp?.name ?? "Employee"} marked absent`,
-          variant: "success",
-        });
+        toast({ title: `${emp?.name ?? "Employee"} marked absent`, variant: "success" });
       }
     } catch {
       toast({ title: "Failed to update attendance", variant: "error" });
@@ -60,6 +59,8 @@ export function ManualAttendanceTab({ records, employees }: Props) {
 
   const presentCount = dayRecords.filter((r) => r.status === "present").length;
   const absentCount = dayRecords.filter((r) => r.status === "absent").length;
+  const closedCount = dayRecords.filter((r) => r.status === "closed").length;
+  const isStoreClosed = activeEmployees.length > 0 && closedCount === activeEmployees.length;
 
   const unmarkedIds = useMemo(() => {
     const markedIds = new Set(dayRecords.map((r) => r.employeeId));
@@ -67,11 +68,16 @@ export function ManualAttendanceTab({ records, employees }: Props) {
   }, [activeEmployees, dayRecords]);
 
   async function handleBulk(status: AttendanceStatus, shift?: ShiftType) {
-    if (unmarkedIds.length === 0) return;
+    const targetIds = status === "closed" ? activeEmployees.map((e) => e.id) : unmarkedIds;
+    if (targetIds.length === 0) return;
     try {
-      await bulkAttendance.mutateAsync({ employeeIds: unmarkedIds, date: selectedDate, status, shift });
-      const label = status === "present" ? `All ${unmarkedIds.length} employees present` : `All ${unmarkedIds.length} employees absent`;
-      toast({ title: label, variant: "success" });
+      await bulkAttendance.mutateAsync({ employeeIds: targetIds, date: selectedDate, status, shift });
+      if (status === "closed") {
+        toast({ title: `Store marked as closed for ${format(new Date(selectedDate), "MMM d")}`, variant: "success" });
+      } else {
+        const label = status === "present" ? `All ${targetIds.length} employees present` : `All ${targetIds.length} employees absent`;
+        toast({ title: label, variant: "success" });
+      }
     } catch {
       toast({ title: "Failed to update attendance", variant: "error" });
     }
@@ -92,7 +98,14 @@ export function ManualAttendanceTab({ records, employees }: Props) {
             {format(new Date(selectedDate), "EEEE, MMM d, yyyy")}
           </p>
           <p className="text-xs text-ink-faint">
-            {presentCount} present · {absentCount} absent · {activeEmployees.length} total
+            {isStoreClosed ? (
+              "Store closed"
+            ) : (
+              <>
+                {presentCount} present · {absentCount} absent · {activeEmployees.length} total
+                {closedCount > 0 && <> · {closedCount} closed</>}
+              </>
+            )}
           </p>
         </div>
         <button
@@ -103,8 +116,30 @@ export function ManualAttendanceTab({ records, employees }: Props) {
         </button>
       </div>
 
+      {/* Store closed banner */}
+      {isStoreClosed && (
+        <div className="flex items-center gap-3 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3">
+          <Store className="h-5 w-5 text-amber-600" />
+          <div className="flex-1">
+            <p className="text-sm font-semibold text-amber-800">Store Closed</p>
+            <p className="text-xs text-amber-600">
+              All {activeEmployees.length} employees marked as closed for this day.
+            </p>
+          </div>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => handleBulk("absent")}
+            disabled={bulkAttendance.isPending}
+            className="gap-1.5 text-xs text-amber-700 border-amber-300 hover:bg-amber-100"
+          >
+            Reopen
+          </Button>
+        </div>
+      )}
+
       {/* Bulk actions */}
-      {unmarkedIds.length > 0 && (
+      {!isStoreClosed && unmarkedIds.length > 0 && (
         <div className="flex flex-wrap items-center gap-2 rounded-lg border border-dashed border-annatto-300 bg-annatto-50/40 px-4 py-3">
           <Users className="h-4 w-4 text-annatto-600" />
           <span className="text-xs font-medium text-annatto-700">
@@ -145,6 +180,20 @@ export function ManualAttendanceTab({ records, employees }: Props) {
         </div>
       )}
 
+      {/* Close store button — always visible when not already closed */}
+      {!isStoreClosed && (
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() => handleBulk("closed")}
+          disabled={bulkAttendance.isPending}
+          className="gap-1.5 text-xs"
+        >
+          {bulkAttendance.isPending ? <Loader2 className="h-3 w-3 animate-spin" /> : <Store className="h-3 w-3" />}
+          Close store
+        </Button>
+      )}
+
       {/* Employee list */}
       <div className="space-y-2">
         {activeEmployees.map((emp) => {
@@ -157,7 +206,10 @@ export function ManualAttendanceTab({ records, employees }: Props) {
           return (
             <div
               key={emp.id}
-              className="rounded-xl border border-line bg-surface p-4"
+              className={cn(
+                "rounded-xl border border-line bg-surface p-4",
+                status === "closed" && "opacity-60"
+              )}
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -175,14 +227,19 @@ export function ManualAttendanceTab({ records, employees }: Props) {
                         {record?.hoursWorked != null && ` · ${record.hoursWorked}h`}
                       </p>
                     )}
+                    {status === "closed" && (
+                      <p className="text-xs text-amber-600">Store closed</p>
+                    )}
                   </div>
                 </div>
 
                 <div className="flex items-center gap-2">
                   {status && (
-                    <Badge variant={status === "present" ? "success" : "danger"}>
+                    <Badge variant={status === "present" ? "success" : status === "closed" ? "warning" : "danger"}>
                       {status === "present" ? (
                         <><CheckCircle className="h-3 w-3" /> {shift === "full" ? "Full" : "Half"}</>
+                      ) : status === "closed" ? (
+                        <><Store className="h-3 w-3" /> Closed</>
                       ) : (
                         <><XCircle className="h-3 w-3" /> Absent</>
                       )}

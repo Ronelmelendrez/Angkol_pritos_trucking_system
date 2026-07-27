@@ -1,7 +1,7 @@
 import type { BaseRecord } from "@/types";
 
 export type ShiftType = "full" | "half";
-export type AttendanceStatus = "present" | "absent";
+export type AttendanceStatus = "present" | "absent" | "closed";
 
 export interface AttendanceRecord extends BaseRecord {
   employeeId: string;

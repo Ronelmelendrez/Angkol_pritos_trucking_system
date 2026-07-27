@@ -24,11 +24,13 @@ export function AttendanceCalendar({ records, onDayClick }: Props) {
   const days = useMemo(() => eachDayOfInterval({ start, end }), [start, end]);
 
   const dayStats = useMemo(() => {
-    const map = new Map<string, { present: number; absent: number }>();
+    const map = new Map<string, { present: number; absent: number; closed: number }>();
     records.forEach((r) => {
-      const stats = map.get(r.date) ?? { present: 0, absent: 0 };
+      const stats = map.get(r.date) ?? { present: 0, absent: 0, closed: 0 };
       if (r.status === "absent") {
         stats.absent++;
+      } else if (r.status === "closed") {
+        stats.closed++;
       } else {
         stats.present++;
       }
@@ -75,8 +77,12 @@ export function AttendanceCalendar({ records, onDayClick }: Props) {
         {days.map((day) => {
           const key = format(day, "yyyy-MM-dd");
           const stats = dayStats.get(key);
-          const count = (stats?.present ?? 0) + (stats?.absent ?? 0);
-          const hasAbsences = (stats?.absent ?? 0) > 0;
+          const presentCount = stats?.present ?? 0;
+          const absentCount = stats?.absent ?? 0;
+          const closedCount = stats?.closed ?? 0;
+          const count = presentCount + absentCount;
+          const isClosed = closedCount > 0 && count === 0;
+          const hasAbsences = absentCount > 0;
           const inMonth = isSameMonth(day, start);
 
           return (
@@ -86,20 +92,26 @@ export function AttendanceCalendar({ records, onDayClick }: Props) {
               className={cn(
                 "flex aspect-square flex-col items-center justify-center rounded-lg text-xs transition-all",
                 !inMonth && "opacity-30",
-                count === 0 && "bg-ink/4 text-ink-faint hover:bg-ink/8",
-                count > 0 && !hasAbsences && "bg-primary/15 text-primary-dark font-medium hover:bg-primary/25",
+                count === 0 && !isClosed && "bg-ink/4 text-ink-faint hover:bg-ink/8",
+                isClosed && "bg-amber-100 text-amber-700 font-medium hover:bg-amber-200",
+                count > 0 && !hasAbsences && !isClosed && "bg-primary/15 text-primary-dark font-medium hover:bg-primary/25",
                 hasAbsences && "bg-danger-bg text-danger font-medium hover:bg-danger-bg/80",
               )}
               title={
-                count > 0
-                  ? `${stats?.present ?? 0} present, ${stats?.absent ?? 0} absent`
-                  : "No records"
+                isClosed
+                  ? "Store closed"
+                  : count > 0
+                    ? `${presentCount} present, ${absentCount} absent`
+                    : "No records"
               }
             >
               {format(day, "d")}
+              {isClosed && (
+                <span className="mt-0.5 text-[9px] leading-none">Closed</span>
+              )}
               {count > 0 && (
                 <span className="mt-0.5 text-[9px] leading-none">
-                  {stats?.present ?? 0}/{count}
+                  {presentCount}/{count}
                 </span>
               )}
             </button>
@@ -114,6 +126,9 @@ export function AttendanceCalendar({ records, onDayClick }: Props) {
         </div>
         <div className="flex items-center gap-1.5">
           <span className="h-2.5 w-2.5 rounded-sm bg-danger-bg" /> Has absences
+        </div>
+        <div className="flex items-center gap-1.5">
+          <span className="h-2.5 w-2.5 rounded-sm bg-amber-100" /> Closed
         </div>
         <div className="flex items-center gap-1.5">
           <span className="h-2.5 w-2.5 rounded-sm bg-ink/4" /> No data
