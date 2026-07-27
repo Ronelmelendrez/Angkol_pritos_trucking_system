@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { TrendingUp, TrendingDown, Users, Receipt, ArrowRight, Wallet, PiggyBank, Medal, CircleDollarSign, CalendarClock } from "lucide-react";
+import { TrendingUp, TrendingDown, Receipt, ArrowRight, Wallet, PiggyBank, Medal, CircleDollarSign, CalendarClock, Package } from "lucide-react";
 import { Link } from "react-router-dom";
 import {
   AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend,
@@ -44,7 +44,7 @@ export function DashboardPage() {
   const totalToday = todaysExpenses.reduce((sum, e) => sum + e.amount, 0);
   const netProfitToday = todaysSalesTotal - totalToday;
   const activeEmployees = employees.filter((e) => e.isActive);
-  const clockedInNow = attendance.filter((a) => isDateToday(a.date) && !a.clockOut);
+  const todaysQtySold = todaysSales.reduce((sum, s) => sum + s.quantitySold, 0);
   const recentExpenses = [...expenses]
     .sort((a, b) => (a.date < b.date ? 1 : -1))
     .slice(0, 5);
@@ -55,10 +55,12 @@ export function DashboardPage() {
   const yesterdaysExpenses = expenses.filter((e) => e.date === yesterday);
   const yesterdaysExpensesTotal = yesterdaysExpenses.reduce((sum, e) => sum + e.amount, 0);
   const yesterdaysProfit = yesterdaysSalesTotal - yesterdaysExpensesTotal;
+  const yesterdaysQtySold = yesterdaysSales.reduce((sum, s) => sum + s.quantitySold, 0);
 
   const salesComparison = comparePeriods(todaysSalesTotal, yesterdaysSalesTotal);
   const expensesComparison = comparePeriods(totalToday, yesterdaysExpensesTotal);
   const profitComparison = comparePeriods(netProfitToday, yesterdaysProfit);
+  const qtyComparison = comparePeriods(todaysQtySold, yesterdaysQtySold);
 
   // 7-day sparkline data
   const last7 = useMemo(() => {
@@ -194,11 +196,12 @@ export function DashboardPage() {
           isLoading={isLoading}
         />
         <StatCard
-          label="On shift now"
-          value={`${clockedInNow.length} / ${activeEmployees.length}`}
-          icon={Users}
-          tone="primary"
-          hint="Active employees"
+          label="Product sales (qty)"
+          value={`${todaysQtySold}`}
+          icon={Package}
+          tone="accent"
+          hint={`${todaysSales.length} transaction${todaysSales.length === 1 ? "" : "s"}`}
+          trend={qtyComparison}
           isLoading={isLoading}
         />
       </div>
