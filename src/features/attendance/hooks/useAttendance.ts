@@ -3,6 +3,7 @@ import { supabase } from "@/lib/supabaseClient";
 import { attendanceRowToApp } from "@/lib/supabaseMappers";
 import { hoursBetween, nowISO, todayISO } from "@/utils/date";
 import type { AttendanceRecord, AttendanceStatus, ShiftType } from "../types";
+import type { Database } from "@/types/database.types";
 
 const ATTENDANCE_KEY = ["attendance"] as const;
 
@@ -136,6 +137,58 @@ export function useManualAttendance() {
         .single();
       if (error) throw error;
       return attendanceRowToApp(data);
+    },
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ATTENDANCE_KEY }),
+  });
+}
+
+export function useBulkAttendance() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({
+      employeeIds,
+      date,
+      status,
+      shift,
+    }: {
+      employeeIds: string[];
+      date: string;
+      status: AttendanceStatus;
+      shift?: ShiftType;
+    }) => {
+      const isPresent = status === "present" && shift;
+
+      const rows: Database["public"]["Tables"]["attendance_records"]["Insert"][] = employeeIds.map((empId) => {
+        if (isPresent) {
+          const clockInTime = `${date}T05:00:00`;
+          const clockOutTime = shift === "full" ? `${date}T19:00:00` : `${date}T12:00:00`;
+          return {
+            employee_id: empId,
+            date,
+            clock_in: clockInTime,
+            clock_out: clockOutTime,
+            hours_worked: hoursBetween(clockInTime, clockOutTime),
+            shift,
+            status,
+          };
+        }
+        return {
+          employee_id: empId,
+          date,
+          clock_in: null,
+          clock_out: null,
+          hours_worked: null,
+          shift: null,
+          status,
+        };
+      });
+
+      const { data, error } = await supabase
+        .from("attendance_records")
+        .upsert(rows, { onConflict: "employee_id,date" })
+        .select();
+      if (error) throw error;
+      return data.map(attendanceRowToApp);
     },
     onSettled: () => queryClient.invalidateQueries({ queryKey: ATTENDANCE_KEY }),
   });

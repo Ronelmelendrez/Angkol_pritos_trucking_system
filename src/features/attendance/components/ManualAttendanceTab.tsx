@@ -1,9 +1,9 @@
 import { useState, useMemo } from "react";
 import { format } from "date-fns";
-import { ChevronLeft, ChevronRight, CheckCircle, XCircle, Loader2, Sun, Clock } from "lucide-react";
+import { ChevronLeft, ChevronRight, CheckCircle, XCircle, Loader2, Sun, Clock, Users } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
-import { useManualAttendance } from "../hooks/useAttendance";
+import { useManualAttendance, useBulkAttendance } from "../hooks/useAttendance";
 import { useToast } from "@/components/ui/useToast";
 import type { AttendanceRecord, AttendanceStatus, ShiftType } from "../types";
 import type { Employee } from "@/features/employees/types";
@@ -18,6 +18,7 @@ export function ManualAttendanceTab({ records, employees }: Props) {
   const [selectedDate, setSelectedDate] = useState(() => format(new Date(), "yyyy-MM-dd"));
   const [shiftPickerId, setShiftPickerId] = useState<string | null>(null);
   const manualAttendance = useManualAttendance();
+  const bulkAttendance = useBulkAttendance();
   const { toast } = useToast();
 
   const activeEmployees = useMemo(
@@ -60,6 +61,22 @@ export function ManualAttendanceTab({ records, employees }: Props) {
   const presentCount = dayRecords.filter((r) => r.status === "present").length;
   const absentCount = dayRecords.filter((r) => r.status === "absent").length;
 
+  const unmarkedIds = useMemo(() => {
+    const markedIds = new Set(dayRecords.map((r) => r.employeeId));
+    return activeEmployees.filter((e) => !markedIds.has(e.id)).map((e) => e.id);
+  }, [activeEmployees, dayRecords]);
+
+  async function handleBulk(status: AttendanceStatus, shift?: ShiftType) {
+    if (unmarkedIds.length === 0) return;
+    try {
+      await bulkAttendance.mutateAsync({ employeeIds: unmarkedIds, date: selectedDate, status, shift });
+      const label = status === "present" ? `All ${unmarkedIds.length} employees present` : `All ${unmarkedIds.length} employees absent`;
+      toast({ title: label, variant: "success" });
+    } catch {
+      toast({ title: "Failed to update attendance", variant: "error" });
+    }
+  }
+
   return (
     <div className="space-y-4">
       {/* Date selector */}
@@ -85,6 +102,48 @@ export function ManualAttendanceTab({ records, employees }: Props) {
           <ChevronRight className="h-4 w-4" />
         </button>
       </div>
+
+      {/* Bulk actions */}
+      {unmarkedIds.length > 0 && (
+        <div className="flex flex-wrap items-center gap-2 rounded-lg border border-dashed border-annatto-300 bg-annatto-50/40 px-4 py-3">
+          <Users className="h-4 w-4 text-annatto-600" />
+          <span className="text-xs font-medium text-annatto-700">
+            {unmarkedIds.length} unmarked
+          </span>
+          <div className="flex gap-2 ml-auto">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => handleBulk("present", "full")}
+              disabled={bulkAttendance.isPending}
+              className="gap-1.5 text-xs"
+            >
+              {bulkAttendance.isPending ? <Loader2 className="h-3 w-3 animate-spin" /> : <Clock className="h-3 w-3" />}
+              All present (Full)
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => handleBulk("present", "half")}
+              disabled={bulkAttendance.isPending}
+              className="gap-1.5 text-xs"
+            >
+              {bulkAttendance.isPending ? <Loader2 className="h-3 w-3 animate-spin" /> : <Sun className="h-3 w-3" />}
+              All present (Half)
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => handleBulk("absent")}
+              disabled={bulkAttendance.isPending}
+              className="gap-1.5 text-xs"
+            >
+              {bulkAttendance.isPending ? <Loader2 className="h-3 w-3 animate-spin" /> : <XCircle className="h-3 w-3" />}
+              All absent
+            </Button>
+          </div>
+        </div>
+      )}
 
       {/* Employee list */}
       <div className="space-y-2">
