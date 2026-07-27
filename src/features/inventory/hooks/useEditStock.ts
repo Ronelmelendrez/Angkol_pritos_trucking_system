@@ -3,9 +3,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabaseClient";
 import { stockAdjAppToRow } from "@/lib/supabaseMappers";
 import { useToast } from "@/components/ui/useToast";
-import { useAllProductStock } from "./useAllProductStock";
-
-const ADJUSTMENTS_KEY = ["stockAdjustments"] as const;
+import { useAllProductStock, stockAdjAllKey } from "./useAllProductStock";
+import { stockAdjLogKey } from "./useAdjustmentsLog";
 
 export function useCurrentStock(productId: string) {
   const stockData = useAllProductStock();
@@ -37,7 +36,8 @@ export function useSetStock() {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ADJUSTMENTS_KEY });
+      queryClient.invalidateQueries({ queryKey: stockAdjAllKey });
+      queryClient.invalidateQueries({ queryKey: stockAdjLogKey });
       toast({ title: "Stock updated", variant: "success" });
     },
     onError: () => {

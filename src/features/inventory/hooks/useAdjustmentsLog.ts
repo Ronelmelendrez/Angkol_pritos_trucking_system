@@ -4,13 +4,13 @@ import { supabase } from "@/lib/supabaseClient";
 import { stockAdjRowToApp } from "@/lib/supabaseMappers";
 import { useProducts } from "@/features/products/hooks/useProducts";
 
-const ADJUSTMENTS_KEY = ["stockAdjustments"] as const;
+export const stockAdjLogKey = ["stockAdjustments", "log"] as const;
 
 export function useAdjustmentsLog() {
   const { data: products = [] } = useProducts();
 
   const { data: adjustments = [] } = useQuery({
-    queryKey: ADJUSTMENTS_KEY,
+    queryKey: stockAdjLogKey,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("stock_adjustments")

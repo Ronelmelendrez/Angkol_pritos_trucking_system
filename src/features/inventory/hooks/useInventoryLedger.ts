@@ -5,13 +5,13 @@ import { stockAdjRowToApp } from "@/lib/supabaseMappers";
 import { useSales } from "@/features/sales/hooks/useSales";
 import { buildLedger } from "../utils/buildLedger";
 
-const ADJUSTMENTS_KEY = ["stockAdjustments"] as const;
+import { stockAdjAllKey } from "./useAllProductStock";
 
 export function useInventoryLedger(productId: string, dateRange: string[]) {
   const { data: sales = [] } = useSales();
 
   const { data: adjustments = [] } = useQuery({
-    queryKey: ADJUSTMENTS_KEY,
+    queryKey: stockAdjAllKey,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("stock_adjustments")

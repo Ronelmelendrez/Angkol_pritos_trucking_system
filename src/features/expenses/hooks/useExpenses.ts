@@ -79,7 +79,8 @@ export function useAddExpense() {
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: EXPENSES_KEY });
-      queryClient.invalidateQueries({ queryKey: ["stockAdjustments"] });
+      queryClient.invalidateQueries({ queryKey: ["stockAdjustments", "log"] });
+      queryClient.invalidateQueries({ queryKey: ["stockAdjustments", "all"] });
     },
   });
 }

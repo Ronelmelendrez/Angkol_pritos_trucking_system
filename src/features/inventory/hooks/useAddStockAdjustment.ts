@@ -2,8 +2,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabaseClient";
 import { stockAdjAppToRow } from "@/lib/supabaseMappers";
 import { useToast } from "@/components/ui/useToast";
-
-const ADJUSTMENTS_KEY = ["stockAdjustments"] as const;
+import { stockAdjLogKey } from "./useAdjustmentsLog";
+import { stockAdjAllKey } from "./useAllProductStock";
 
 export function useAddStockAdjustment() {
   const { toast } = useToast();
@@ -20,7 +20,8 @@ export function useAddStockAdjustment() {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ADJUSTMENTS_KEY });
+      queryClient.invalidateQueries({ queryKey: stockAdjLogKey });
+      queryClient.invalidateQueries({ queryKey: stockAdjAllKey });
       toast({ title: "Adjustment recorded", variant: "success" });
     },
     onError: () => {

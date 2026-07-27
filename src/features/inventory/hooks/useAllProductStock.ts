@@ -7,7 +7,7 @@ import { useSales } from "@/features/sales/hooks/useSales";
 import { buildLedger } from "../utils/buildLedger";
 import { todayISO } from "@/utils/date";
 
-const ADJUSTMENTS_KEY = ["stockAdjustments"] as const;
+export const stockAdjAllKey = ["stockAdjustments", "all"] as const;
 
 export interface ProductStockInfo {
   productId: string;
@@ -26,7 +26,7 @@ export function useAllProductStock() {
   const today = todayISO();
 
   const { data: adjustments = [] } = useQuery({
-    queryKey: ADJUSTMENTS_KEY,
+    queryKey: stockAdjAllKey,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("stock_adjustments")

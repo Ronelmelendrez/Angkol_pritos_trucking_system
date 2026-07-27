@@ -1,8 +1,8 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabaseClient";
 import { useToast } from "@/components/ui/useToast";
-
-const ADJUSTMENTS_KEY = ["stockAdjustments"] as const;
+import { stockAdjLogKey } from "./useAdjustmentsLog";
+import { stockAdjAllKey } from "./useAllProductStock";
 
 export function useDeleteStockAdjustment() {
   const { toast } = useToast();
@@ -14,7 +14,8 @@ export function useDeleteStockAdjustment() {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ADJUSTMENTS_KEY });
+      queryClient.invalidateQueries({ queryKey: stockAdjLogKey });
+      queryClient.invalidateQueries({ queryKey: stockAdjAllKey });
       toast({ title: "Adjustment deleted", variant: "success" });
     },
     onError: () => {
