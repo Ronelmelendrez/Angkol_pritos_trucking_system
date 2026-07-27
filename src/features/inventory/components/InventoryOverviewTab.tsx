@@ -50,8 +50,8 @@ function ProductOverviewCard({ item }: { item: ProductStockInfo }) {
           <span className="text-sm font-normal text-ink-faint">{item.unit}</span>
         </p>
         <div className="mt-2 flex items-center gap-3 text-xs text-ink-faint">
-          <span className={item.purchasedQty > 0 ? "text-success" : ""}>
-            +{formatQty(item.purchasedQty)} today
+          <span className={(item.purchasedQty + item.adjustmentQty) > 0 ? "text-success" : ""}>
+            +{formatQty(item.purchasedQty + item.adjustmentQty)} today
           </span>
           <span className={item.soldQty > 0 ? "text-danger" : ""}>
             -{formatQty(item.soldQty)} sold

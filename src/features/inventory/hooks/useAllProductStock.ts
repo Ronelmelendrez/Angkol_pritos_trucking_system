@@ -18,6 +18,7 @@ export interface ProductStockInfo {
   openingQty: number;
   purchasedQty: number;
   soldQty: number;
+  adjustmentQty: number;
 }
 
 export function useAllProductStock() {
@@ -51,6 +52,7 @@ export function useAllProductStock() {
         openingQty: current?.openingQty ?? 0,
         purchasedQty: current?.purchasedQty ?? 0,
         soldQty: current?.soldQty ?? 0,
+        adjustmentQty: current?.adjustmentQty ?? 0,
       } satisfies ProductStockInfo;
     });
   }, [products, expenses, sales, adjustments, today]);

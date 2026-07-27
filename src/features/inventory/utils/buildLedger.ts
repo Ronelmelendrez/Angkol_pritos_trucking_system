@@ -12,7 +12,12 @@ export function buildLedger(
   const adjByDate = new Map<string, { qty: number; note?: string }>();
   for (const adj of adjustments) {
     if (adj.productId === productId) {
-      adjByDate.set(adj.date, { qty: adj.quantity, note: adj.note });
+      const existing = adjByDate.get(adj.date);
+      if (existing) {
+        existing.qty += adj.quantity;
+      } else {
+        adjByDate.set(adj.date, { qty: adj.quantity, note: adj.note });
+      }
     }
   }
 
