@@ -16,10 +16,13 @@ export function useExpenses() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("expenses")
-        .select("*, categories!expenses_category_id_fkey(name)")
+        .select("*")
         .order("date", { ascending: false });
       if (error) throw error;
-      return data.map((row) => expenseRowToApp(row));
+      return Promise.all(data.map(async (row) => {
+        const categoryName = await getCategoryNameById(row.category_id);
+        return expenseRowToApp({ ...row, categories: { name: categoryName } });
+      }));
     },
   });
 }

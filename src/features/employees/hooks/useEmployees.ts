@@ -10,6 +10,23 @@ export const employeesKeys = {
 };
 const AVATAR_COLORS = ["#E67E22", "#C0392B", "#F1C40F", "#8D6E63", "#D35400", "#6D4C41"];
 
+const empNameCache = new Map<string, string>();
+
+export async function getEmployeeNameById(id: string): Promise<string> {
+  const cached = empNameCache.get(id);
+  if (cached) return cached;
+
+  const { data, error } = await supabase
+    .from("employees")
+    .select("name")
+    .eq("id", id)
+    .single();
+
+  if (error || !data) return "Unknown";
+  empNameCache.set(id, data.name);
+  return data.name;
+}
+
 export function useEmployees() {
   return useQuery({
     queryKey: EMPLOYEES_KEY,
