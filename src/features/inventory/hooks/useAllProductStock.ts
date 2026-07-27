@@ -5,7 +5,6 @@ import { stockAdjRowToApp } from "@/lib/supabaseMappers";
 import { useProducts } from "@/features/products/hooks/useProducts";
 import { useSales } from "@/features/sales/hooks/useSales";
 import { buildLedger } from "../utils/buildLedger";
-import { todayISO } from "@/utils/date";
 
 export const stockAdjAllKey = ["stockAdjustments", "all"] as const;
 
@@ -23,7 +22,6 @@ export interface ProductStockInfo {
 export function useAllProductStock() {
   const { data: products = [] } = useProducts();
   const { data: sales = [] } = useSales();
-  const today = todayISO();
 
   const { data: adjustments = [] } = useQuery({
     queryKey: stockAdjAllKey,
@@ -39,8 +37,14 @@ export function useAllProductStock() {
 
   return useMemo(() => {
     const active = products.filter((p) => p.isActive);
+
+    const allDates = [...new Set([
+      ...adjustments.map((a) => a.date),
+      ...sales.map((s) => s.date),
+    ])].sort();
+
     return active.map((p) => {
-      const entries = buildLedger(p.id, [today], sales, adjustments);
+      const entries = buildLedger(p.id, allDates, sales, adjustments);
       const current = entries[entries.length - 1];
       return {
         productId: p.id,
@@ -53,5 +57,5 @@ export function useAllProductStock() {
         adjustmentQty: current?.adjustmentQty ?? 0,
       } satisfies ProductStockInfo;
     });
-  }, [products, sales, adjustments, today]);
+  }, [products, sales, adjustments]);
 }
