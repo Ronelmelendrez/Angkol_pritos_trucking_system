@@ -71,6 +71,8 @@ function PayrollContent() {
         delete next[row.employeeId];
         return next;
       });
+    } catch {
+      // Error handled by mutation's onError toast
     } finally {
       setPayingIds((prev) => prev.filter((id) => id !== row.employeeId));
     }

@@ -84,7 +84,7 @@ export function PayrollHistory() {
                   </td>
                   <td className="py-2.5 pr-2 text-right font-semibold text-ink">{formatCurrency(run.netPay)}</td>
                   <td className="py-2.5 pr-2 text-right text-ink-soft">
-                    {run.paidAt ? format(new Date(run.paidAt + "T00:00:00"), "MMM d, yy") : "\u2014"}
+                    {run.paidAt ? format(new Date(run.paidAt), "MMM d, yy") : "\u2014"}
                   </td>
                   <td className="py-2.5 pr-0 text-right">
                     <Badge variant="success">Paid</Badge>
