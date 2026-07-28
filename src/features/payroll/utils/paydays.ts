@@ -1,5 +1,6 @@
 import { addDays } from "date-fns/addDays";
 import { nextDay } from "date-fns/nextDay";
+import { startOfWeek } from "date-fns/startOfWeek";
 import { previousFriday } from "date-fns/previousFriday";
 import { nextMonday } from "date-fns/nextMonday";
 import { isWeekend } from "date-fns/isWeekend";
@@ -12,7 +13,10 @@ export function getScheduledPayday(period: PayPeriod, rule: PaydayRule): string 
 
   let date: Date;
   if (rule.fixedWeekday != null) {
-    date = nextDay(end, rule.fixedWeekday);
+    const weekStart = startOfWeek(end, { weekStartsOn: 1 });
+    const ruleDay = (rule.fixedWeekday - 1 + 7) % 7;
+    const candidate = addDays(weekStart, ruleDay);
+    date = candidate <= end ? candidate : nextDay(end, rule.fixedWeekday);
   } else {
     date = addDays(end, rule.offsetDays);
   }
