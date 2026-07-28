@@ -39,7 +39,7 @@ export function EmployeeDetailModal({ employee, open, onOpenChange, onEdit }: Pr
   const employeeAttendance = useMemo(
     () =>
       attendance
-        .filter((a) => a.employeeId === employee?.id)
+        .filter((a) => a.employeeId === employee?.id && a.status !== "closed")
         .sort((a, b) => b.date.localeCompare(a.date))
         .slice(0, 10),
     [attendance, employee?.id],
