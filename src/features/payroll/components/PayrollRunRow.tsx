@@ -187,6 +187,9 @@ export function PayrollRunRow({
         open={showConfirmPay}
         onOpenChange={setShowConfirmPay}
         row={row}
+        advanceIds={selectedAdvanceIds}
+        loanRepayAmount={currentLoanDeduction}
+        currentAdjustment={currentAdjustment}
         onConfirm={(paidAt) => {
           onPay(paidAt);
           setShowConfirmPay(false);
