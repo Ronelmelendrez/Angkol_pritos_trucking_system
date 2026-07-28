@@ -94,7 +94,7 @@ export function LandingPage() {
                 <Flame className="h-3.5 w-3.5 text-accent" /> Internal operations system
               </div>
               <h1 className="stamp text-4xl font-bold leading-tight text-white sm:text-5xl">
-                The system that runs Manong's Grill &amp; Lechon Manok
+                The system that runs Angkol Prito's &amp; Lechon Manok
               </h1>
               <p className="mt-5 text-lg text-white/75">
                 One dashboard for everything the truck needs day to day — expenses,
