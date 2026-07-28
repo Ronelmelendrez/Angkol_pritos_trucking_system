@@ -255,7 +255,7 @@ export function PayRuleSettingsForm() {
             </div>
           ))}
           {availableFrequencies.length > 0 && (
-            <Button type="button" variant="outline" size="sm" onClick={() => append({ frequency: availableFrequencies[0], offsetDays: 5, weekendAdjustment: "move_earlier", fixedWeekday: "" })}>
+            <Button type="button" variant="outline" size="sm" onClick={() => append({ frequency: availableFrequencies[0], offsetDays: 0, weekendAdjustment: "none", fixedWeekday: "" })}>
               <Plus className="h-4 w-4" /> Add {FREQ_LABELS[availableFrequencies[0]]} rule
             </Button>
           )}

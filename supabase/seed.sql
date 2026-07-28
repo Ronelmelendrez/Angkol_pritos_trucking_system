@@ -8,8 +8,8 @@ VALUES (
   'global',
   '[
     {"frequency": "weekly", "offsetDays": 0, "weekendAdjustment": "none", "fixedWeekday": 5},
-    {"frequency": "semi_monthly", "offsetDays": 5, "weekendAdjustment": "move_earlier"},
-    {"frequency": "monthly", "offsetDays": 5, "weekendAdjustment": "move_earlier"}
+    {"frequency": "semi_monthly", "offsetDays": 0, "weekendAdjustment": "none"},
+    {"frequency": "monthly", "offsetDays": 0, "weekendAdjustment": "none"}
   ]'::jsonb
 );
 
