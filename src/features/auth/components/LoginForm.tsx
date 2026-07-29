@@ -35,7 +35,7 @@ export function LoginForm() {
       await login({ email: trimmedEmail, password: trimmedPassword });
       reset();
       toast({ title: "Welcome back!", description: "Logged in as manager.", variant: "success" });
-      navigate("/", { replace: true });
+      navigate("/dashboard", { replace: true });
     } catch (err) {
       recordFailure();
       const message = err instanceof Error ? err.message : "Something went wrong.";
