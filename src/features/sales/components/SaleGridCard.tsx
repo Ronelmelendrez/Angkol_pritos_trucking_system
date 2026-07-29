@@ -1,5 +1,6 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Trash2 } from "lucide-react";
+import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/components/ui/AlertDialog";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { formatCurrency } from "@/utils/currency";
@@ -14,6 +15,7 @@ interface Props {
 }
 
 export function SaleGridCard({ sale }: Props) {
+  const [deleteTarget, setDeleteTarget] = useState<Sale | null>(null);
   const deleteSale = useDeleteSale();
   const { data: products = [] } = useProducts();
   const { toast } = useToast();
@@ -23,11 +25,15 @@ export function SaleGridCard({ sale }: Props) {
   }, [products, sale.productId]);
 
   async function handleDelete() {
+    if (!deleteTarget) return;
     try {
-      await deleteSale.mutateAsync(sale.id);
+      await deleteSale.mutateAsync(deleteTarget.id);
       toast({ title: "Sale removed", variant: "default" });
-    } catch {
+    } catch (err) {
+      console.error("Delete sale error:", err);
       toast({ title: "Couldn't remove sale", variant: "error" });
+    } finally {
+      setDeleteTarget(null);
     }
   }
 
@@ -41,7 +47,7 @@ export function SaleGridCard({ sale }: Props) {
           variant="ghost"
           size="icon"
           className="h-7 w-7 shrink-0 text-ink-faint hover:text-danger"
-          onClick={handleDelete}
+          onClick={() => setDeleteTarget(sale)}
           aria-label="Delete sale"
         >
           <Trash2 className="h-3.5 w-3.5" />
@@ -58,6 +64,21 @@ export function SaleGridCard({ sale }: Props) {
         <span>{formatDate(sale.date)}</span>
         {sale.notes && <span className="truncate">{sale.notes}</span>}
       </div>
+
+      <AlertDialog open={!!deleteTarget} onOpenChange={(v) => !v && setDeleteTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete sale</AlertDialogTitle>
+            <AlertDialogDescription>
+              Remove this sale record? This cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete}>Delete</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
