@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Plus } from "lucide-react";
+import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/components/ui/AlertDialog";
 import { Button } from "@/components/ui/Button";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/Dialog";
@@ -17,6 +18,7 @@ export function EmployeesPage() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selected, setSelected] = useState<Employee | null>(null);
   const [editing, setEditing] = useState<Employee | undefined>(undefined);
+  const [deleteTarget, setDeleteTarget] = useState<Employee | null>(null);
 
   function openAdd() {
     setEditing(undefined);
@@ -28,13 +30,16 @@ export function EmployeesPage() {
     setDialogOpen(true);
   }
 
-  async function handleDelete(employee: Employee) {
-    if (!confirm(`Remove ${employee.name} from the crew?`)) return;
+  async function handleDeleteConfirm() {
+    if (!deleteTarget) return;
     try {
-      await deleteEmployee.mutateAsync(employee.id);
-      toast({ title: "Employee removed", description: employee.name });
-    } catch {
+      await deleteEmployee.mutateAsync(deleteTarget.id);
+      toast({ title: "Employee removed", description: deleteTarget.name });
+    } catch (err) {
+      console.error("Delete employee error:", err);
       toast({ title: "Couldn't remove employee", variant: "error" });
+    } finally {
+      setDeleteTarget(null);
     }
   }
 
@@ -66,7 +71,7 @@ export function EmployeesPage() {
         </Dialog>
       </CardHeader>
 
-      <EmployeeList employees={employees} isLoading={isLoading} onSelect={setSelected} onEdit={openEdit} onDelete={handleDelete} />
+      <EmployeeList employees={employees} isLoading={isLoading} onSelect={setSelected} onEdit={openEdit} onDelete={setDeleteTarget} />
 
       <EmployeeDetailModal
         employee={selected}
@@ -74,6 +79,21 @@ export function EmployeesPage() {
         onOpenChange={(open) => { if (!open) setSelected(null); }}
         onEdit={openEdit}
       />
+
+      <AlertDialog open={!!deleteTarget} onOpenChange={(v) => !v && setDeleteTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Remove employee</AlertDialogTitle>
+            <AlertDialogDescription>
+              Remove <span className="font-medium text-ink">{deleteTarget?.name}</span> from the crew? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteConfirm}>Remove</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Card>
   );
 }
