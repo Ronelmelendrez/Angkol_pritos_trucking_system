@@ -38,7 +38,10 @@ export function useAllProductStock() {
   return useMemo(() => {
     const active = products.filter((p) => p.isActive);
 
+    const d = new Date();
+    const today = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
     const allDates = [...new Set([
+      today,
       ...adjustments.map((a) => a.date),
       ...sales.map((s) => s.date),
     ])].sort();
