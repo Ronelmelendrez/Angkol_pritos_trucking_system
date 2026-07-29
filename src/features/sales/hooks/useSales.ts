@@ -104,6 +104,9 @@ export function useDeleteSale() {
     onError: (_err, _id, context) => {
       if (context?.previous) queryClient.setQueryData(SALES_KEY, context.previous);
     },
+    onSuccess: () => {
+      queryClient.refetchQueries({ queryKey: SALES_KEY });
+    },
     onSettled: () => queryClient.invalidateQueries({ queryKey: SALES_KEY }),
   });
 }
