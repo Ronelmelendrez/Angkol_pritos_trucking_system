@@ -66,7 +66,7 @@ export function AttendancePage() {
         <CardHeader>
           <CardTitle>Mark attendance</CardTitle>
         </CardHeader>
-        <ManualAttendanceTab records={filtered} employees={employees} />
+        <ManualAttendanceTab records={attendance} employees={employees} />
       </Card>
 
       <Card>
