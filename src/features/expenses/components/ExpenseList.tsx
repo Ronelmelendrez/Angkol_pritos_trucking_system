@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { Trash2, Receipt } from "lucide-react";
+import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/components/ui/AlertDialog";
 import { Badge } from "@/components/ui/Badge";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { Button } from "@/components/ui/Button";
@@ -20,6 +21,7 @@ interface Props {
 
 export function ExpenseList({ expenses, isLoading }: Props) {
   const [page, setPage] = useState(1);
+  const [deleteTarget, setDeleteTarget] = useState<Expense | null>(null);
   const deleteExpense = useDeleteExpense();
   const { toast } = useToast();
 
@@ -37,12 +39,15 @@ export function ExpenseList({ expenses, isLoading }: Props) {
   const safePage = Math.min(page, totalPages);
   const pageGroups = groups.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
 
-  async function handleDelete(id: string, description: string) {
+  async function handleDelete() {
+    if (!deleteTarget) return;
     try {
-      await deleteExpense.mutateAsync(id);
-      toast({ title: "Expense removed", description, variant: "default" });
+      await deleteExpense.mutateAsync(deleteTarget.id);
+      toast({ title: "Expense removed", description: deleteTarget.description, variant: "default" });
     } catch {
       toast({ title: "Couldn't remove expense", variant: "error" });
+    } finally {
+      setDeleteTarget(null);
     }
   }
 
@@ -116,7 +121,7 @@ export function ExpenseList({ expenses, isLoading }: Props) {
                       variant="ghost"
                       size="icon"
                       className="h-7 w-7 shrink-0 text-ink-faint hover:text-danger"
-                      onClick={() => handleDelete(exp.id, exp.description)}
+                      onClick={() => setDeleteTarget(exp)}
                       aria-label={`Delete ${exp.description}`}
                     >
                       <Trash2 className="h-3.5 w-3.5" />
@@ -130,6 +135,21 @@ export function ExpenseList({ expenses, isLoading }: Props) {
       </div>
 
       <Pagination currentPage={safePage} totalPages={totalPages} onPageChange={setPage} />
+
+      <AlertDialog open={!!deleteTarget} onOpenChange={(v) => !v && setDeleteTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete expense</AlertDialogTitle>
+            <AlertDialogDescription>
+              Remove <span className="font-medium text-ink">{deleteTarget?.description}</span> — {deleteTarget ? formatCurrency(deleteTarget.amount) : ""}? This cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete}>Delete</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
