@@ -44,7 +44,8 @@ export function ExpenseList({ expenses, isLoading }: Props) {
     try {
       await deleteExpense.mutateAsync(deleteTarget.id);
       toast({ title: "Expense removed", description: deleteTarget.description, variant: "default" });
-    } catch {
+    } catch (err) {
+      console.error("Delete expense error:", err);
       toast({ title: "Couldn't remove expense", variant: "error" });
     } finally {
       setDeleteTarget(null);

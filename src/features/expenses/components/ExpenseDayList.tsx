@@ -45,7 +45,8 @@ export function ExpenseDayList({ expenses, isLoading }: Props) {
     try {
       await deleteExpense.mutateAsync(id);
       toast({ title: "Expense removed", description, variant: "default" });
-    } catch {
+    } catch (err) {
+      console.error("Delete expense error:", err);
       toast({ title: "Couldn't remove expense", variant: "error" });
     }
   }
