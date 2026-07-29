@@ -43,7 +43,7 @@ export function PayslipDialog({ open, onOpenChange, row, advanceIds, loanRepayAm
           </div>
           <div className="flex justify-between">
             <span className="text-ink-faint">Pay date</span>
-            <span className="font-medium text-ink">{format(new Date(), "MMM d, yyyy")}</span>
+            <span className="font-medium text-ink">{format(new Date(row.periodEnd + "T00:00:00"), "MMM d, yyyy")}</span>
           </div>
           <hr className="border-line" />
           <div className="flex items-center gap-4">
