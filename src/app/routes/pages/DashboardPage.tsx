@@ -140,13 +140,25 @@ export function DashboardPage() {
         const records = attendance.filter(
           (a) => a.employeeId === emp.id && a.date >= thirtyDaysAgo && a.date <= today,
         );
-        const present = records.filter(
-          (a) => a.status === "present" || a.clockIn !== null,
-        ).length;
-        const absent = records.filter((a) => a.status === "absent").length;
+
+        let present = 0;
+        let absent = 0;
+        let closed = 0;
+
+        for (const a of records) {
+          if (a.status === "absent") {
+            absent++;
+          } else if (a.status === "closed") {
+            closed++;
+          } else if (a.status === "present" || a.clockIn !== null) {
+            present++;
+          }
+          // status === null && clockIn === null: skip (incomplete data)
+        }
+
         const total = present + absent;
         const rate = total > 0 ? (present / total) * 100 : 0;
-        return { ...emp, present, absent, total, rate };
+        return { ...emp, present, absent, closed, total, rate };
       })
       .sort((a, b) => b.rate - a.rate || b.present - a.present);
   }, [activeEmployees, attendance]);
