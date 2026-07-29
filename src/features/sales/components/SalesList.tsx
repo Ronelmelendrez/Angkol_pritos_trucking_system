@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { Trash2, ShoppingCart } from "lucide-react";
+import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/components/ui/AlertDialog";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Pagination } from "@/components/ui/Pagination";
@@ -18,6 +19,7 @@ interface Props {
 
 export function SalesList({ sales }: Props) {
   const [page, setPage] = useState(1);
+  const [deleteTarget, setDeleteTarget] = useState<Sale | null>(null);
   const { data: products = [] } = useProducts();
   const deleteSale = useDeleteSale();
   const { toast } = useToast();
@@ -41,12 +43,16 @@ export function SalesList({ sales }: Props) {
   const safePage = Math.min(page, totalPages);
   const pageGroups = groups.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
 
-  async function handleDelete(id: string) {
+  async function handleDelete() {
+    if (!deleteTarget) return;
     try {
-      await deleteSale.mutateAsync(id);
+      await deleteSale.mutateAsync(deleteTarget.id);
       toast({ title: "Sale removed", variant: "default" });
-    } catch {
+    } catch (err) {
+      console.error("Delete sale error:", err);
       toast({ title: "Couldn't remove sale", variant: "error" });
+    } finally {
+      setDeleteTarget(null);
     }
   }
 
@@ -104,7 +110,7 @@ export function SalesList({ sales }: Props) {
                         variant="ghost"
                         size="icon"
                         className="h-7 w-7 shrink-0 text-ink-faint hover:text-danger"
-                        onClick={() => handleDelete(sale.id)}
+                        onClick={() => setDeleteTarget(sale)}
                         aria-label="Delete sale"
                       >
                         <Trash2 className="h-3.5 w-3.5" />
@@ -119,6 +125,21 @@ export function SalesList({ sales }: Props) {
       </div>
 
       <Pagination currentPage={safePage} totalPages={totalPages} onPageChange={setPage} />
+
+      <AlertDialog open={!!deleteTarget} onOpenChange={(v) => !v && setDeleteTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete sale</AlertDialogTitle>
+            <AlertDialogDescription>
+              Remove this sale record? This cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete}>Delete</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
