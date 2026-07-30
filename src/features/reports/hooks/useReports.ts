@@ -1,24 +1,19 @@
 import { useMemo } from "react";
 import { format, startOfMonth, endOfMonth, eachDayOfInterval } from "date-fns";
 import { useExpenses } from "@/features/expenses/hooks/useExpenses";
-import { useAttendance } from "@/features/attendance/hooks/useAttendance";
 import { useEmployees } from "@/features/employees/hooks/useEmployees";
-import { useAdvances } from "@/features/advances/hooks/useAdvances";
 import { useSales } from "@/features/sales/hooks/useSales";
-import { usePayRuleSettings } from "@/features/settings/hooks/usePayRuleSettings";
-import { resolvePayRules, computeGrossPay } from "@/features/settings/utils/resolvePayRules";
+import { usePayrollHistory } from "@/features/payroll/hooks/usePayrollHistory";
 import { CATEGORY_COLORS } from "@/lib/constants";
 import type { CategoryBreakdown, DailyProfitPoint, PayrollRow } from "../types";
 
 export function useReports(dateFrom?: string, dateTo?: string) {
   const { data: expenses = [], isLoading: expensesLoading } = useExpenses();
-  const { data: attendance = [], isLoading: attendanceLoading } = useAttendance();
   const { data: employees = [], isLoading: employeesLoading } = useEmployees();
-  const { data: advances = [], isLoading: advancesLoading } = useAdvances();
   const { data: sales = [], isLoading: salesLoading } = useSales();
-  const { data: globalSettings } = usePayRuleSettings();
+  const { data: paidRuns = [], isLoading: payrollLoading } = usePayrollHistory();
 
-  const isLoading = expensesLoading || attendanceLoading || employeesLoading || advancesLoading || salesLoading;
+  const isLoading = expensesLoading || employeesLoading || salesLoading || payrollLoading;
 
   const effectiveFrom = dateFrom ?? format(startOfMonth(new Date()), "yyyy-MM-dd");
   const effectiveTo = dateTo ?? format(endOfMonth(new Date()), "yyyy-MM-dd");
@@ -31,22 +26,6 @@ export function useReports(dateFrom?: string, dateTo?: string) {
   const filteredSales = useMemo(
     () => sales.filter((s) => s.date >= effectiveFrom && s.date <= effectiveTo),
     [sales, effectiveFrom, effectiveTo],
-  );
-
-  const filteredAttendance = useMemo(
-    () => attendance.filter((a) => {
-      if (!a.date) return false;
-      return a.date >= effectiveFrom && a.date <= effectiveTo;
-    }),
-    [attendance, effectiveFrom, effectiveTo],
-  );
-
-  const filteredAdvances = useMemo(
-    () => advances.filter((a) => {
-      if (!a.date) return false;
-      return a.date >= effectiveFrom && a.date <= effectiveTo;
-    }),
-    [advances, effectiveFrom, effectiveTo],
   );
 
   const categoryBreakdown = useMemo<CategoryBreakdown[]>(() => {
@@ -84,36 +63,19 @@ export function useReports(dateFrom?: string, dateTo?: string) {
   }, [filteredExpenses, filteredSales, effectiveFrom, effectiveTo]);
 
   const payroll = useMemo<PayrollRow[]>(() => {
-    if (!globalSettings) return [];
-    return employees
-      .filter((e) => e.isActive)
-      .map((emp) => {
-        const empAttendance = filteredAttendance.filter(
-          (a) => a.employeeId === emp.id && a.hoursWorked != null,
-        );
-        const hoursWorked = empAttendance.reduce((sum, a) => sum + (a.hoursWorked ?? 0), 0);
-        const grossPayInputs = empAttendance.map((a) => ({
-          hoursWorked: a.hoursWorked ?? 0,
-          shift: a.shift,
-          clockIn: a.clockIn,
-          clockOut: a.clockOut,
-        }));
-        const rules = resolvePayRules(globalSettings);
-        const grossPay = computeGrossPay(grossPayInputs, emp.dailyRate, rules);
-        const pendingAdvances = filteredAdvances
-          .filter((a) => a.employeeId === emp.id && a.status === "pending")
-          .reduce((sum, a) => sum + a.amount, 0);
-        return {
-          employeeId: emp.id,
-          name: emp.name,
-          hoursWorked: Math.round(hoursWorked * 100) / 100,
-          dailyRate: emp.dailyRate,
-          grossPay,
-          pendingAdvances,
-          netPay: grossPay - pendingAdvances,
-        };
-      });
-  }, [employees, filteredAttendance, filteredAdvances, globalSettings]);
+    const paid = paidRuns.filter(
+      (r) => r.status === "paid" && r.periodStart >= effectiveFrom && r.periodEnd <= effectiveTo,
+    );
+    return paid.map((r) => ({
+      employeeId: r.employeeId,
+      name: r.employeeName,
+      hoursWorked: r.hoursWorked,
+      dailyRate: r.dailyRate,
+      grossPay: r.grossPay,
+      pendingAdvances: r.advanceDeductions,
+      netPay: r.netPay,
+    }));
+  }, [paidRuns, effectiveFrom, effectiveTo]);
 
   const totals = useMemo(() => {
     const totalExpenses = filteredExpenses.reduce((sum, e) => sum + e.amount, 0);
