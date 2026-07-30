@@ -74,8 +74,8 @@ export function LandingPage() {
 
       {/* Hero — introduces the system, not a sales pitch */}
       <section className="relative overflow-hidden bg-ink">
-        <div className="absolute inset-0 bg-gradient-to-br from-secondary-dark via-primary-dark to-ink" />
-        <div className="absolute inset-0 bg-gradient-to-t from-ink via-transparent to-accent/10" />
+        <div className="absolute inset-0 bg-linear-to-br from-secondary-dark via-primary-dark to-ink" />
+        <div className="absolute inset-0 bg-linear-to-t from-ink via-transparent to-accent/10" />
         <div className="absolute -left-32 top-1/4 h-96 w-96 rounded-full bg-primary/30 blur-3xl" />
         <div className="absolute -right-24 top-0 h-80 w-80 rounded-full bg-accent/30 blur-3xl" />
         <div
@@ -119,7 +119,7 @@ export function LandingPage() {
             </div>
 
             {/* Right — floating preview ticket */}
-            <div className="relative mx-auto w-full max-w-[460px]">
+            <div className="relative mx-auto w-full max-w-115">
               <div className="ticket absolute inset-x-6 top-6 -rotate-3 bg-surface/60 p-5 shadow-2xl" />
               <div className="ticket ticket-perf relative w-full space-y-4 p-5 shadow-2xl">
                 <div className="flex items-center justify-between border-b border-dashed border-line pb-3">
