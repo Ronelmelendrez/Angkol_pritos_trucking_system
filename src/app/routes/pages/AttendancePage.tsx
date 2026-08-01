@@ -60,6 +60,20 @@ export function AttendancePage() {
     });
   }, [attendance, dateFrom, dateTo, filters, employees]);
 
+  const calendarRecords = useMemo(() => {
+    return attendance.filter((r) => {
+      if (filters.employeeId !== "all" && r.employeeId !== filters.employeeId) return false;
+      if (filters.status !== "all" && r.status !== filters.status) return false;
+      if (filters.shift !== "all" && r.shift !== filters.shift) return false;
+      if (filters.search) {
+        const q = filters.search.toLowerCase();
+        const emp = employees.find((e) => e.id === r.employeeId);
+        if (!emp || !emp.name.toLowerCase().includes(q)) return false;
+      }
+      return true;
+    });
+  }, [attendance, filters, employees]);
+
   return (
     <div className="space-y-5">
       <Card>
@@ -96,7 +110,7 @@ export function AttendancePage() {
           </TabsContent>
           <TabsContent value="calendar">
             <AttendanceCalendar
-              records={filtered}
+              records={calendarRecords}
               onDayClick={setSelectedDay}
             />
           </TabsContent>
