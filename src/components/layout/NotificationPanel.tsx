@@ -22,6 +22,7 @@ export function NotificationPanel({ open, onClose }: NotificationPanelProps) {
   const notifications = useNotifications();
   const markRead = useNotificationStore((s) => s.markRead);
   const markAllRead = useNotificationStore((s) => s.markAllRead);
+  const dismiss = useNotificationStore((s) => s.dismiss);
 
   const unreadCount = notifications.filter((n) => !n.read).length;
 
@@ -91,11 +92,19 @@ export function NotificationPanel({ open, onClose }: NotificationPanelProps) {
           {notifications.map((item) => {
             const Icon = ICONS[item.kind];
             return (
-              <button
+              <div
                 key={item.id}
+                role="button"
+                tabIndex={0}
                 onClick={() => handleOpen(item)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    handleOpen(item);
+                  }
+                }}
                 className={cn(
-                  "flex w-full gap-3 border-b border-line px-4 py-3 text-left transition-colors hover:bg-ink/[0.02]",
+                  "flex w-full cursor-pointer gap-3 border-b border-line px-4 py-3 text-left transition-colors hover:bg-ink/[0.02] focus:outline-none focus-visible:bg-ink/[0.03]",
                   !item.read && "bg-primary/[0.03]"
                 )}
               >
@@ -112,14 +121,26 @@ export function NotificationPanel({ open, onClose }: NotificationPanelProps) {
                     <p className={cn("text-sm", !item.read ? "font-medium text-ink" : "text-ink-soft")}>
                       {item.title}
                     </p>
-                    {!item.read && (
-                      <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
-                    )}
+                    <span className="flex shrink-0 items-center gap-1">
+                      {!item.read && (
+                        <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+                      )}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          dismiss(item.id);
+                        }}
+                        className="rounded-md p-1 text-ink-faint/60 transition-colors hover:bg-ink/5 hover:text-danger"
+                        aria-label={`Dismiss ${item.title} notification`}
+                      >
+                        <X className="h-3.5 w-3.5" />
+                      </button>
+                    </span>
                   </div>
                   <p className="text-xs text-ink-faint">{item.description}</p>
                   <p className="mt-1 text-[11px] text-ink-faint/60">{relativeTime(item.timestamp)}</p>
                 </div>
-              </button>
+              </div>
             );
           })}
         </div>

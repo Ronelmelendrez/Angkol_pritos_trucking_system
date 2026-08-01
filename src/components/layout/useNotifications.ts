@@ -20,17 +20,20 @@ export interface AppNotification {
   read: boolean;
 }
 
-const STORAGE_KEY = "ap-notifications-read";
+const READ_KEY = "ap-notifications-read";
+const DISMISSED_KEY = "ap-notifications-dismissed";
 
 interface NotificationStore {
   readIds: string[];
+  dismissedIds: string[];
   markRead: (id: string) => void;
   markAllRead: (ids: string[]) => void;
+  dismiss: (id: string) => void;
 }
 
-function loadReadIds(): string[] {
+function loadIds(key: string): string[] {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = localStorage.getItem(key);
     return raw ? (JSON.parse(raw) as string[]) : [];
   } catch {
     return [];
@@ -38,16 +41,25 @@ function loadReadIds(): string[] {
 }
 
 export const useNotificationStore = create<NotificationStore>((set) => ({
-  readIds: loadReadIds(),
+  readIds: loadIds(READ_KEY),
+  dismissedIds: loadIds(DISMISSED_KEY),
   markRead: (id) =>
     set((s) => (s.readIds.includes(id) ? s : { readIds: [...s.readIds, id] })),
   markAllRead: (ids) =>
     set((s) => ({ readIds: [...new Set([...s.readIds, ...ids])] })),
+  dismiss: (id) =>
+    set((s) => ({
+      dismissedIds: s.dismissedIds.includes(id)
+        ? s.dismissedIds
+        : [...s.dismissedIds, id],
+      readIds: s.readIds.filter((rid) => rid !== id),
+    })),
 }));
 
 useNotificationStore.subscribe((state) => {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state.readIds));
+    localStorage.setItem(READ_KEY, JSON.stringify(state.readIds));
+    localStorage.setItem(DISMISSED_KEY, JSON.stringify(state.dismissedIds));
   } catch {
     // ignore storage errors
   }
@@ -63,6 +75,7 @@ export function useNotifications(): AppNotification[] {
   const { data: employees = [] } = useEmployees();
   const { data: attendance = [] } = useAttendance();
   const readIds = useNotificationStore((s) => s.readIds);
+  const dismissedIds = useNotificationStore((s) => s.dismissedIds);
 
   return useMemo(() => {
     const notifications: Omit<AppNotification, "read">[] = [];
@@ -143,7 +156,8 @@ export function useNotifications(): AppNotification[] {
     }
 
     return notifications
+      .filter((n) => !dismissedIds.includes(n.id))
       .map((n) => ({ ...n, read: readIds.includes(n.id) }))
       .sort((a, b) => b.timestamp.localeCompare(a.timestamp));
-  }, [stock, settings, payroll, employees, attendance, readIds]);
+  }, [stock, settings, payroll, employees, attendance, readIds, dismissedIds]);
 }
