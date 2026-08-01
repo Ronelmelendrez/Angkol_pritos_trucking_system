@@ -5,6 +5,7 @@ import { useUiStore } from "@/app/store/useUiStore";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { CommandSearch } from "@/components/layout/CommandSearch";
 import { NotificationPanel } from "@/components/layout/NotificationPanel";
+import { useNotifications } from "@/components/layout/useNotifications";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -21,6 +22,8 @@ export function Header({ title }: { title: string }) {
 
   const [searchOpen, setSearchOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
+  const notifications = useNotifications();
+  const unreadCount = notifications.filter((n) => !n.read).length;
 
   useEffect(() => {
     function handleKey(e: KeyboardEvent) {
@@ -77,7 +80,11 @@ export function Header({ title }: { title: string }) {
             aria-label="Notifications"
           >
             <Bell className="h-4.5 w-4.5" />
-            <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-primary" />
+            {unreadCount > 0 && (
+              <span className="absolute right-0.5 top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[9px] font-bold text-white">
+                {unreadCount > 9 ? "9+" : unreadCount}
+              </span>
+            )}
           </button>
 
           <DropdownMenu>

@@ -1,49 +1,29 @@
 import { useEffect } from "react";
-import { X, Bell, Package, DollarSign, Users, Clock } from "lucide-react";
+import { X, Bell, Package, DollarSign, Users, Clock, TrendingDown, CheckCheck } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { cn } from "@/utils/cn";
+import { relativeTime } from "@/utils/date";
+import { useNotifications, useNotificationStore, type NotificationKind } from "./useNotifications";
 
 interface NotificationPanelProps {
   open: boolean;
   onClose: () => void;
 }
 
-const NOTIFICATIONS = [
-  {
-    id: 1,
-    icon: Package,
-    title: "Low stock alert",
-    description: "Raw Chicken inventory is running low.",
-    time: "2 min ago",
-    read: false,
-  },
-  {
-    id: 2,
-    icon: DollarSign,
-    title: "Payroll processed",
-    description: "Weekly payroll for 8 employees completed.",
-    time: "1 hour ago",
-    read: false,
-  },
-  {
-    id: 3,
-    icon: Users,
-    title: "New employee added",
-    description: "Juan Dela Cruz has been added to the team.",
-    time: "3 hours ago",
-    read: true,
-  },
-  {
-    id: 4,
-    icon: Clock,
-    title: "Attendance summary",
-    description: "Today's attendance: 7/8 employees present.",
-    time: "5 hours ago",
-    read: true,
-  },
-];
+const ICONS: Record<NotificationKind, typeof Package> = {
+  "low-stock": TrendingDown,
+  payroll: DollarSign,
+  employee: Users,
+  attendance: Clock,
+};
 
 export function NotificationPanel({ open, onClose }: NotificationPanelProps) {
-  const unreadCount = NOTIFICATIONS.filter((n) => !n.read).length;
+  const navigate = useNavigate();
+  const notifications = useNotifications();
+  const markRead = useNotificationStore((s) => s.markRead);
+  const markAllRead = useNotificationStore((s) => s.markAllRead);
+
+  const unreadCount = notifications.filter((n) => !n.read).length;
 
   useEffect(() => {
     if (!open) return;
@@ -53,6 +33,12 @@ export function NotificationPanel({ open, onClose }: NotificationPanelProps) {
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
   }, [open, onClose]);
+
+  function handleOpen(item: (typeof notifications)[number]) {
+    if (!item.read) markRead(item.id);
+    onClose();
+    if (item.link) navigate(item.link);
+  }
 
   return (
     <>
@@ -94,44 +80,62 @@ export function NotificationPanel({ open, onClose }: NotificationPanelProps) {
 
         {/* Notification list */}
         <div className="flex-1 overflow-y-auto">
-          {NOTIFICATIONS.map((item) => (
-            <div
-              key={item.id}
-              className={cn(
-                "flex gap-3 border-b border-line px-4 py-3 transition-colors hover:bg-ink/[0.02]",
-                !item.read && "bg-primary/[0.03]"
-              )}
-            >
-              <div
+          {notifications.length === 0 && (
+            <div className="flex flex-col items-center justify-center px-6 py-16 text-center">
+              <Bell className="mb-2 h-8 w-8 text-ink-faint" />
+              <p className="text-sm font-medium text-ink">No notifications</p>
+              <p className="text-xs text-ink-faint">Updates from your business will show up here.</p>
+            </div>
+          )}
+
+          {notifications.map((item) => {
+            const Icon = ICONS[item.kind];
+            return (
+              <button
+                key={item.id}
+                onClick={() => handleOpen(item)}
                 className={cn(
-                  "flex h-8 w-8 shrink-0 items-center justify-center rounded-lg",
-                  !item.read ? "bg-primary/10 text-primary" : "bg-ink/5 text-ink-faint"
+                  "flex w-full gap-3 border-b border-line px-4 py-3 text-left transition-colors hover:bg-ink/[0.02]",
+                  !item.read && "bg-primary/[0.03]"
                 )}
               >
-                <item.icon className="h-4 w-4" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-start justify-between gap-2">
-                  <p className={cn("text-sm", !item.read ? "font-medium text-ink" : "text-ink-soft")}>
-                    {item.title}
-                  </p>
-                  {!item.read && (
-                    <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
+                <div
+                  className={cn(
+                    "flex h-8 w-8 shrink-0 items-center justify-center rounded-lg",
+                    !item.read ? "bg-primary/10 text-primary" : "bg-ink/5 text-ink-faint"
                   )}
+                >
+                  <Icon className="h-4 w-4" />
                 </div>
-                <p className="text-xs text-ink-faint">{item.description}</p>
-                <p className="mt-1 text-[11px] text-ink-faint/60">{item.time}</p>
-              </div>
-            </div>
-          ))}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-start justify-between gap-2">
+                    <p className={cn("text-sm", !item.read ? "font-medium text-ink" : "text-ink-soft")}>
+                      {item.title}
+                    </p>
+                    {!item.read && (
+                      <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
+                    )}
+                  </div>
+                  <p className="text-xs text-ink-faint">{item.description}</p>
+                  <p className="mt-1 text-[11px] text-ink-faint/60">{relativeTime(item.timestamp)}</p>
+                </div>
+              </button>
+            );
+          })}
         </div>
 
         {/* Footer */}
-        <div className="border-t border-line px-4 py-3">
-          <button className="w-full rounded-lg py-2 text-center text-xs font-medium text-primary transition-colors hover:bg-primary/5">
-            Mark all as read
-          </button>
-        </div>
+        {notifications.length > 0 && (
+          <div className="border-t border-line px-4 py-3">
+            <button
+              onClick={() => markAllRead(notifications.map((n) => n.id))}
+              className="flex w-full items-center justify-center gap-1.5 rounded-lg py-2 text-center text-xs font-medium text-primary transition-colors hover:bg-primary/5"
+            >
+              <CheckCheck className="h-3.5 w-3.5" />
+              Mark all as read
+            </button>
+          </div>
+        )}
       </div>
     </>
   );
