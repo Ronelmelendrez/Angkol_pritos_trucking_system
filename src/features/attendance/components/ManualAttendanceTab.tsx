@@ -154,9 +154,9 @@ export function ManualAttendanceTab({ records, employees }: Props) {
 
       {/* Bulk actions */}
       {!isStoreClosed && unmarkedIds.length > 0 && (
-        <div className="flex flex-wrap items-center gap-2 rounded-lg border border-dashed border-annatto-300 bg-annatto-50/40 px-4 py-3">
-          <Users className="h-4 w-4 text-annatto-600" />
-          <span className="text-xs font-medium text-annatto-700">
+        <div className="flex flex-wrap items-center gap-2 rounded-lg border border-dashed border-primary/30 bg-primary/5 px-4 py-3">
+          <Users className="h-4 w-4 text-primary-dark" />
+          <span className="text-xs font-medium text-primary-dark">
             {unmarkedIds.length} unmarked
           </span>
           <div className="flex gap-2 ml-auto">

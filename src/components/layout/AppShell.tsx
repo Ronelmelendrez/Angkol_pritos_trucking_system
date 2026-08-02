@@ -15,7 +15,7 @@ const TITLES: Record<string, string> = {
 
 export function AppShell() {
   const location = useLocation();
-  const title = TITLES[location.pathname] ?? "Manong's Grill";
+  const title = TITLES[location.pathname] ?? "Angkol Prito's";
 
   return (
     <div className="flex min-h-screen">

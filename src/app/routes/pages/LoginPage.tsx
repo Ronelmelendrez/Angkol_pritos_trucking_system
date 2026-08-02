@@ -1,7 +1,31 @@
-import { Navigate } from "react-router-dom"
+import { Navigate, Link } from "react-router-dom"
 import { useAuth } from "@/features/auth"
 import { LoginForm } from "@/features/auth"
-import { Drumstick, Receipt, Users, HandCoins, BarChart3, Flame } from "lucide-react"
+import { Receipt, Users, HandCoins, BarChart3, Flame, ArrowLeft } from "lucide-react"
+import { Logo } from "@/components/brand/Logo"
+
+const FEATURES = [
+  {
+    icon: Receipt,
+    title: "Expenses",
+    desc: "Categorized, searchable, and tied to stock",
+  },
+  {
+    icon: Users,
+    title: "Attendance",
+    desc: "Clock in/out from any phone",
+  },
+  {
+    icon: HandCoins,
+    title: "Advances & loans",
+    desc: "Balances update the moment they're logged",
+  },
+  {
+    icon: BarChart3,
+    title: "Payroll & reports",
+    desc: "Hours × rate, minus advances and utang",
+  },
+]
 
 export function LoginPage() {
   const { user } = useAuth()
@@ -12,103 +36,123 @@ export function LoginPage() {
 
   return (
     <div className="flex min-h-screen">
-      {/* Left — hero, paper / order-ticket stack design */}
-      <div className="relative hidden flex-1 overflow-hidden lg:flex lg:flex-col lg:justify-between lg:p-12">
-        {/* warm gradient wash — deeper, richer tones */}
+      {/* Left — brand showcase */}
+      <div className="relative hidden flex-1 overflow-hidden lg:flex lg:flex-col lg:justify-between lg:p-14">
+        {/* background */}
         <div className="absolute inset-0 bg-gradient-to-br from-secondary-dark via-primary-dark to-ink" />
-        <div className="absolute inset-0 bg-gradient-to-t from-ink/60 via-transparent to-accent/10" />
+        <div className="absolute inset-0 bg-gradient-to-t from-ink/70 via-transparent to-accent/10" />
+        <div
+          className="absolute inset-0 opacity-[0.12]"
+          style={{
+            backgroundImage: "radial-gradient(circle, white 1px, transparent 1px)",
+            backgroundSize: "28px 28px",
+          }}
+        />
+        {/* glow orbs */}
+        <div className="absolute -left-24 top-1/4 h-96 w-96 rounded-full bg-primary/30 blur-3xl" />
+        <div className="absolute -right-20 bottom-0 h-80 w-80 rounded-full bg-accent/25 blur-3xl" />
 
-        {/* dot-grid pattern, clearly visible */}
+        {/* header */}
+        <div className="relative">
+          <Logo tone="glass" size="md" />
+        </div>
+
+        {/* middle — copy + features */}
+        <div className="relative max-w-lg">
+          <span className="mb-6 inline-flex items-center gap-2 rounded-full bg-white/10 px-3.5 py-1.5 text-xs font-medium text-white ring-1 ring-white/20 backdrop-blur-sm">
+            <Flame className="h-3.5 w-3.5 text-accent" /> Internal operations system
+          </span>
+          <h2 className="stamp text-4xl font-bold leading-[1.15] text-white">
+            Run your truck like<br />clockwork.
+          </h2>
+          <p className="mt-4 text-base leading-relaxed text-white/70">
+            Every expense, shift, cash advance, and utang — logged the moment it
+            happens, and tied together in one place.
+          </p>
+
+          <div className="mt-9 grid grid-cols-1 gap-3 sm:grid-cols-2">
+            {FEATURES.map((f) => (
+              <div
+                key={f.title}
+                className="flex items-start gap-3 rounded-2xl bg-white/[0.07] p-4 ring-1 ring-white/10 backdrop-blur-sm"
+              >
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white/10 text-accent">
+                  <f.icon className="h-4 w-4" />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-white">{f.title}</p>
+                  <p className="mt-0.5 text-xs leading-relaxed text-white/60">{f.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* bottom — trust strip */}
+        <div className="relative flex items-center gap-6 text-white/60">
+          <div>
+            <p className="stamp text-xl font-bold text-white">8</p>
+            <p className="text-xs">modules</p>
+          </div>
+          <div className="h-8 w-px bg-white/15" />
+          <div>
+            <p className="stamp text-xl font-bold text-white">1</p>
+            <p className="text-xs">dashboard</p>
+          </div>
+          <div className="h-8 w-px bg-white/15" />
+          <div>
+            <p className="stamp text-xl font-bold text-white">0</p>
+            <p className="text-xs">paper trails</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Right — sign in */}
+      <div className="relative flex flex-1 items-center justify-center overflow-hidden bg-bg px-6 py-12">
         <div
           className="absolute inset-0"
           style={{
-            backgroundImage: "radial-gradient(circle, rgba(230,126,34,0.35) 1.5px, transparent 1.5px)",
-            backgroundSize: "26px 26px",
+            backgroundImage:
+              "radial-gradient(circle at 20% 15%, rgba(230,126,34,0.10), transparent 45%), radial-gradient(circle at 85% 90%, rgba(192,57,43,0.10), transparent 45%)",
           }}
         />
-        {/* warm glow accents */}
-        <div className="absolute -left-24 top-1/3 h-80 w-80 rounded-full bg-primary/20 blur-3xl" />
-        <div className="absolute -right-16 bottom-0 h-96 w-96 rounded-full bg-accent/30 blur-3xl" />
-        <div className="absolute right-1/3 top-0 h-64 w-64 rounded-full bg-secondary/10 blur-3xl" />
 
-        {/* subtle border to separate from form panel */}
-        <div className="absolute inset-y-0 right-0 w-px bg-line" />
-
-        <div className="relative flex items-center gap-2.5">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-white shadow-ticket">
-            <Drumstick className="h-5 w-5" />
+        <div className="relative w-full max-w-md animate-rise">
+          {/* mobile brand */}
+          <div className="mb-8 flex items-center justify-center lg:hidden">
+            <Logo size="md" />
           </div>
-          <div className="leading-tight">
-            <p className="stamp text-sm font-semibold text-white">Angkol Prito"s</p>
-            <p className="text-[11px] text-white/60">&amp; Lechon Manok</p>
-          </div>
-        </div>
 
-        {/* Middle — what the system tracks */}
-        <div className="relative flex flex-1 items-center justify-center py-10">
-          <div className="ticket ticket-perf relative w-full max-w-sm space-y-4 p-6 shadow-ticket">
-            <div className="flex items-center justify-between border-b border-dashed border-line pb-3">
-              <span className="stamp text-sm font-semibold text-ink">Everything in one place</span>
-              <span className="flex items-center gap-1 text-xs font-medium text-primary">
-                <Flame className="h-3.5 w-3.5" /> Built for the truck
-              </span>
+          <div className="rounded-3xl border border-line/70 bg-surface/85 p-8 shadow-2xl backdrop-blur-md sm:p-10">
+            <div className="mb-8">
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-primary">Welcome back</p>
+              <h1 className="stamp mt-2 text-3xl font-bold text-ink">Sign in</h1>
+              <p className="mt-1.5 text-sm text-ink-soft">
+                Log today's expenses, attendance, and sales in minutes.
+              </p>
             </div>
-            <TicketRow icon={Receipt} label="Expenses, categorized and searchable" />
-            <TicketRow icon={Users} label="Attendance that feeds straight into payroll" />
-            <TicketRow icon={HandCoins} label="Cash advances and utang down to the peso" />
-            <TicketRow icon={BarChart3} label="Sales vs. expenses, visible day by day" />
-          </div>
-        </div>
 
-        {/* Bottom — headline */}
-        <div className="relative max-w-md">
-          <h2 className="stamp text-3xl font-bold leading-tight text-white">
-            Run your truck like<br />clockwork.
-          </h2>
-          <p className="mt-3 text-sm text-white/70">
-            Expenses, attendance, cash advances, and payroll — tracked on one
-            ticket, updated the moment it happens.
+            <LoginForm />
+
+            <div className="mt-8 flex items-center gap-3 text-[11px] uppercase tracking-wider text-ink-faint">
+              <span className="h-px flex-1 bg-line" />
+              For the crew
+              <span className="h-px flex-1 bg-line" />
+            </div>
+
+            <Link
+              to="/"
+              className="mt-5 flex items-center justify-center gap-1.5 text-sm font-medium text-ink-soft transition-colors hover:text-primary"
+            >
+              <ArrowLeft className="h-4 w-4" /> Back to homepage
+            </Link>
+          </div>
+
+          <p className="mt-6 text-center text-xs text-ink-faint">
+            © {new Date().getFullYear()} Angkol Prito's &amp; Lechon Manok
           </p>
         </div>
       </div>
-
-      {/* Right — form */}
-      <div className="relative flex flex-1 items-center justify-center px-6 py-12">
-        <div
-          className="absolute inset-0 opacity-40"
-          style={{
-            backgroundImage:
-              "radial-gradient(circle at 15% 20%, rgba(230,126,34,0.25), transparent 45%), radial-gradient(circle at 85% 80%, rgba(192,57,43,0.3), transparent 45%)",
-          }}
-        />
-        <div className="ticket relative w-full max-w-sm bg-surface p-8 shadow-2xl">
-          <div className="mb-8">
-            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary text-white shadow-ticket lg:hidden">
-              <Drumstick className="h-6 w-6" />
-            </div>
-            <h1 className="stamp text-2xl font-semibold text-ink">Angkol Prito's</h1>
-            <p className="mt-1 text-sm text-ink-soft">Sign in to your account</p>
-          </div>
-          <LoginForm />
-        </div>
-      </div>
-    </div>
-  )
-}
-
-function TicketRow({
-  icon: Icon,
-  label,
-}: {
-  icon: React.ComponentType<{ className?: string }>
-  label: string
-}) {
-  return (
-    <div className="flex items-center gap-2.5">
-      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary-dark">
-        <Icon className="h-3.5 w-3.5" />
-      </div>
-      <span className="text-sm text-ink-soft">{label}</span>
     </div>
   )
 }

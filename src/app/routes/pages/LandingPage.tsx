@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
 import {
-  Drumstick,
   Receipt,
   Users,
   CalendarClock,
@@ -19,6 +18,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Logo } from "@/components/brand/Logo";
 
 const MODULES = [
   { icon: Receipt, title: "Expenses", desc: "Every purchase — raw chicken, oil, fuel, packaging, repairs — logged by category, supplier, and payment method." },
@@ -51,13 +51,7 @@ export function LandingPage() {
       <header className="sticky top-0 z-30 border-b border-line bg-bg/80 backdrop-blur-md">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-white shadow-ticket">
-              <Drumstick className="h-5 w-5" />
-            </div>
-            <div className="leading-tight">
-              <p className="stamp text-sm font-semibold text-ink">Angkol Prito's</p>
-              <p className="text-[11px] text-ink-faint">&amp; Lechon Manok</p>
-            </div>
+            <Logo />
           </div>
           <nav className="hidden items-center gap-8 md:flex">
             <a href="#about" className="text-sm font-medium text-ink-soft transition-colors hover:text-ink">About</a>
@@ -151,7 +145,7 @@ export function LandingPage() {
       <section id="about" className="mx-auto max-w-4xl px-6 py-20 text-center sm:py-28">
         <h2 className="stamp text-3xl font-bold text-ink sm:text-4xl">What this system is</h2>
         <p className="mt-5 text-lg leading-relaxed text-ink-soft">
-          Manong's Grill &amp; Lechon Manok runs on a food truck, on a tight
+          Angkol Prito's &amp; Lechon Manok runs on a food truck, on a tight
           schedule, with a small crew doing everything from cooking to cash
           handling. This system exists to replace the scattered notebooks,
           text-message reminders, and end-of-month guesswork with one place
@@ -249,11 +243,9 @@ export function LandingPage() {
       <footer className="border-t border-line px-6 py-8">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 text-center sm:flex-row sm:text-left">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary text-white">
-              <Drumstick className="h-3.5 w-3.5" />
-            </div>
+            <Logo showText={false} />
             <p className="text-xs text-ink-faint">
-              Manong's Grill &amp; Lechon Manok — internal operations system, built for one truck.
+              Angkol Prito's &amp; Lechon Manok — internal operations system, built for one truck.
             </p>
           </div>
           <p className="text-xs text-ink-faint">© {new Date().getFullYear()} — fresh daily, served with pride.</p>

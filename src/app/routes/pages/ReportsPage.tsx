@@ -199,7 +199,7 @@ function ReportsContent() {
     <div className="flex flex-col gap-5">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h2 className="font-display text-lg font-semibold text-char-900 md:text-xl">Reports</h2>
+          <h2 className="stamp text-lg font-semibold text-ink md:text-xl">Reports</h2>
           <p className="text-xs text-ink-faint">{rangeLabel}</p>
         </div>
         <DatePresets

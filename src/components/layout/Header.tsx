@@ -69,7 +69,7 @@ export function Header({ title }: { title: string }) {
           >
             <Search className="h-3.5 w-3.5" />
             <span className="hidden sm:inline">Search...</span>
-            <kbd className="hidden items-center gap-0.5 rounded border border-line bg-background px-1.5 py-0.5 text-[10px] font-medium text-ink-faint sm:inline-flex">
+            <kbd className="hidden items-center gap-0.5 rounded border border-line bg-surface px-1.5 py-0.5 text-[10px] font-medium text-ink-faint sm:inline-flex">
               <Command className="h-2.5 w-2.5" />K
             </kbd>
           </button>

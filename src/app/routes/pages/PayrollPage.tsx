@@ -103,7 +103,7 @@ function PayrollContent() {
   return (
     <div className="flex flex-col gap-5">
       <div>
-        <h2 className="font-display text-lg font-semibold text-char-900 md:text-xl">Payroll</h2>
+        <h2 className="stamp text-lg font-semibold text-ink md:text-xl">Payroll</h2>
       </div>
 
       <div>

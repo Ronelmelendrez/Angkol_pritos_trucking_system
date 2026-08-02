@@ -12,12 +12,12 @@ import {
   DollarSign,
   BarChart3,
   Settings,
-  Drumstick,
   PanelLeftClose,
   PanelLeftOpen,
 } from "lucide-react";
 import { cn } from "@/utils/cn";
 import { useUiStore } from "@/app/store/useUiStore";
+import { Logo } from "@/components/brand/Logo";
 
 const NAV_ITEMS = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard, end: true },
@@ -60,19 +60,7 @@ export function Sidebar() {
             isSidebarCollapsed && "justify-center",
           )}
         >
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary text-white">
-            <Drumstick className="h-5 w-5" />
-          </div>
-          {!isSidebarCollapsed && (
-            <div className="whitespace-nowrap">
-              <p className="stamp text-sm font-semibold leading-tight text-ink">
-                Angkol Prito"s
-              </p>
-              <p className="text-[11px] leading-tight text-ink-faint">
-                &amp; Lechon Manok
-              </p>
-            </div>
-          )}
+          <Logo showText={!isSidebarCollapsed} />
         </div>
       </div>
 

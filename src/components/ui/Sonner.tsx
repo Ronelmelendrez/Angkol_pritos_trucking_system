@@ -9,12 +9,12 @@ const Toaster = ({ ...props }: ToasterProps) => {
       toastOptions={{
         classNames: {
           toast:
-            "group toast bg-card! text-card-foreground! border-border! shadow-ticket-lg! rounded-lg!",
-          description: "text-muted-foreground!",
-          actionButton: "bg-primary! text-primary-foreground!",
-          cancelButton: "bg-muted! text-muted-foreground!",
-          success: "border-success-500/30!",
-          error: "border-destructive/30!",
+            "group toast bg-surface! text-ink! border-line! shadow-ticket! rounded-xl!",
+          description: "text-ink-faint!",
+          actionButton: "bg-primary! text-white!",
+          cancelButton: "bg-ink/5! text-ink-faint!",
+          success: "border-success/30!",
+          error: "border-danger/30!",
         },
       }}
       {...props}

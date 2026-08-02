@@ -18,24 +18,24 @@ export function DailyExpenseSummary({ expenses }: DailyExpenseSummaryProps) {
     <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
       <Card>
         <CardContent className="py-4">
-          <p className="text-xs font-medium text-muted-foreground">Today's expenses</p>
-          <p className="mt-1 font-figures text-2xl font-bold text-annatto-500">
+          <p className="text-xs font-medium text-ink-faint">Today's expenses</p>
+          <p className="mt-1 stamp text-2xl font-semibold text-ink">
             {formatCurrency(todayTotal)}
           </p>
         </CardContent>
       </Card>
       <Card>
         <CardContent className="py-4">
-          <p className="text-xs font-medium text-muted-foreground">Filtered total</p>
-          <p className="mt-1 font-figures text-2xl font-bold text-char-900">
+          <p className="text-xs font-medium text-ink-faint">Filtered total</p>
+          <p className="mt-1 stamp text-2xl font-semibold text-ink">
             {formatCurrency(total)}
           </p>
         </CardContent>
       </Card>
       <Card className="hidden md:block">
         <CardContent className="py-4">
-          <p className="text-xs font-medium text-muted-foreground">Entries shown</p>
-          <p className="mt-1 font-figures text-2xl font-bold text-char-900">
+          <p className="text-xs font-medium text-ink-faint">Entries shown</p>
+          <p className="mt-1 stamp text-2xl font-semibold text-ink">
             {expenses.length}
           </p>
         </CardContent>

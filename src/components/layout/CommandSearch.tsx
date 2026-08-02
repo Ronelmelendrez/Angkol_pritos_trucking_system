@@ -77,7 +77,7 @@ export function CommandSearch({ open, onClose }: CommandSearchProps) {
           )}
           <button
             onClick={handleClose}
-            className="rounded-md border border-line bg-background px-2 py-1 text-[11px] font-medium text-ink-faint transition-colors hover:text-ink"
+            className="rounded-md border border-line bg-surface px-2 py-1 text-[11px] font-medium text-ink-faint transition-colors hover:text-ink"
           >
             Cancel
           </button>

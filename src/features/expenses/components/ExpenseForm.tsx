@@ -186,20 +186,20 @@ export function ExpenseForm({ onDone }: { onDone?: () => void }) {
         <button
           type="button"
           onClick={toggleStock}
-          className="w-full flex items-center gap-3 rounded-lg border border-dashed border-annatto-300 bg-annatto-50/40 px-4 py-3 text-sm font-medium text-annatto-700 hover:border-annatto-400 hover:bg-annatto-50 transition-colors"
+          className="w-full flex items-center gap-3 rounded-lg border border-dashed border-primary/30 bg-primary/5 px-4 py-3 text-sm font-medium text-primary-dark hover:border-primary/40 hover:bg-primary/10 transition-colors"
         >
-          <span className="flex h-8 w-8 items-center justify-center rounded-md bg-annatto-100 text-annatto-600">
+          <span className="flex h-8 w-8 items-center justify-center rounded-md bg-primary/15 text-primary-dark">
             <PackagePlus className="h-4 w-4" />
           </span>
           <span className="flex flex-col items-start">
             <span className="leading-tight">Track stock for this expense</span>
-            <span className="text-xs font-normal text-annatto-500">Link purchased items to your inventory</span>
+            <span className="text-xs font-normal text-primary-dark/70">Link purchased items to your inventory</span>
           </span>
         </button>
       ) : (
-        <div className="rounded-lg border border-annatto-200 bg-annatto-50/50 px-4 py-3">
+        <div className="rounded-lg border border-primary/20 bg-primary/5 px-4 py-3">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-sm font-medium text-annatto-700">
+            <div className="flex items-center gap-2 text-sm font-medium text-primary-dark">
               <Package className="h-4 w-4" />
               Tracking stock
             </div>
@@ -216,9 +216,9 @@ export function ExpenseForm({ onDone }: { onDone?: () => void }) {
 
       {/* Stock product rows */}
       {trackStock && (
-        <div className="rounded-lg border border-annatto-200 bg-annatto-50/30 p-4 space-y-3">
+        <div className="rounded-lg border border-primary/20 bg-primary/5 p-4 space-y-3">
           <div className="flex items-center justify-between">
-            <p className="text-xs font-semibold uppercase tracking-wide text-annatto-700">
+            <p className="text-xs font-semibold uppercase tracking-wide text-primary-dark">
               Stock items
             </p>
             <Button type="button" variant="outline" size="sm" onClick={addItem} className="gap-1.5">
@@ -227,7 +227,7 @@ export function ExpenseForm({ onDone }: { onDone?: () => void }) {
           </div>
 
           {items.length === 0 && (
-            <p className="text-xs text-annatto-600">Click "Add product" to start tracking stock.</p>
+            <p className="text-xs text-primary-dark">Click "Add product" to start tracking stock.</p>
           )}
 
           {items.map((item, index) => (

@@ -16,7 +16,7 @@ export function AppLayout() {
   const title = NAV_ITEMS.find((item) => item.path === location.pathname)?.label ?? "Dashboard"
 
   return (
-    <div className="flex h-screen overflow-hidden bg-background">
+    <div className="flex h-screen overflow-hidden bg-bg">
       {/* Sidebar — desktop only */}
       <Sidebar />
 
