@@ -153,19 +153,18 @@ export function LandingPage() {
       <section id="about" className="mx-auto max-w-4xl px-6 py-20 text-center sm:py-28">
         <h2 className="stamp text-3xl font-bold text-ink sm:text-4xl">What this system is</h2>
         <p className="mt-5 text-lg leading-relaxed text-ink-soft">
-          Angkol Prito's &amp; Lechon Manok runs on a food truck, on a tight
-          schedule, with a small crew doing everything from cooking to cash
-          handling. This system exists to replace the scattered notebooks,
-          text-message reminders, and end-of-month guesswork with one place
-          where every expense, shift, advance, and utang gets recorded the
-          moment it happens — and stays there, searchable, for as long as it's
-          needed.
+          Angkol Prito's &amp; Lechon Manok is a local food business with its main operations based at its
+          home location and an additional branch serving customers. With a small team handling everything
+          from food preparation to cash management, daily operations require accurate and organized record-keeping.
+          This system was developed to replace scattered notebooks and end-of-month guesswork with a centralized
+          platform where every expense, employee shift, cash advance, and utang is recorded the moment it happens—and
+          remains securely stored, searchable, and accessible whenever needed across all business locations.
         </p>
         <p className="mt-4 text-lg leading-relaxed text-ink-soft">
-          It isn't a generic point-of-sale or accounting product. Every module
-          was built around how this specific truck operates: no inventory
-          quantities on the expense side by default, cash advances that tie
-          straight into payroll, and utang that tracks down to the peso.
+          It is not a generic point-of-sale or accounting system. Every module was designed around how
+          Angkol Prito's & Lechon Manok operates, including support for multiple business locations, 
+          expense recording without mandatory inventory tracking, cash advances that integrate directly 
+          with payroll, and utang management that tracks every balance accurately down to the peso.
         </p>
       </section>
 
