@@ -5,6 +5,8 @@ import {
 import { Download } from "lucide-react";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/Button";
+import { formatQty } from "@/utils/currency";
+import { useChartLabelCount, chartXInterval } from "@/utils/chartTicks";
 import { useInventoryLedger } from "../hooks/useInventoryLedger";
 
 interface Props {
@@ -25,6 +27,10 @@ export function InventoryReportsTab({ productId, dateRange }: Props) {
       })),
     [entries],
   );
+
+  // Keep X labels evenly spaced and non-overlapping on any screen size.
+  const labelCount = useChartLabelCount();
+  const xInterval = chartXInterval(chartData.length, labelCount);
 
   function handleExportCsv() {
     const headers = ["Date,Opening,Purchased,Sold,Adjustment,Closing"];
@@ -55,7 +61,7 @@ export function InventoryReportsTab({ productId, dateRange }: Props) {
       <div className="h-64">
         <p className="mb-2 text-xs font-medium text-ink-faint">Stock level trend</p>
         <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={chartData} margin={{ left: -10, right: 10, top: 5, bottom: 0 }}>
+          <AreaChart data={chartData} margin={{ left: 0, right: 12, top: 10, bottom: 0 }}>
             <defs>
               <linearGradient id="closingGradient" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stopColor="#F1C40F" stopOpacity={0.35} />
@@ -63,10 +69,24 @@ export function InventoryReportsTab({ productId, dateRange }: Props) {
               </linearGradient>
             </defs>
             <CartesianGrid strokeDasharray="3 3" stroke="var(--color-line)" vertical={false} />
-            <XAxis dataKey="label" tick={{ fontSize: 11, fill: "var(--color-ink-soft)" }} axisLine={{ stroke: "var(--color-line)" }} tickLine={false} interval="preserveStartEnd" />
-            <YAxis tick={{ fontSize: 11, fill: "var(--color-ink-soft)" }} axisLine={false} tickLine={false} width={40} />
+            <XAxis
+              dataKey="label"
+              tick={{ fontSize: 11, fill: "var(--color-ink-soft)" }}
+              axisLine={{ stroke: "var(--color-line)" }}
+              tickLine={false}
+              interval={xInterval}
+              padding={{ left: 12, right: 12 }}
+              tickMargin={8}
+            />
+            <YAxis
+              tick={{ fontSize: 11, fill: "var(--color-ink-soft)" }}
+              tickFormatter={(v) => formatQty(Number(v))}
+              axisLine={false}
+              tickLine={false}
+              width={48}
+            />
             <Tooltip
-              formatter={(value) => Number(value).toFixed(1)}
+              formatter={(value) => formatQty(Number(value))}
               contentStyle={{ borderRadius: 12, border: "1px solid var(--color-line)", fontSize: 13 }}
             />
             <Area type="monotone" dataKey="closing" name="Closing stock" stroke="#F1C40F" strokeWidth={2} fill="url(#closingGradient)" dot={false} />
@@ -77,12 +97,26 @@ export function InventoryReportsTab({ productId, dateRange }: Props) {
       <div className="h-64">
         <p className="mb-2 text-xs font-medium text-ink-faint">Purchased vs sold volume</p>
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={chartData} margin={{ left: -10, right: 10, top: 5, bottom: 0 }}>
+          <BarChart data={chartData} margin={{ left: 0, right: 12, top: 10, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="var(--color-line)" vertical={false} />
-            <XAxis dataKey="label" tick={{ fontSize: 11, fill: "var(--color-ink-soft)" }} axisLine={{ stroke: "var(--color-line)" }} tickLine={false} interval="preserveStartEnd" />
-            <YAxis tick={{ fontSize: 11, fill: "var(--color-ink-soft)" }} axisLine={false} tickLine={false} width={40} />
+            <XAxis
+              dataKey="label"
+              tick={{ fontSize: 11, fill: "var(--color-ink-soft)" }}
+              axisLine={{ stroke: "var(--color-line)" }}
+              tickLine={false}
+              interval={xInterval}
+              padding={{ left: 12, right: 12 }}
+              tickMargin={8}
+            />
+            <YAxis
+              tick={{ fontSize: 11, fill: "var(--color-ink-soft)" }}
+              tickFormatter={(v) => formatQty(Number(v))}
+              axisLine={false}
+              tickLine={false}
+              width={48}
+            />
             <Tooltip
-              formatter={(value) => Number(value).toFixed(1)}
+              formatter={(value) => formatQty(Number(value))}
               contentStyle={{ borderRadius: 12, border: "1px solid var(--color-line)", fontSize: 13 }}
             />
             <Legend verticalAlign="top" height={28} iconType="circle" iconSize={8} />

@@ -18,6 +18,7 @@ import {
   BarChart, Bar,
 } from "recharts";
 import { formatCurrency, formatCurrencyCompact } from "@/utils/currency";
+import { useChartLabelCount, chartXInterval } from "@/utils/chartTicks";
 import { format, startOfMonth, endOfMonth } from "date-fns";
 import { startOfWeek } from "date-fns/startOfWeek";
 import { endOfWeek } from "date-fns/endOfWeek";
@@ -99,6 +100,8 @@ function ReportsContent() {
   const [preset, setPreset] = useState<DatePreset>("this-month");
   const [customFrom, setCustomFrom] = useState(todayStr);
   const [customTo, setCustomTo] = useState(todayStr);
+
+  const labelCount = useChartLabelCount();
 
   const dateFrom = useMemo(() => {
     switch (preset) {
@@ -268,10 +271,18 @@ function ReportsContent() {
                 ) : (
                   <div className="h-72 -mx-2">
                     <ResponsiveContainer width="100%" height="100%">
-                      <AreaChart data={expenseStackedData} margin={{ left: -10, right: 10, top: 10, bottom: 0 }}>
+                      <AreaChart data={expenseStackedData} margin={{ left: 0, right: 12, top: 10, bottom: 0 }}>
                         <CartesianGrid strokeDasharray="3 3" stroke="var(--color-line)" vertical={false} />
-                        <XAxis dataKey="label" tick={{ fontSize: 11, fill: "var(--color-ink-soft)" }} axisLine={{ stroke: "var(--color-line)" }} tickLine={false} interval="preserveStartEnd" minTickGap={24} />
-                        <YAxis tickFormatter={(v) => formatCurrencyCompact(v)} tick={{ fontSize: 11, fill: "var(--color-ink-soft)" }} axisLine={false} tickLine={false} width={68} />
+                        <XAxis
+                          dataKey="label"
+                          tick={{ fontSize: 11, fill: "var(--color-ink-soft)" }}
+                          axisLine={{ stroke: "var(--color-line)" }}
+                          tickLine={false}
+                          interval={chartXInterval(expenseStackedData.length, labelCount)}
+                          padding={{ left: 12, right: 12 }}
+                          tickMargin={8}
+                        />
+                        <YAxis tickFormatter={(v) => formatCurrencyCompact(v)} tick={{ fontSize: 11, fill: "var(--color-ink-soft)" }} axisLine={false} tickLine={false} width={56} />
                         <Tooltip formatter={(value) => formatCurrency(Number(value ?? 0))} contentStyle={{ borderRadius: 12, border: "1px solid var(--color-line)", fontSize: 13 }} />
                         <Legend verticalAlign="top" height={32} iconType="circle" iconSize={8} formatter={(value) => <span className="text-[10px] text-ink-soft">{value}</span>} />
                         {categoryBreakdown.map((cat) => (
@@ -294,12 +305,12 @@ function ReportsContent() {
                     <CardDescription>Which days cost the most</CardDescription>
                   </div>
                 </CardHeader>
-                <div className="h-56">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={weekdayData} margin={{ left: -10, right: 10, top: 10, bottom: 0 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="var(--color-line)" vertical={false} />
-                      <XAxis dataKey="day" tick={{ fontSize: 11, fill: "var(--color-ink-soft)" }} axisLine={{ stroke: "var(--color-line)" }} tickLine={false} />
-                      <YAxis tickFormatter={(v) => formatCurrencyCompact(v)} tick={{ fontSize: 11, fill: "var(--color-ink-soft)" }} axisLine={false} tickLine={false} width={68} />
+                  <div className="h-56">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={weekdayData} margin={{ left: 0, right: 12, top: 10, bottom: 0 }}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="var(--color-line)" vertical={false} />
+                        <XAxis dataKey="day" tick={{ fontSize: 11, fill: "var(--color-ink-soft)" }} axisLine={{ stroke: "var(--color-line)" }} tickLine={false} padding={{ left: 12, right: 12 }} tickMargin={8} />
+                        <YAxis tickFormatter={(v) => formatCurrencyCompact(v)} tick={{ fontSize: 11, fill: "var(--color-ink-soft)" }} axisLine={false} tickLine={false} width={56} />
                       <Tooltip formatter={(value) => formatCurrency(Number(value ?? 0))} contentStyle={{ borderRadius: 12, border: "1px solid var(--color-line)", fontSize: 13 }} />
                       <Bar dataKey="average" name="Avg. expense" fill="#C0392B" radius={[4, 4, 0, 0]} />
                     </BarChart>

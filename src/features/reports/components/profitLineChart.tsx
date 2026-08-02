@@ -1,9 +1,13 @@
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card";
 import { formatCurrencyCompact, formatCurrency } from "@/utils/currency";
+import { useChartLabelCount, chartXInterval } from "@/utils/chartTicks";
 import type { DailyProfitPoint } from "../types";
 
 export function ProfitLineChart({ data }: { data: DailyProfitPoint[] }) {
+  const labelCount = useChartLabelCount();
+  const xInterval = chartXInterval(data.length, labelCount);
+
   return (
     <Card>
       <CardHeader>
@@ -14,12 +18,14 @@ export function ProfitLineChart({ data }: { data: DailyProfitPoint[] }) {
       </CardHeader>
       <div className="h-64">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={data} margin={{ left: -10, right: 10, top: 10 }}>
+          <LineChart data={data} margin={{ left: 0, right: 12, top: 10, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="var(--color-line)" vertical={false} />
             <XAxis
               dataKey="label"
               tick={{ fontSize: 11, fill: "var(--color-ink-soft)" }}
-              interval="preserveStartEnd"
+              interval={xInterval}
+              padding={{ left: 12, right: 12 }}
+              tickMargin={8}
               axisLine={{ stroke: "var(--color-line)" }}
               tickLine={false}
             />
@@ -28,7 +34,7 @@ export function ProfitLineChart({ data }: { data: DailyProfitPoint[] }) {
               tick={{ fontSize: 11, fill: "var(--color-ink-soft)" }}
               axisLine={false}
               tickLine={false}
-              width={64}
+              width={60}
             />
             <Tooltip
               formatter={(value, name) => [formatCurrency(Number(value ?? 0)), name]}
