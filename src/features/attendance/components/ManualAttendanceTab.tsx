@@ -326,39 +326,43 @@ export function ManualAttendanceTab({ records, employees }: Props) {
 
               {/* Inline shift picker */}
               {showShiftPicker && (
-                <div className="mt-3 flex flex-wrap items-center gap-2 rounded-lg border border-line bg-ink/[0.02] p-3">
-                  <span className="w-full text-xs font-medium text-ink-soft sm:w-auto">Select shift:</span>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => handleMark(emp.id, "present", "half")}
-                    disabled={isUpdating}
-                    className="flex-1 justify-center gap-1.5 sm:flex-none"
-                  >
-                    {isUpdating ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Sun className="h-3.5 w-3.5" />}
-                    Half day
-                    <span className="text-[10px] text-ink-faint">5 AM – 12 PM</span>
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => handleMark(emp.id, "present", "full")}
-                    disabled={isUpdating}
-                    className="flex-1 justify-center gap-1.5 sm:flex-none"
-                  >
-                    {isUpdating ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Clock className="h-3.5 w-3.5" />}
-                    Full day
-                    <span className="text-[10px] text-ink-faint">5 AM – 7 PM</span>
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => setShiftPickerId(null)}
-                    disabled={isUpdating}
-                    className="flex-1 justify-center text-xs sm:flex-none"
-                  >
-                    Cancel
-                  </Button>
+                <div className="mt-3 rounded-lg border border-line bg-ink/[0.02] p-3 sm:flex sm:items-center sm:gap-2">
+                  <span className="mb-2 block text-xs font-medium text-ink-soft sm:mb-0">
+                    Select shift:
+                  </span>
+                  <div className="grid grid-cols-2 gap-2 sm:flex sm:items-center">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleMark(emp.id, "present", "half")}
+                      disabled={isUpdating}
+                      className="justify-center gap-1.5 sm:w-auto"
+                    >
+                      {isUpdating ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Sun className="h-3.5 w-3.5" />}
+                      Half day
+                      <span className="hidden text-[10px] text-ink-faint sm:inline">5 AM – 12 PM</span>
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleMark(emp.id, "present", "full")}
+                      disabled={isUpdating}
+                      className="justify-center gap-1.5 sm:w-auto"
+                    >
+                      {isUpdating ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Clock className="h-3.5 w-3.5" />}
+                      Full day
+                      <span className="hidden text-[10px] text-ink-faint sm:inline">5 AM – 7 PM</span>
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => setShiftPickerId(null)}
+                      disabled={isUpdating}
+                      className="col-span-2 justify-center text-xs sm:col-auto sm:w-auto"
+                    >
+                      Cancel
+                    </Button>
+                  </div>
                 </div>
               )}
             </div>
