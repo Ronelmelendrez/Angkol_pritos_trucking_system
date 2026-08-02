@@ -509,8 +509,8 @@ export function DashboardPage() {
       <Dialog open={selectedDay !== null} onOpenChange={(open) => { if (!open) setSelectedDay(null); }}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle className="capitalize">{heatmapMode} · {selectedDay ? formatDateFns(new Date(`${selectedDay}T00:00:00`), "MMMM d, yyyy") : ""}</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-base capitalize">{heatmapMode} · {selectedDay ? formatDateFns(new Date(`${selectedDay}T00:00:00`), "MMMM d, yyyy") : ""}</DialogTitle>
+            <DialogDescription className="text-xs">
               {selectedDayItems.length} {selectedDayItems.length === 1 ? "transaction" : "transactions"} logged
             </DialogDescription>
           </DialogHeader>
@@ -519,32 +519,32 @@ export function DashboardPage() {
               <p className="py-6 text-center text-sm text-ink-faint">No {heatmapMode} logged on this day.</p>
             ) : (
               selectedDayItems.map((item) => (
-                <div key={item.id} className="flex items-center justify-between gap-3 rounded-lg bg-ink/3 px-4 py-2.5">
+                <div key={item.id} className="flex items-center justify-between gap-3 rounded-lg bg-ink/3 px-4 py-2">
                   <div className="min-w-0">
                     {"category" in item ? (
                       <>
-                        <p className="truncate text-sm font-medium text-ink">{item.description}</p>
+                        <p className="truncate text-xs font-medium text-ink">{item.description}</p>
                         <Badge className="mt-1 border-0" style={{ backgroundColor: `${CATEGORY_COLORS[item.category]}1a`, color: CATEGORY_COLORS[item.category] }}>
                           {item.category}
                         </Badge>
                       </>
                     ) : (
                       <>
-                        <p className="truncate text-sm font-medium text-ink">
+                        <p className="truncate text-xs font-medium text-ink">
                           {item.quantitySold} {item.quantitySold === 1 ? "unit" : "units"} @ {formatCurrency(item.unitPrice)}
                         </p>
-                        {item.notes && <p className="mt-0.5 truncate text-xs text-ink-faint">{item.notes}</p>}
+                        {item.notes && <p className="mt-0.5 truncate text-[11px] text-ink-faint">{item.notes}</p>}
                       </>
                     )}
                   </div>
-                  <span className="shrink-0 text-sm font-semibold text-ink">{formatCurrency(item.amount)}</span>
+                  <span className="shrink-0 text-xs font-semibold text-ink">{formatCurrency(item.amount)}</span>
                 </div>
               ))
             )}
           </div>
           <div className="flex items-center justify-between border-t border-line pt-3">
-            <span className="text-sm font-medium text-ink">Day total</span>
-            <span className="text-lg font-bold text-ink">{formatCurrency(selectedDayTotal)}</span>
+            <span className="text-xs font-medium text-ink">Day total</span>
+            <span className="text-base font-bold text-ink">{formatCurrency(selectedDayTotal)}</span>
           </div>
         </DialogContent>
       </Dialog>
