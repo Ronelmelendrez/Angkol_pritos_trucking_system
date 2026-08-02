@@ -7,6 +7,7 @@ import {
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { Badge } from "@/components/ui/Badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/Dialog";
 import { subDays, format as formatDateFns } from "date-fns";
 import { useExpenses } from "@/features/expenses/hooks/useExpenses";
 import { useEmployees } from "@/features/employees/hooks/useEmployees";
@@ -103,6 +104,18 @@ export function DashboardPage() {
       .forEach((s) => map.set(s.date, (map.get(s.date) ?? 0) + s.amount));
     return Array.from(map.entries()).map(([date, value]) => ({ date, value }));
   }, [sales]);
+
+  // Selected day drill-down for the heatmap
+  const [selectedDay, setSelectedDay] = useState<string | null>(null);
+
+  const selectedDayItems = useMemo(() => {
+    if (!selectedDay) return [];
+    return heatmapMode === "expenses"
+      ? expenses.filter((e) => e.date === selectedDay)
+      : sales.filter((s) => s.date === selectedDay);
+  }, [selectedDay, heatmapMode, expenses, sales]);
+
+  const selectedDayTotal = selectedDayItems.reduce((sum, i) => sum + i.amount, 0);
 
   // Cash flow health
   const pendingAdvances = advances
@@ -329,6 +342,7 @@ export function DashboardPage() {
             <CalendarHeatmap
               data={heatmapMode === "expenses" ? expenseHeatmap : salesHeatmap}
               color={heatmapMode === "expenses" ? "#C0392B" : "#F1C40F"}
+              onDayClick={setSelectedDay}
             />
           )}
         </Card>
@@ -490,6 +504,50 @@ export function DashboardPage() {
           )}
         </Card>
       </div>
+
+      {/* Day drill-down dialog */}
+      <Dialog open={selectedDay !== null} onOpenChange={(open) => { if (!open) setSelectedDay(null); }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="capitalize">{heatmapMode} · {selectedDay ? formatDateFns(new Date(`${selectedDay}T00:00:00`), "MMMM d, yyyy") : ""}</DialogTitle>
+            <DialogDescription>
+              {selectedDayItems.length} {selectedDayItems.length === 1 ? "transaction" : "transactions"} logged
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-2">
+            {selectedDayItems.length === 0 ? (
+              <p className="py-6 text-center text-sm text-ink-faint">No {heatmapMode} logged on this day.</p>
+            ) : (
+              selectedDayItems.map((item) => (
+                <div key={item.id} className="flex items-center justify-between gap-3 rounded-lg bg-ink/3 px-4 py-2.5">
+                  <div className="min-w-0">
+                    {"category" in item ? (
+                      <>
+                        <p className="truncate text-sm font-medium text-ink">{item.description}</p>
+                        <Badge className="mt-1 border-0" style={{ backgroundColor: `${CATEGORY_COLORS[item.category]}1a`, color: CATEGORY_COLORS[item.category] }}>
+                          {item.category}
+                        </Badge>
+                      </>
+                    ) : (
+                      <>
+                        <p className="truncate text-sm font-medium text-ink">
+                          {item.quantitySold} {item.quantitySold === 1 ? "unit" : "units"} @ {formatCurrency(item.unitPrice)}
+                        </p>
+                        {item.notes && <p className="mt-0.5 truncate text-xs text-ink-faint">{item.notes}</p>}
+                      </>
+                    )}
+                  </div>
+                  <span className="shrink-0 text-sm font-semibold text-ink">{formatCurrency(item.amount)}</span>
+                </div>
+              ))
+            )}
+          </div>
+          <div className="flex items-center justify-between border-t border-line pt-3">
+            <span className="text-sm font-medium text-ink">Day total</span>
+            <span className="text-lg font-bold text-ink">{formatCurrency(selectedDayTotal)}</span>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

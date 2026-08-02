@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { eachDayOfInterval, format, startOfMonth, endOfMonth, isSameMonth } from "date-fns";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/utils/cn";
+import { formatCurrencyCompact } from "@/utils/currency";
 
 interface DataPoint {
   date: string;
@@ -13,6 +14,7 @@ interface Props {
   color?: string;
   maxValue?: number;
   title?: string;
+  onDayClick?: (date: string) => void;
 }
 
 function shiftMonth(date: Date, delta: number): Date {
@@ -21,7 +23,11 @@ function shiftMonth(date: Date, delta: number): Date {
   return d;
 }
 
-export function CalendarHeatmap({ data, color = "var(--color-primary)", maxValue, title }: Props) {
+function compactNumber(value: number): string {
+  return formatCurrencyCompact(value).replace(/[₱,]/g, "");
+}
+
+export function CalendarHeatmap({ data, color = "var(--color-primary)", maxValue, title, onDayClick }: Props) {
   const [currentMonth, setCurrentMonth] = useState(new Date());
 
   const valueMap = useMemo(() => {
@@ -71,22 +77,38 @@ export function CalendarHeatmap({ data, color = "var(--color-primary)", maxValue
           const value = valueMap.get(key) ?? 0;
           const intensity = max > 0 ? value / max : 0;
           const inMonth = isSameMonth(day, start);
+          const label = `${format(day, "MMMM d, yyyy")}: ${value > 0 ? formatCurrencyCompact(value) : "No activity"}`;
 
           return (
-            <div
+            <button
               key={key}
+              type="button"
+              onClick={() => onDayClick?.(key)}
+              aria-label={label}
               className={cn(
-                "aspect-square rounded-sm transition-colors",
+                "flex aspect-square items-center justify-center rounded-sm transition-all",
                 !inMonth && "opacity-20",
                 intensity === 0 && "bg-ink/5",
+                onDayClick && "cursor-pointer active:scale-90"
               )}
               style={
                 intensity > 0
                   ? { backgroundColor: color, opacity: 0.15 + intensity * 0.85 }
                   : undefined
               }
-              title={`${format(day, "MMM d")}: ${value}`}
-            />
+              title={label}
+            >
+              {value > 0 && (
+                <span
+                  className={cn(
+                    "text-[8px] font-semibold leading-none",
+                    intensity > 0.5 ? "text-white" : "text-ink"
+                  )}
+                >
+                  {compactNumber(value)}
+                </span>
+              )}
+            </button>
           );
         })}
       </div>
