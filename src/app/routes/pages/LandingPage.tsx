@@ -118,20 +118,29 @@ export function LandingPage() {
               </div>
             </div>
 
-            {/* Right — floating preview ticket */}
+            {/* Right — system overview */}
             <div className="relative mx-auto w-full max-w-115">
               <div className="ticket absolute inset-x-6 top-6 -rotate-3 bg-surface/60 p-5 shadow-2xl" />
               <div className="ticket ticket-perf relative w-full space-y-4 p-5 shadow-2xl">
                 <div className="flex items-center justify-between border-b border-dashed border-line pb-3">
-                  <span className="stamp text-sm font-semibold text-ink">Today's Ticket</span>
+                  <span className="stamp text-sm font-semibold text-ink">One system, one truck</span>
                   <span className="flex items-center gap-1 text-xs font-medium text-primary">
-                    <Flame className="h-3.5 w-3.5" /> Live
+                    <Layers className="h-3.5 w-3.5" /> 8 modules
                   </span>
                 </div>
-                <PreviewRow icon={Receipt} label="Expenses logged" value="12" />
-                <PreviewRow icon={Users} label="On shift now" value="3 of 4" />
-                <PreviewRow icon={HandCoins} label="Pending advances" value="₱1,800" />
-                <PreviewRow icon={BarChart3} label="Net profit today" value="₱16,700" accent />
+                <div className="grid grid-cols-2 gap-2.5">
+                  {MODULES.map((m) => (
+                    <div key={m.title} className="flex items-center gap-2.5">
+                      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary-dark">
+                        <m.icon className="h-3.5 w-3.5" />
+                      </div>
+                      <span className="text-sm text-ink-soft">{m.title}</span>
+                    </div>
+                  ))}
+                </div>
+                <p className="border-t border-dashed border-line pt-3 text-xs text-ink-faint">
+                  Every module reads from and feeds into the others — so the numbers always tie out.
+                </p>
               </div>
             </div>
           </div>
@@ -250,30 +259,6 @@ export function LandingPage() {
           <p className="text-xs text-ink-faint">© {new Date().getFullYear()} — fresh daily, served with pride.</p>
         </div>
       </footer>
-    </div>
-  );
-}
-
-function PreviewRow({
-  icon: Icon,
-  label,
-  value,
-  accent = false,
-}: {
-  icon: React.ComponentType<{ className?: string }>;
-  label: string;
-  value: string;
-  accent?: boolean;
-}) {
-  return (
-    <div className="flex items-center justify-between">
-      <div className="flex items-center gap-2.5 text-ink-soft">
-        <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary/10 text-primary-dark">
-          <Icon className="h-3.5 w-3.5" />
-        </div>
-        <span className="text-sm">{label}</span>
-      </div>
-      <span className={`text-sm font-bold ${accent ? "text-primary-dark" : "text-ink"}`}>{value}</span>
     </div>
   );
 }

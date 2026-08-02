@@ -44,24 +44,19 @@ export function LoginPage() {
           </div>
         </div>
 
-        {/* Middle — stacked ticket cards, fanned like receipts */}
+        {/* Middle — what the system tracks */}
         <div className="relative flex flex-1 items-center justify-center py-10">
-          <div className="relative h-72 w-full max-w-sm">
-            <div className="ticket absolute inset-x-6 top-8 -rotate-6 bg-surface/70 p-5 shadow-ticket" />
-            <div className="ticket absolute inset-x-4 top-4 rotate-3 bg-surface/90 p-5 shadow-ticket" />
-
-            <div className="ticket ticket-perf absolute inset-x-0 top-0 space-y-4 p-5">
-              <div className="flex items-center justify-between border-b border-dashed border-line pb-3">
-                <span className="stamp text-sm font-semibold text-ink">Today's Ticket</span>
-                <span className="flex items-center gap-1 text-xs font-medium text-primary">
-                  <Flame className="h-3.5 w-3.5" /> Live
-                </span>
-              </div>
-              <TicketRow icon={Receipt} label="Expenses logged" value="12" />
-              <TicketRow icon={Users} label="On shift now" value="3 of 4" />
-              <TicketRow icon={HandCoins} label="Pending advances" value="₱1,800" />
-              <TicketRow icon={BarChart3} label="Net profit today" value="₱16,700" accent />
+          <div className="ticket ticket-perf relative w-full max-w-sm space-y-4 p-6 shadow-ticket">
+            <div className="flex items-center justify-between border-b border-dashed border-line pb-3">
+              <span className="stamp text-sm font-semibold text-ink">Everything in one place</span>
+              <span className="flex items-center gap-1 text-xs font-medium text-primary">
+                <Flame className="h-3.5 w-3.5" /> Built for the truck
+              </span>
             </div>
+            <TicketRow icon={Receipt} label="Expenses, categorized and searchable" />
+            <TicketRow icon={Users} label="Attendance that feeds straight into payroll" />
+            <TicketRow icon={HandCoins} label="Cash advances and utang down to the peso" />
+            <TicketRow icon={BarChart3} label="Sales vs. expenses, visible day by day" />
           </div>
         </div>
 
@@ -104,23 +99,16 @@ export function LoginPage() {
 function TicketRow({
   icon: Icon,
   label,
-  value,
-  accent = false,
 }: {
   icon: React.ComponentType<{ className?: string }>
   label: string
-  value: string
-  accent?: boolean
 }) {
   return (
-    <div className="flex items-center justify-between">
-      <div className="flex items-center gap-2.5 text-ink-soft">
-        <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary/10 text-primary-dark">
-          <Icon className="h-3.5 w-3.5" />
-        </div>
-        <span className="text-sm">{label}</span>
+    <div className="flex items-center gap-2.5">
+      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary-dark">
+        <Icon className="h-3.5 w-3.5" />
       </div>
-      <span className={`text-sm font-bold ${accent ? "text-primary-dark" : "text-ink"}`}>{value}</span>
+      <span className="text-sm text-ink-soft">{label}</span>
     </div>
   )
 }
