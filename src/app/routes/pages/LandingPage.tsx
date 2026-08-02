@@ -1,13 +1,17 @@
 import { Link } from "react-router-dom";
 import {
+  LayoutDashboard,
+  ShoppingCart,
+  Package,
   Receipt,
+  ClipboardList,
   Users,
   CalendarClock,
   HandCoins,
   Landmark,
+  DollarSign,
   BarChart3,
-  Boxes,
-  Wallet,
+  Settings,
   ArrowRight,
   CheckCircle2,
   Flame,
@@ -21,14 +25,18 @@ import { Card } from "@/components/ui/card";
 import { Logo } from "@/components/brand/Logo";
 
 const MODULES = [
-  { icon: Receipt, title: "Expenses", desc: "Every purchase — raw chicken, oil, fuel, packaging, repairs — logged by category, supplier, and payment method." },
-  { icon: Users, title: "Employees", desc: "One directory: contact info, hourly rate, hire date, active status for everyone on the crew." },
+  { icon: LayoutDashboard, title: "Dashboard", desc: "Today at a glance: sales, expenses, attendance, advances, and net — all on one screen." },
+  { icon: ShoppingCart, title: "Sales", desc: "Record every sale by product and quantity. Daily totals flow straight into reports." },
+  { icon: Package, title: "Products", desc: "One master list of everything the truck sells — price, category, and what it costs to make." },
+  { icon: Receipt, title: "Expenses", desc: "Raw chicken, oil, fuel, packaging, repairs — logged by category, supplier, and payment method." },
+  { icon: ClipboardList, title: "Inventory", desc: "A running daily stock ledger per product. What's left over today opens tomorrow's count." },
+  { icon: Users, title: "Employees", desc: "One directory: contact info, hourly rate, hire date, and active status for the crew." },
   { icon: CalendarClock, title: "Attendance", desc: "Clock in/out from any phone. Hours worked feed directly into payroll — no manual timesheets." },
   { icon: HandCoins, title: "Cash advances", desc: "Record an advance the moment it's given, and deduct it automatically from the next payout." },
   { icon: Landmark, title: "Loans (utang)", desc: "Track principal, remaining balance, and every repayment per employee, over time." },
-  { icon: Boxes, title: "Inventory", desc: "A running daily stock ledger per product. What's left over today opens tomorrow's count automatically." },
-  { icon: Wallet, title: "Payroll", desc: "Weekly, semi-monthly, or monthly — hours × rate, minus advances and loan deductions, with a locked paid history." },
-  { icon: BarChart3, title: "Reports", desc: "Sales vs. expenses over time, spending by category, and payroll summaries in one dashboard." },
+  { icon: DollarSign, title: "Payroll", desc: "Weekly, semi-monthly, or monthly — hours × rate, minus advances and loan deductions, with a locked paid history." },
+  { icon: BarChart3, title: "Reports", desc: "Sales vs. expenses over time, spending by category, and payroll summaries in one place." },
+  { icon: Settings, title: "Settings", desc: "Company profile, work schedules, and the payroll rules that drive the whole system." },
 ];
 
 const BEFORE_AFTER = [
@@ -39,9 +47,9 @@ const BEFORE_AFTER = [
 ];
 
 const BUILD_NOTES = [
-  { icon: Layers, title: "Frontend-first", desc: "Fully usable today on mock data — nothing to install or configure to start logging real operations." },
-  { icon: Database, title: "Built to connect later", desc: "The data layer is structured so a real database (Supabase/Postgres) can be dropped in without rebuilding the app." },
-  { icon: Smartphone, title: "Made for the truck, not a desk", desc: "Every screen is designed mobile-first, since the people using it are on their feet, not behind a computer." },
+  { icon: Smartphone, title: "Mobile-first", desc: "Every screen is designed mobile-first, since the people using it are on their feet, not behind a computer." },
+  { icon: Database, title: "One database", desc: "Backed by Supabase/Postgres — sales, expenses, attendance, and payroll all persist in a single database, in sync across devices." },
+  { icon: Layers, title: "Built for this truck", desc: "Not a generic point-of-sale or accounting product. Each module was shaped around how Angkol Prito's actually operates day to day." },
 ];
 
 export function LandingPage() {
@@ -90,11 +98,11 @@ export function LandingPage() {
               <h1 className="stamp text-4xl font-bold leading-tight text-white sm:text-5xl">
                 The system that runs Angkol Prito's &amp; Lechon Manok
               </h1>
-              <p className="mt-5 text-lg text-white/75">
-                One dashboard for everything the truck needs day to day — expenses,
-                crew attendance, cash advances, utang, inventory, and payroll.
-                Built specifically for how this business actually operates.
-              </p>
+                <p className="mt-5 text-lg text-white/75">
+                  One dashboard for everything the truck needs day to day — sales,
+                  expenses, crew attendance, cash advances, utang, inventory, and
+                  payroll. Built specifically for how this business actually operates.
+                </p>
               <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row sm:justify-start">
                 <Button asChild size="lg">
                   <Link to="/login">
@@ -119,7 +127,7 @@ export function LandingPage() {
                 <div className="flex items-center justify-between border-b border-dashed border-line pb-3">
                   <span className="stamp text-sm font-semibold text-ink">One system, one truck</span>
                   <span className="flex items-center gap-1 text-xs font-medium text-primary">
-                    <Layers className="h-3.5 w-3.5" /> 8 modules
+                    <Layers className="h-3.5 w-3.5" /> 12 modules
                   </span>
                 </div>
                 <div className="grid grid-cols-2 gap-2.5">
@@ -189,10 +197,10 @@ export function LandingPage() {
         <div className="mx-auto mb-12 max-w-xl text-center">
           <h2 className="stamp text-3xl font-bold text-ink sm:text-4xl">What's inside the system</h2>
           <p className="mt-3 text-ink-soft">
-            Eight modules, all reading from and feeding into each other.
+            Twelve modules, all reading from and feeding into each other.
           </p>
         </div>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {MODULES.map((m) => (
             <Card key={m.title} className="group ticket-hover">
               <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary-dark transition-colors group-hover:bg-primary group-hover:text-white">
