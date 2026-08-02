@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/Button";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/Dialog";
 import { useEmployees, useDeleteEmployee } from "@/features/employees/hooks/useEmployees";
-import { EmployeeForm } from "@/features/employees/components/Employeeform";
+import { EmployeeForm } from "@/features/employees/components/EmployeeForm";
 import { EmployeeList } from "@/features/employees/components/EmployeeList";
 import { EmployeeDetailModal } from "@/features/employees/components/EmployeeDetailModal";
 import { useToast } from "@/components/ui/useToast";
