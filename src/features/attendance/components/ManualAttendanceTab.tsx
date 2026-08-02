@@ -260,8 +260,8 @@ export function ManualAttendanceTab({ records, employees }: Props) {
                 status === "closed" && "opacity-60"
               )}
             >
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <div className="flex min-w-0 flex-1 items-center gap-3">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex min-w-0 items-center gap-3">
                   <div
                     className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white"
                     style={{ backgroundColor: emp.avatarColor }}
@@ -304,7 +304,7 @@ export function ManualAttendanceTab({ records, employees }: Props) {
                       variant={status === "present" ? "default" : "outline"}
                       onClick={() => setShiftPickerId(emp.id)}
                       disabled={isUpdating}
-                      className={cn(status === "present" && "bg-success text-white hover:bg-success/90")}
+                      className={cn("flex-1 justify-center sm:flex-none", status === "present" && "bg-success text-white hover:bg-success/90")}
                     >
                       <CheckCircle className="h-3.5 w-3.5" />
                       Present
@@ -316,7 +316,7 @@ export function ManualAttendanceTab({ records, employees }: Props) {
                     variant={status === "absent" ? "default" : "outline"}
                     onClick={() => handleMark(emp.id, "absent")}
                     disabled={isUpdating}
-                    className={cn(status === "absent" && "bg-danger text-white hover:bg-danger/90")}
+                    className={cn("flex-1 justify-center sm:flex-none", status === "absent" && "bg-danger text-white hover:bg-danger/90")}
                   >
                     {isUpdating ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <XCircle className="h-3.5 w-3.5" />}
                     Absent
@@ -327,13 +327,13 @@ export function ManualAttendanceTab({ records, employees }: Props) {
               {/* Inline shift picker */}
               {showShiftPicker && (
                 <div className="mt-3 flex flex-wrap items-center gap-2 rounded-lg border border-line bg-ink/[0.02] p-3">
-                  <span className="text-xs font-medium text-ink-soft">Select shift:</span>
+                  <span className="w-full text-xs font-medium text-ink-soft sm:w-auto">Select shift:</span>
                   <Button
                     size="sm"
                     variant="outline"
                     onClick={() => handleMark(emp.id, "present", "half")}
                     disabled={isUpdating}
-                    className="gap-1.5"
+                    className="flex-1 justify-center gap-1.5 sm:flex-none"
                   >
                     {isUpdating ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Sun className="h-3.5 w-3.5" />}
                     Half day
@@ -344,7 +344,7 @@ export function ManualAttendanceTab({ records, employees }: Props) {
                     variant="outline"
                     onClick={() => handleMark(emp.id, "present", "full")}
                     disabled={isUpdating}
-                    className="gap-1.5"
+                    className="flex-1 justify-center gap-1.5 sm:flex-none"
                   >
                     {isUpdating ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Clock className="h-3.5 w-3.5" />}
                     Full day
@@ -355,7 +355,7 @@ export function ManualAttendanceTab({ records, employees }: Props) {
                     variant="ghost"
                     onClick={() => setShiftPickerId(null)}
                     disabled={isUpdating}
-                    className="text-xs"
+                    className="flex-1 justify-center text-xs sm:flex-none"
                   >
                     Cancel
                   </Button>
