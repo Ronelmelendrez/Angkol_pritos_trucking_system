@@ -16,9 +16,9 @@ export function PayPeriodPicker({ periodLabel, frequency, onFrequencyChange, onP
   const isAll = frequency === "all";
 
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
       <Select value={frequency} onValueChange={(v) => onFrequencyChange(v as PayFrequencyFilter)}>
-        <SelectTrigger className="w-44">
+        <SelectTrigger className="w-full sm:w-44">
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
@@ -28,11 +28,11 @@ export function PayPeriodPicker({ periodLabel, frequency, onFrequencyChange, onP
           <SelectItem value="monthly">Monthly</SelectItem>
         </SelectContent>
       </Select>
-      <div className="flex items-center gap-1">
+      <div className="flex items-center justify-between gap-1 sm:justify-start">
         <Button variant="outline" size="icon" onClick={onPrev} disabled={isAll}>
           <ChevronLeft className="h-4 w-4" />
         </Button>
-        <span className="min-w-40 text-center text-sm font-medium text-ink">{isAll ? "All frequencies" : periodLabel}</span>
+        <span className="min-w-0 flex-1 px-1 text-center text-sm font-medium text-ink sm:min-w-40 sm:flex-none">{isAll ? "All frequencies" : periodLabel}</span>
         <Button variant="outline" size="icon" onClick={onNext} disabled={isAll || !canGoNext}>
           <ChevronRight className="h-4 w-4" />
         </Button>

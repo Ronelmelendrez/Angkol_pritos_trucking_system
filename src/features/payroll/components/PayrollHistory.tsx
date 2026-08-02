@@ -53,7 +53,7 @@ export function PayrollHistory() {
         <CardDescription>{paidRuns.length} run{paidRuns.length === 1 ? "" : "s"} completed</CardDescription>
       </CardHeader>
       <div className="overflow-x-auto">
-        <table className="w-full text-sm">
+        <table className="w-full min-w-[640px] text-sm">
           <thead className="text-left text-xs uppercase tracking-wide text-ink-soft">
             <tr>
               <th className="py-2 pr-2 font-medium">Period</th>

@@ -145,12 +145,12 @@ function PayrollContent() {
 
               return (
                 <div key={run.id} className="rounded-xl border border-line bg-surface p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <div className="min-w-0 flex-1">
                       <span className="font-medium text-ink">{run.employeeName}</span>
                       <p className="text-xs text-ink-faint">{format(new Date(run.periodStart + "T00:00:00"), "MMM d")} - {format(new Date(run.periodEnd + "T00:00:00"), "MMM d, yy")}</p>
                     </div>
-                    <div className="flex items-center gap-3">
+                    <div className="flex flex-wrap items-center gap-3">
                       <div className="text-right">
                         <p className="text-sm text-ink-faint">Net pay</p>
                         <p className="font-bold text-ink">{formatCurrency(run.netPay)}</p>

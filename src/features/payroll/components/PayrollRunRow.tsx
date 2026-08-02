@@ -58,23 +58,23 @@ export function PayrollRunRow({
   return (
     <>
       <div className="rounded-xl border border-line bg-surface p-4">
-        <div className="flex items-center justify-between gap-4">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
           <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <span className="font-semibold text-ink">{row.name}</span>
               <Badge variant="neutral">{row.payFrequency === "semi_monthly" ? "Semi-monthly" : row.payFrequency === "weekly" ? "Weekly" : "Monthly"}</Badge>
             </div>
-            <div className="mt-0.5 flex items-center gap-3 text-xs text-ink-faint">
+            <div className="mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-ink-faint">
               <span className="flex items-center gap-1">
                 <Calendar className="h-3 w-3" />
                 {formatDate(row.periodStart)} — {formatDate(row.periodEnd)}
               </span>
-              <span>·</span>
+              <span className="hidden sm:inline">·</span>
               <span>{row.daysWorked} / {periodDays(row.periodStart, row.periodEnd)} days</span>
-              <span>·</span>
+              <span className="hidden sm:inline">·</span>
               <span>{formatCurrency(row.dailyRate)}/day</span>
             </div>
-            <div className="mt-1 flex items-center gap-3 text-xs">
+            <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
               <span className="flex items-center gap-1 text-success">
                 <CheckCircle className="h-3 w-3" />
                 {row.presentCount} present
@@ -85,7 +85,7 @@ export function PayrollRunRow({
               </span>
             </div>
           </div>
-          <div className="text-right">
+          <div className="shrink-0 text-left sm:text-right">
             <p className="text-sm text-ink-faint">Gross</p>
             <p className="font-bold text-ink">{formatCurrency(row.grossPay)}</p>
           </div>
@@ -129,7 +129,7 @@ export function PayrollRunRow({
               </div>
             )}
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div>
                 <p className="mb-1 text-xs font-medium text-ink-faint">Adjustment (+/-)</p>
                 <Input
@@ -154,12 +154,12 @@ export function PayrollRunRow({
           </div>
         )}
 
-        <div className="mt-4 flex items-center justify-between border-t border-line pt-3">
+        <div className="mt-4 flex flex-col gap-3 border-t border-line pt-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <span className="text-sm text-ink-faint">Net pay: </span>
             <span className="text-lg font-bold text-primary-dark">{formatCurrency(netPay)}</span>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <Button variant="ghost" size="sm" onClick={() => setShowPayslip(true)}>
               <Eye className="h-4 w-4" /> Payslip
             </Button>
