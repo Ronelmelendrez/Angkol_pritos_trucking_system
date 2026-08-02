@@ -35,8 +35,14 @@ export function AttendanceDayDetail({ date, records, employees, onClose }: Props
         aria-hidden
       />
 
-      {/* Panel */}
-      <div className="fixed right-0 top-0 z-[95] flex h-full w-full max-w-sm flex-col border-l border-line bg-surface shadow-2xl transition-transform duration-200 translate-x-0">
+      {/* Panel — bottom-sheet modal on mobile/tablet, right slide-in on desktop */}
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-label={date ? `Attendance for ${formatDate(date)}` : undefined}
+        className="fixed inset-x-0 bottom-0 z-[95] flex max-h-[85vh] w-full flex-col rounded-t-2xl border-t border-line bg-surface shadow-2xl animate-in slide-in-from-bottom duration-200 md:inset-x-auto md:right-0 md:top-0 md:h-full md:max-h-none md:max-w-sm md:rounded-none md:border-l md:border-t-0 md:shadow-2xl md:animate-in md:slide-in-from-right"
+      >
+        <div className="mx-auto mt-2 h-1 w-10 shrink-0 rounded-full bg-ink/10 md:hidden" />
         {/* Header */}
         <div className="flex items-center justify-between border-b border-line px-4 py-4">
           <div>
