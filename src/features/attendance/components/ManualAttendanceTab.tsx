@@ -159,13 +159,13 @@ export function ManualAttendanceTab({ records, employees }: Props) {
           <span className="text-xs font-medium text-primary-dark">
             {unmarkedIds.length} unmarked
           </span>
-          <div className="flex gap-2 ml-auto">
+          <div className="flex w-full flex-col gap-2 sm:ml-auto sm:w-auto sm:flex-row">
             <Button
               size="sm"
               variant="outline"
               onClick={() => handleBulk("present", "full")}
               disabled={bulkAttendance.isPending}
-              className="gap-1.5 text-xs"
+              className="w-full justify-center gap-1.5 text-xs sm:w-auto"
             >
               {bulkAttendance.isPending ? <Loader2 className="h-3 w-3 animate-spin" /> : <Clock className="h-3 w-3" />}
               All present (Full)
@@ -175,7 +175,7 @@ export function ManualAttendanceTab({ records, employees }: Props) {
               variant="outline"
               onClick={() => handleBulk("present", "half")}
               disabled={bulkAttendance.isPending}
-              className="gap-1.5 text-xs"
+              className="w-full justify-center gap-1.5 text-xs sm:w-auto"
             >
               {bulkAttendance.isPending ? <Loader2 className="h-3 w-3 animate-spin" /> : <Sun className="h-3 w-3" />}
               All present (Half)
@@ -185,7 +185,7 @@ export function ManualAttendanceTab({ records, employees }: Props) {
               variant="outline"
               onClick={() => handleBulk("absent")}
               disabled={bulkAttendance.isPending}
-              className="gap-1.5 text-xs"
+              className="w-full justify-center gap-1.5 text-xs sm:w-auto"
             >
               {bulkAttendance.isPending ? <Loader2 className="h-3 w-3 animate-spin" /> : <XCircle className="h-3 w-3" />}
               All absent
@@ -260,16 +260,16 @@ export function ManualAttendanceTab({ records, employees }: Props) {
                 status === "closed" && "opacity-60"
               )}
             >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="flex min-w-0 flex-1 items-center gap-3">
                   <div
                     className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white"
                     style={{ backgroundColor: emp.avatarColor }}
                   >
                     {emp.name.split(" ").map((p) => p[0]).slice(0, 2).join("")}
                   </div>
-                  <div>
-                    <p className="text-sm font-medium text-ink">{emp.name}</p>
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-medium text-ink">{emp.name}</p>
                     {status === "present" && shift && (
                       <p className="text-xs text-ink-faint">
                         {shift === "full" ? "Full day · 5:00 AM – 7:00 PM" : "Half day · 5:00 AM – 12:00 PM"}
@@ -282,7 +282,7 @@ export function ManualAttendanceTab({ records, employees }: Props) {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center justify-end gap-2">
                   {status && (
                     <Badge variant={status === "present" ? "success" : status === "closed" ? "warning" : "danger"}>
                       {status === "present" ? (
@@ -324,7 +324,7 @@ export function ManualAttendanceTab({ records, employees }: Props) {
 
               {/* Inline shift picker */}
               {showShiftPicker && (
-                <div className="mt-3 flex items-center gap-2 rounded-lg border border-line bg-ink/[0.02] p-3">
+                <div className="mt-3 flex flex-wrap items-center gap-2 rounded-lg border border-line bg-ink/[0.02] p-3">
                   <span className="text-xs font-medium text-ink-soft">Select shift:</span>
                   <Button
                     size="sm"

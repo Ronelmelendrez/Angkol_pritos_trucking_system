@@ -50,8 +50,8 @@ export function AttendanceLog({ records, employees, isLoading }: Props) {
 
   return (
     <div>
-      <div className="overflow-hidden rounded-xl border border-line">
-        <table className="w-full text-sm">
+      <div className="overflow-x-auto rounded-xl border border-line">
+        <table className="w-full min-w-[640px] text-sm">
           <thead className="bg-ink/3 text-left text-xs uppercase tracking-wide text-ink-soft">
             <tr>
               <th className="px-4 py-3 font-medium">Employee</th>
