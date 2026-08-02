@@ -77,6 +77,11 @@ export function AttendanceDayDetail({ date, records, employees, onClose }: Props
                     </div>
                     <div>
                       <p className="text-sm font-medium text-ink">{emp.name}</p>
+                      {record?.shift && (
+                        <p className="text-xs text-ink-faint">
+                          {record.shift === "full" ? "Full day" : "Half day"}
+                        </p>
+                      )}
                       {record?.clockIn && (
                         <p className="text-xs text-ink-faint">
                           <Clock className="mr-1 inline h-3 w-3" />
@@ -91,7 +96,7 @@ export function AttendanceDayDetail({ date, records, employees, onClose }: Props
                   <div>
                     {status === "present" && (
                       <Badge variant="success" className="gap-1">
-                        <CheckCircle className="h-3 w-3" /> Present
+                        <CheckCircle className="h-3 w-3" /> {record?.shift === "full" ? "Full day" : record?.shift === "half" ? "Half day" : "Present"}
                       </Badge>
                     )}
                     {status === "absent" && (

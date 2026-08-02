@@ -139,7 +139,7 @@ export function EmployeeDetailModal({ employee, open, onOpenChange, onEdit }: Pr
                       <span className="text-ink">{formatDate(record.date)}</span>
                       {record.shift && (
                         <Badge variant={record.shift === "half" ? "warning" : "success"}>
-                          {record.shift === "half" ? "Half" : "Full"}
+                          {record.shift === "half" ? "Half day" : "Full day"}
                         </Badge>
                       )}
                       <span className="text-ink-soft">

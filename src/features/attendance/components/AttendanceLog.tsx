@@ -84,7 +84,7 @@ export function AttendanceLog({ records, employees, isLoading }: Props) {
                 <td className="px-4 py-3">
                   {r.shift ? (
                     <Badge variant={r.shift === "half" ? "warning" : "success"}>
-                      {r.shift === "half" ? "Half" : "Full"}
+                      {r.shift === "half" ? "Half day" : "Full day"}
                     </Badge>
                   ) : (
                     <span className="text-ink-faint">—</span>
