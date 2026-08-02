@@ -270,9 +270,11 @@ export function ManualAttendanceTab({ records, employees }: Props) {
                   </div>
                   <div className="min-w-0">
                     <p className="truncate text-sm font-medium text-ink">{emp.name}</p>
-                    {status === "present" && shift && (
+                    {status === "present" && (
                       <p className="text-xs text-ink-faint">
-                        {shift === "full" ? "Full day · 5:00 AM – 7:00 PM" : "Half day · 5:00 AM – 12:00 PM"}
+                        {shift
+                          ? `${shift === "full" ? "Full day" : "Half day"} · ${shift === "full" ? "5:00 AM – 7:00 PM" : "5:00 AM – 12:00 PM"}`
+                          : "Clocked in"}
                         {record?.hoursWorked != null && ` · ${record.hoursWorked}h`}
                       </p>
                     )}
@@ -286,7 +288,7 @@ export function ManualAttendanceTab({ records, employees }: Props) {
                   {status && (
                     <Badge variant={status === "present" ? "success" : status === "closed" ? "warning" : "danger"}>
                       {status === "present" ? (
-                        <><CheckCircle className="h-3 w-3" /> {shift === "full" ? "Full" : "Half"}</>
+                        <><CheckCircle className="h-3 w-3" /> {shift === "full" ? "Full day" : shift === "half" ? "Half day" : "Present"}</>
                       ) : status === "closed" ? (
                         <><Store className="h-3 w-3" /> Closed</>
                       ) : (
