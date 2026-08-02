@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useForm, Controller, useWatch, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, Plus, Trash2, Package, PackagePlus } from "lucide-react";
-import { expenseSchema, type ExpenseFormValues } from "@/utils/validators";
+import { expenseSchema, type ExpenseFormValues } from "@/utils/Validators";
 import { EXPENSE_CATEGORIES, PAYMENT_METHODS } from "@/lib/constants";
 import { useProducts } from "@/features/products/hooks/useProducts";
 import { Button } from "@/components/ui/Button";

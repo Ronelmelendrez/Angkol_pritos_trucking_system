@@ -1,7 +1,7 @@
 import { useForm, Controller, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
-import { employeeSchema, type EmployeeFormValues } from "@/utils/validators";
+import { employeeSchema, type EmployeeFormValues } from "@/utils/Validators";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Label } from "@/components/ui/Label";

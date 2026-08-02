@@ -2,7 +2,7 @@ import { useForm, Controller, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
 import { Loader2 } from "lucide-react";
-import { saleSchema, type SaleFormValues } from "@/utils/validators";
+import { saleSchema, type SaleFormValues } from "@/utils/Validators";
 import { useProducts } from "@/features/products/hooks/useProducts";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";

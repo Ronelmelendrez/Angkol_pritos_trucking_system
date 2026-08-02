@@ -1,7 +1,7 @@
 import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
-import { productSchema, type ProductFormValues } from "@/utils/validators";
+import { productSchema, type ProductFormValues } from "@/utils/Validators";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Label } from "@/components/ui/Label";

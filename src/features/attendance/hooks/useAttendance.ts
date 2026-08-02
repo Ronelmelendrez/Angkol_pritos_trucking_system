@@ -87,7 +87,7 @@ export function useManualAttendance() {
     }) => {
       const isPresent = status === "present" && shift;
 
-      const patch: Record<string, unknown> = { status };
+      const patch: Database["public"]["Tables"]["attendance_records"]["Update"] = { status };
 
       if (isPresent) {
         const clockInTime = `${date}T05:00:00`;

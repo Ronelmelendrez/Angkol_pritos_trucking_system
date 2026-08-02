@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabaseClient";
 import { saleRowToApp, saleAppToRow } from "@/lib/supabaseMappers";
 import type { Sale, NewSale, UpdateSale } from "../types";
+import type { Database } from "@/types/database.types";
 
 const SALES_KEY = ["sales"] as const;
 export const salesKeys = {
@@ -64,7 +65,7 @@ export function useUpdateSale() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({ id, ...patch }: UpdateSale) => {
-      const row: Record<string, unknown> = {};
+      const row: Database["public"]["Tables"]["sales"]["Update"] = {};
       if (patch.date !== undefined) row.date = patch.date;
       if (patch.productId !== undefined) row.product_id = patch.productId;
       if (patch.quantitySold !== undefined) row.quantity_sold = patch.quantitySold;

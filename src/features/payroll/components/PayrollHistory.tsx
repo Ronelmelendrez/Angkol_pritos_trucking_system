@@ -11,7 +11,7 @@ const PAGE_SIZE = 10;
 
 export function PayrollHistory() {
   const [page, setPage] = useState(1);
-  const { data: runs, isLoading } = usePayrollHistory();
+  const { data: runs = [], isLoading } = usePayrollHistory();
 
   if (isLoading) {
     return (

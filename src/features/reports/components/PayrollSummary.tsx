@@ -6,7 +6,7 @@ import { Skeleton } from "@/components/ui/Skeleton";
 import { formatCurrency } from "@/utils/currency";
 
 export function PayrollSummary() {
-  const { data: runs, isLoading } = usePayrollHistory();
+  const { data: runs = [], isLoading } = usePayrollHistory();
 
   const { periodLabel, rows, totalNet } = useMemo(() => {
     const paid = runs.filter((r) => r.status === "paid").sort((a, b) => b.periodStart.localeCompare(a.periodStart));

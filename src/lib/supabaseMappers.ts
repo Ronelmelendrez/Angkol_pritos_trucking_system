@@ -1,4 +1,6 @@
 import type { Database } from "@/types/database.types";
+import type { ExpenseCategory, PaymentMethod } from "@/lib/constants";
+import type { PaydayRule } from "@/features/settings/types";
 
 type ExpenseRow = Database["public"]["Tables"]["expenses"]["Row"];
 type ProductRow = Database["public"]["Tables"]["products"]["Row"];
@@ -29,11 +31,11 @@ export function expenseRowToApp(row: ExpenseRow & { categories?: { name: string 
   return {
     id: row.id,
     date: row.date,
-    category: row.categories?.name ?? "",
+    category: (row.categories?.name ?? "") as ExpenseCategory,
     description: row.description ?? "",
     amount: Number(row.amount),
     supplier: row.supplier ?? undefined,
-    paymentMethod: PM_DB_TO_APP[row.payment_method] ?? "Cash",
+    paymentMethod: (PM_DB_TO_APP[row.payment_method] ?? "Cash") as PaymentMethod,
     productId: row.product_id ?? undefined,
     quantityPurchased: row.quantity_purchased ?? undefined,
     createdAt: row.created_at,
@@ -101,7 +103,7 @@ export function stockAdjRowToApp(row: StockAdjRow) {
     date: row.date,
     quantity: row.quantity,
     note: row.note,
-    source: row.source ?? "adjustment",
+    source: (row.source ?? "adjustment") as "purchase" | "adjustment",
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
@@ -291,7 +293,7 @@ export function payRuleRowToApp(row: PayRuleRow) {
     holidayRateMultiplier: Number(row.holiday_rate_multiplier),
     nightDifferentialPercent: Number(row.night_differential_percent),
     roundHoursTo: Number(row.round_hours_to) as 0 | 0.25 | 0.5,
-    paydayRules: row.payday_rules as unknown as PayRuleRow["payday_rules"],
+    paydayRules: (row.payday_rules as unknown as PaydayRule[] | null) ?? [],
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
