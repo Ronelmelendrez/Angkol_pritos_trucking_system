@@ -21,6 +21,7 @@ import { TrendBadge } from "@/components/charts/TrendBadge";
 import { CalendarHeatmap } from "@/components/charts/CalendarHeatmap";
 import { comparePeriods } from "@/utils/periodComparison";
 import { formatCurrency, formatCurrencyCompact } from "@/utils/currency";
+import { useChartLabelCount, chartXInterval } from "@/utils/chartTicks";
 import { formatDate, isDateToday } from "@/utils/date";
 import { CATEGORY_COLORS } from "@/lib/constants";
 
@@ -35,6 +36,8 @@ export function DashboardPage() {
   const dateTo = formatDateFns(new Date(), "yyyy-MM-dd");
   const dateFrom = formatDateFns(subDays(new Date(), 29), "yyyy-MM-dd");
   const { dailyProfit, isLoading: reportsLoading } = useReports(dateFrom, dateTo);
+
+  const labelCount = useChartLabelCount();
 
   const yesterday = formatDateFns(subDays(new Date(), 1), "yyyy-MM-dd");
 
@@ -250,7 +253,7 @@ export function DashboardPage() {
         ) : (
           <div className="h-72 -mx-2">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={dailyProfit} margin={{ left: -10, right: 10, top: 10, bottom: 0 }}>
+              <AreaChart data={dailyProfit} margin={{ left: 0, right: 12, top: 10, bottom: 0 }}>
                 <defs>
                   <linearGradient id="salesGradient" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0%" stopColor="#F1C40F" stopOpacity={0.35} />
@@ -266,8 +269,16 @@ export function DashboardPage() {
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--color-line)" vertical={false} />
-                <XAxis dataKey="label" tick={{ fontSize: 11, fill: "var(--color-ink-soft)" }} axisLine={{ stroke: "var(--color-line)" }} tickLine={false} interval="preserveStartEnd" minTickGap={24} />
-                <YAxis tickFormatter={(v) => formatCurrencyCompact(v)} tick={{ fontSize: 11, fill: "var(--color-ink-soft)" }} axisLine={false} tickLine={false} width={68} />
+                <XAxis
+                  dataKey="label"
+                  tick={{ fontSize: 11, fill: "var(--color-ink-soft)" }}
+                  axisLine={{ stroke: "var(--color-line)" }}
+                  tickLine={false}
+                  interval={chartXInterval(dailyProfit.length, labelCount)}
+                  padding={{ left: 12, right: 12 }}
+                  tickMargin={8}
+                />
+                <YAxis tickFormatter={(v) => formatCurrencyCompact(v)} tick={{ fontSize: 11, fill: "var(--color-ink-soft)" }} axisLine={false} tickLine={false} width={56} />
                 <Tooltip formatter={(value) => formatCurrency(Number(value ?? 0))} labelFormatter={(label) => label} contentStyle={{ borderRadius: 12, border: "1px solid var(--color-line)", boxShadow: "0 6px 20px rgba(62,39,35,0.12)", fontSize: 13 }} />
                 <Legend verticalAlign="top" height={32} iconType="circle" iconSize={8} formatter={(value) => <span className="text-xs text-ink-soft">{value}</span>} />
                 <Area type="monotone" dataKey="sales" name="Sales" stroke="#F1C40F" strokeWidth={2.5} fill="url(#salesGradient)" dot={false} activeDot={{ r: 4 }} />
