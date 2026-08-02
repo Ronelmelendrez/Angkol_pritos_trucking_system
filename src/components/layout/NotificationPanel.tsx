@@ -1,5 +1,5 @@
-import { useEffect } from "react";
-import { X, Bell, Package, DollarSign, Users, Clock, TrendingDown, CheckCheck } from "lucide-react";
+import { useEffect, useState } from "react";
+import { X, Bell, Package, DollarSign, Users, Clock, TrendingDown, CheckCheck, ChevronLeft, ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/utils/cn";
 import { relativeTime } from "@/utils/date";
@@ -17,14 +17,32 @@ const ICONS: Record<NotificationKind, typeof Package> = {
   attendance: Clock,
 };
 
+const PAGE_SIZE = 5;
+
 export function NotificationPanel({ open, onClose }: NotificationPanelProps) {
   const navigate = useNavigate();
   const notifications = useNotifications();
   const markRead = useNotificationStore((s) => s.markRead);
   const markAllRead = useNotificationStore((s) => s.markAllRead);
   const dismiss = useNotificationStore((s) => s.dismiss);
+  const [page, setPage] = useState(1);
 
   const unreadCount = notifications.filter((n) => !n.read).length;
+  const pageCount = Math.max(1, Math.ceil(notifications.length / PAGE_SIZE));
+
+  const [lastOpen, setLastOpen] = useState(open);
+  if (open && !lastOpen) {
+    setLastOpen(open);
+    setPage(1);
+  }
+
+  const [lastLen, setLastLen] = useState(notifications.length);
+  if (notifications.length !== lastLen) {
+    setLastLen(notifications.length);
+    setPage((p) => Math.min(p, pageCount));
+  }
+
+  const paginated = notifications.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   useEffect(() => {
     if (!open) return;
@@ -89,7 +107,7 @@ export function NotificationPanel({ open, onClose }: NotificationPanelProps) {
             </div>
           )}
 
-          {notifications.map((item) => {
+          {paginated.map((item) => {
             const Icon = ICONS[item.kind];
             return (
               <div
@@ -148,6 +166,31 @@ export function NotificationPanel({ open, onClose }: NotificationPanelProps) {
         {/* Footer */}
         {notifications.length > 0 && (
           <div className="border-t border-line px-4 py-3">
+            {pageCount > 1 && (
+              <div className="mb-2 flex items-center justify-between">
+                <span className="text-xs text-ink-faint">
+                  Page {page} of {pageCount}
+                </span>
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => setPage((p) => Math.max(1, p - 1))}
+                    disabled={page <= 1}
+                    className="flex h-7 w-7 items-center justify-center rounded-md text-ink-soft transition-colors hover:bg-primary/5 hover:text-primary disabled:pointer-events-none disabled:opacity-40"
+                    aria-label="Previous page"
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </button>
+                  <button
+                    onClick={() => setPage((p) => Math.min(pageCount, p + 1))}
+                    disabled={page >= pageCount}
+                    className="flex h-7 w-7 items-center justify-center rounded-md text-ink-soft transition-colors hover:bg-primary/5 hover:text-primary disabled:pointer-events-none disabled:opacity-40"
+                    aria-label="Next page"
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
+            )}
             <button
               onClick={() => markAllRead(notifications.map((n) => n.id))}
               className="flex w-full items-center justify-center gap-1.5 rounded-lg py-2 text-center text-xs font-medium text-primary transition-colors hover:bg-primary/5"
