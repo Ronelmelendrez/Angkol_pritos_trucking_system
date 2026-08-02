@@ -4,8 +4,8 @@ import { cn } from "@/utils/cn";
 interface LogoProps {
   /** sm = compact (sidebar, header), md = prominent (login) */
   size?: "sm" | "md";
-  /** brand = orange mark on light surfaces, glass = translucent mark on dark surfaces */
-  tone?: "brand" | "glass";
+  /** brand = dark wordmark for light surfaces, onDark = white wordmark for dark surfaces (same orange mark in both) */
+  tone?: "brand" | "onDark";
   /** Show the wordmark ("Angkol Prito's & Lechon Manok") */
   showText?: boolean;
   className?: string;
@@ -21,11 +21,9 @@ export function Logo({
     <div className={cn("flex items-center gap-2.5", className)}>
       <div
         className={cn(
-          "flex shrink-0 items-center justify-center",
+          "flex shrink-0 items-center justify-center bg-primary text-white",
           size === "sm" ? "h-9 w-9 rounded-xl" : "h-11 w-11 rounded-2xl",
-          tone === "brand"
-            ? "bg-primary text-white shadow-sm"
-            : "bg-white/10 text-white ring-1 ring-white/20 backdrop-blur-sm",
+          tone === "brand" ? "shadow-sm" : "shadow-ticket",
         )}
       >
         <Drumstick className={size === "sm" ? "h-5 w-5" : "h-5.5 w-5.5"} />

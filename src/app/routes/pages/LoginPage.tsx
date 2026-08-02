@@ -54,7 +54,7 @@ export function LoginPage() {
 
         {/* header */}
         <div className="relative">
-          <Logo tone="glass" size="md" />
+          <Logo tone="onDark" size="md" />
         </div>
 
         {/* middle — copy + features */}
