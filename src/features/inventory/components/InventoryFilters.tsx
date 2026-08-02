@@ -42,7 +42,7 @@ export function InventoryFilters({ selectedProductId, onProductChange, rangePres
       </div>
       <div>
         <Label className="text-xs text-ink-faint">Period</Label>
-        <div className="mt-1 flex gap-1">
+        <div className="mt-1 flex flex-wrap gap-1">
           {(["7d", "14d", "30d"] as const).map((preset) => (
             <Button
               key={preset}

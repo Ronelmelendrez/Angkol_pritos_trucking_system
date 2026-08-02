@@ -114,48 +114,51 @@ export function BatchStockEntryForm({ open, onOpenChange }: Props) {
           <div className="space-y-3">
             <Label>Products</Label>
             {items.map((item, index) => (
-              
-                <div key={index} className="flex items-end gap-2">
-                  <div className="flex-1">
-                    {index === 0 && <Label className="mb-1.5 text-xs">Product</Label>}
-                    <Select
-                      value={item.productId}
-                      onValueChange={(v) => updateItem(index, { productId: v })}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select product" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {activeProducts.map((p) => (
-                          <SelectItem key={p.id} value={p.id}>
-                            {p.name} ({p.unit})
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="w-24">
-                    {index === 0 && <Label className="mb-1.5 text-xs">Qty</Label>}
-                    <Input
-                      type="number"
-                      step="0.01"
-                      min="0"
-                      placeholder="0"
-                      value={item.quantity || ""}
-                      onChange={(e) =>
-                        updateItem(index, { quantity: parseFloat(e.target.value) || 0 })
-                      }
-                    />
-                  </div>
-                  <div className="flex-1">
-                    {index === 0 && <Label className="mb-1.5 text-xs">Reason</Label>}
-                    <Input
-                      placeholder="e.g. Delivery received"
-                      value={item.note}
-                      onChange={(e) => updateItem(index, { note: e.target.value })}
-                    />
-                  </div>
-                  {items.length > 1 && (
+              <div
+                key={index}
+                className="space-y-3 rounded-lg border border-line p-3 sm:flex sm:items-end sm:gap-2 sm:space-y-0 sm:rounded-none sm:border-0 sm:p-0"
+              >
+                <div className="sm:flex-1">
+                  {index === 0 && <Label className="mb-1.5 text-xs">Product</Label>}
+                  <Select
+                    value={item.productId}
+                    onValueChange={(v) => updateItem(index, { productId: v })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select product" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {activeProducts.map((p) => (
+                        <SelectItem key={p.id} value={p.id}>
+                          {p.name} ({p.unit})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="w-full sm:w-24">
+                  {index === 0 && <Label className="mb-1.5 text-xs">Qty</Label>}
+                  <Input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    placeholder="0"
+                    value={item.quantity || ""}
+                    onChange={(e) =>
+                      updateItem(index, { quantity: parseFloat(e.target.value) || 0 })
+                    }
+                  />
+                </div>
+                <div className="sm:flex-1">
+                  {index === 0 && <Label className="mb-1.5 text-xs">Reason</Label>}
+                  <Input
+                    placeholder="e.g. Delivery received"
+                    value={item.note}
+                    onChange={(e) => updateItem(index, { note: e.target.value })}
+                  />
+                </div>
+                {items.length > 1 && (
+                  <div className="flex justify-end sm:justify-start">
                     <Button
                       type="button"
                       variant="ghost"
@@ -165,9 +168,10 @@ export function BatchStockEntryForm({ open, onOpenChange }: Props) {
                     >
                       <X className="h-4 w-4" />
                     </Button>
-                  )}
-                </div>
-              ))}
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
 
           <Button type="button" variant="outline" size="sm" onClick={addItem}>

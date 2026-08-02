@@ -52,8 +52,8 @@ export function InventoryPage() {
 
       <Card>
         <Tabs value={tab} onValueChange={setTab}>
-          <div className="flex items-center justify-between border-b border-line px-4 pt-2">
-            <TabsList className="mb-2">
+          <div className="border-b border-line px-4 pt-2">
+            <TabsList className="mb-2 max-w-full overflow-x-auto">
               <TabsTrigger value="overview">Overview</TabsTrigger>
               <TabsTrigger value="ledger">Ledger</TabsTrigger>
               <TabsTrigger value="adjustments">Adjustments</TabsTrigger>

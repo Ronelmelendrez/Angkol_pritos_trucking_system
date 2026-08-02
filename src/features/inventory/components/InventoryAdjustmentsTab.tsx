@@ -26,11 +26,11 @@ export function InventoryAdjustmentsTab() {
       <StockAdjustmentDialog open={addOpen} onOpenChange={setAddOpen} />
       <BatchStockEntryForm open={batchOpen} onOpenChange={setBatchOpen} />
 
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm text-ink-faint">
           {adjustments.length} adjustment{adjustments.length === 1 ? "" : "s"} recorded
         </p>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <Button variant="outline" size="sm" onClick={() => setBatchOpen(true)}>
             <Plus className="mr-1 h-3.5 w-3.5" /> Batch entry
           </Button>
@@ -48,8 +48,8 @@ export function InventoryAdjustmentsTab() {
         </div>
       ) : (
         <>
-          <div className="overflow-hidden rounded-xl border border-line">
-            <table className="w-full text-sm">
+          <div className="overflow-x-auto rounded-xl border border-line">
+            <table className="w-full min-w-[560px] text-sm">
               <thead className="bg-ink/3 text-left text-xs uppercase tracking-wide text-ink-soft">
                 <tr>
                   <th className="px-4 py-3 font-medium">Date</th>
