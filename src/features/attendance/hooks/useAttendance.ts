@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabaseClient";
 import { attendanceRowToApp } from "@/lib/supabaseMappers";
-import { hoursBetween, nowISO, todayISO } from "@/utils/date";
+import { hoursBetween, localISO, nowISO, todayISO } from "@/utils/date";
 import type { AttendanceRecord, AttendanceStatus, ShiftType } from "../types";
 import type { Database } from "@/types/database.types";
 
@@ -90,8 +90,8 @@ export function useManualAttendance() {
       const patch: Database["public"]["Tables"]["attendance_records"]["Update"] = { status };
 
       if (isPresent) {
-        const clockInTime = `${date}T05:00:00`;
-        const clockOutTime = shift === "full" ? `${date}T19:00:00` : `${date}T12:00:00`;
+        const clockInTime = localISO(date, 5, 0);
+        const clockOutTime = shift === "full" ? localISO(date, 19, 0) : localISO(date, 12, 0);
         patch.clock_in = clockInTime;
         patch.clock_out = clockOutTime;
         patch.hours_worked = hoursBetween(clockInTime, clockOutTime);
@@ -160,8 +160,8 @@ export function useBulkAttendance() {
 
       const rows: Database["public"]["Tables"]["attendance_records"]["Insert"][] = employeeIds.map((empId) => {
         if (isPresent) {
-          const clockInTime = `${date}T05:00:00`;
-          const clockOutTime = shift === "full" ? `${date}T19:00:00` : `${date}T12:00:00`;
+          const clockInTime = localISO(date, 5, 0);
+          const clockOutTime = shift === "full" ? localISO(date, 19, 0) : localISO(date, 12, 0);
           return {
             employee_id: empId,
             date,

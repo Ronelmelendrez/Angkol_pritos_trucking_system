@@ -63,3 +63,13 @@ export function todayISO(): string {
 export function nowISO(): string {
   return new Date().toISOString();
 }
+
+/**
+ * Build a UTC ISO timestamp for a local wall-clock date + time, e.g.
+ * localISO("2026-08-03", 5, 0) → the instant of 5:00 AM in the user's
+ * timezone, serialized to UTC so it round-trips through timestamptz.
+ */
+export function localISO(date: string, hour: number, minute = 0): string {
+  const [year, month, day] = date.split("-").map(Number);
+  return new Date(year, month - 1, day, hour, minute, 0, 0).toISOString();
+}
