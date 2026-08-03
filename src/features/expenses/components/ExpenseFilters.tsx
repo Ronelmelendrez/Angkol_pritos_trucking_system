@@ -22,7 +22,7 @@ export function ExpenseFiltersBar({ filters, onChange }: BarProps) {
         value={filters.category ?? "All"}
         onValueChange={(v) => onChange({ ...filters, category: v as ExpenseFiltersType["category"] })}
       >
-        <SelectTrigger className="w-full sm:w-36">
+        <SelectTrigger className="min-w-0 flex-1 sm:w-36 sm:flex-none">
           <SelectValue placeholder="Category" />
         </SelectTrigger>
         <SelectContent>
@@ -38,7 +38,7 @@ export function ExpenseFiltersBar({ filters, onChange }: BarProps) {
         value={filters.paymentMethod ?? "All"}
         onValueChange={(v) => onChange({ ...filters, paymentMethod: v as ExpenseFiltersType["paymentMethod"] })}
       >
-        <SelectTrigger className="w-full sm:w-36">
+        <SelectTrigger className="min-w-0 flex-1 sm:w-36 sm:flex-none">
           <SelectValue placeholder="Payment" />
         </SelectTrigger>
         <SelectContent>
