@@ -124,7 +124,7 @@ export function PayRuleSettingsForm() {
 
       <Card>
         <CardHeader><CardTitle>Working hours</CardTitle></CardHeader>
-        <div className="grid grid-cols-2 gap-4 p-6 pt-0">
+        <div className="grid grid-cols-1 gap-4 p-6 pt-0 sm:grid-cols-2">
           <div>
             <Label htmlFor="standardHoursPerDay">Standard hours per day</Label>
             <Input id="standardHoursPerDay" type="number" step="0.5" min="1" max="24" {...register("standardHoursPerDay")} />
@@ -152,7 +152,7 @@ export function PayRuleSettingsForm() {
 
       <Card>
         <CardHeader><CardTitle>Half-day rate</CardTitle></CardHeader>
-        <div className="grid grid-cols-2 gap-4 p-6 pt-0">
+        <div className="grid grid-cols-1 gap-4 p-6 pt-0 sm:grid-cols-2">
           <div>
             <Label htmlFor="halfDayThresholdHours">Half-day threshold (hrs)</Label>
             <Input id="halfDayThresholdHours" type="number" step="0.5" min="0" {...register("halfDayThresholdHours")} />
@@ -167,7 +167,7 @@ export function PayRuleSettingsForm() {
 
       <Card>
         <CardHeader><CardTitle>Lateness</CardTitle></CardHeader>
-        <div className="grid grid-cols-2 gap-4 p-6 pt-0">
+        <div className="grid grid-cols-1 gap-4 p-6 pt-0 sm:grid-cols-2">
           <div>
             <Label htmlFor="lateGraceMinutes">Grace period (minutes)</Label>
             <Input id="lateGraceMinutes" type="number" min="0" {...register("lateGraceMinutes")} />
@@ -181,7 +181,7 @@ export function PayRuleSettingsForm() {
 
       <Card>
         <CardHeader><CardTitle>Special days</CardTitle></CardHeader>
-        <div className="grid grid-cols-3 gap-4 p-6 pt-0">
+        <div className="grid grid-cols-1 gap-4 p-6 pt-0 sm:grid-cols-3">
           <div>
             <Label htmlFor="restDayRateMultiplier">Rest day multiplier</Label>
             <Input id="restDayRateMultiplier" type="number" step="0.05" min="1" {...register("restDayRateMultiplier")} />
