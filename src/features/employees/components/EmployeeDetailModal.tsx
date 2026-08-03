@@ -77,16 +77,16 @@ export function EmployeeDetailModal({ employee, open, onOpenChange, onEdit }: Pr
         {employee && (
           <>
             <DialogHeader>
-              <div className="flex items-center gap-3">
+              <div className="flex items-start gap-3">
                 <div
                   className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-base font-bold text-white"
                   style={{ backgroundColor: employee.avatarColor }}
                 >
                   {initials(employee.name)}
                 </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <DialogTitle>{employee.name}</DialogTitle>
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <DialogTitle className="break-words">{employee.name}</DialogTitle>
                     <Badge variant={employee.isActive ? "success" : "neutral"}>
                       {employee.isActive ? "Active" : "Inactive"}
                     </Badge>
@@ -94,7 +94,7 @@ export function EmployeeDetailModal({ employee, open, onOpenChange, onEdit }: Pr
                   <p className="text-sm text-ink-soft">Crew member since {formatDate(employee.hireDate)}</p>
                 </div>
                 {onEdit && (
-                  <Button variant="ghost" size="icon" className="ml-auto mr-10 h-8 w-8 shrink-0 text-ink-faint" onClick={() => { onEdit(employee); onOpenChange(false); }}>
+                  <Button variant="ghost" size="icon" className="mr-10 h-8 w-8 shrink-0 text-ink-faint" onClick={() => { onEdit(employee); onOpenChange(false); }}>
                     <Pencil className="h-4 w-4" />
                   </Button>
                 )}
@@ -168,10 +168,10 @@ export function EmployeeDetailModal({ employee, open, onOpenChange, onEdit }: Pr
               ) : (
                 <div className="divide-y divide-dashed divide-line rounded-lg border border-line">
                   {employeeAdvances.map((advance) => (
-                    <div key={advance.id} className="flex items-center justify-between px-4 py-2 text-sm">
-                      <span className="text-ink">{formatDate(advance.date)}</span>
-                      <span className="font-medium text-ink">{formatCurrency(advance.amount)}</span>
-                      <Badge variant={advance.status === "deducted" ? "success" : "warning"} className="capitalize">
+                    <div key={advance.id} className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 px-4 py-2 text-sm">
+                      <span className="whitespace-nowrap text-ink">{formatDate(advance.date)}</span>
+                      <span className="whitespace-nowrap font-medium text-ink">{formatCurrency(advance.amount)}</span>
+                      <Badge variant={advance.status === "deducted" ? "success" : "warning"} className="whitespace-nowrap capitalize">
                         {advance.status}
                       </Badge>
                     </div>
@@ -197,9 +197,9 @@ export function EmployeeDetailModal({ employee, open, onOpenChange, onEdit }: Pr
                     const progress = loan.principal > 0 ? paid / loan.principal : 1;
                     return (
                       <div key={loan.id} className="px-4 py-2 text-sm">
-                        <div className="flex items-center justify-between">
-                          <span className="text-ink">{formatDate(loan.dateIssued)}</span>
-                          <Badge variant={loan.status === "paid" ? "success" : "warning"}>
+                        <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
+                          <span className="whitespace-nowrap text-ink">{formatDate(loan.dateIssued)}</span>
+                          <Badge variant={loan.status === "paid" ? "success" : "warning"} className="whitespace-nowrap">
                             {loan.status === "paid" ? "Paid off" : "Active"}
                           </Badge>
                         </div>
@@ -243,17 +243,17 @@ export function EmployeeDetailModal({ employee, open, onOpenChange, onEdit }: Pr
               ) : (
                 <div className="divide-y divide-dashed divide-line rounded-lg border border-line">
                   {employeePayrollRuns.map((run) => (
-                    <div key={run.id} className="flex items-center justify-between px-4 py-2 text-sm">
-                      <span className="text-ink">
+                    <div key={run.id} className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 px-4 py-2 text-sm">
+                      <span className="whitespace-nowrap text-ink">
                         {formatDate(run.periodStart)} — {formatDate(run.periodEnd)}
                       </span>
-                      <div className="flex items-center gap-3">
+                      <div className="flex flex-wrap items-center gap-3">
                         {(run.advanceDeductions + run.loanDeductions) > 0 && (
-                          <span className="text-xs text-danger">
+                          <span className="whitespace-nowrap text-xs text-danger">
                             -{formatCurrency(run.advanceDeductions + run.loanDeductions)}
                           </span>
                         )}
-                        <span className="font-bold text-primary-dark">{formatCurrency(run.netPay)}</span>
+                        <span className="whitespace-nowrap font-bold text-primary-dark">{formatCurrency(run.netPay)}</span>
                       </div>
                     </div>
                   ))}
