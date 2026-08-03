@@ -15,11 +15,11 @@ export function DailyExpenseSummary({ expenses }: DailyExpenseSummaryProps) {
     .reduce((sum, e) => sum + e.amount, 0)
 
   return (
-    <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
+    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3">
       <Card>
         <CardContent className="py-4">
           <p className="text-xs font-medium text-ink-faint">Today's expenses</p>
-          <p className="mt-1 stamp text-2xl font-semibold text-ink">
+          <p className="mt-1 stamp text-xl sm:text-2xl font-semibold text-ink">
             {formatCurrency(todayTotal)}
           </p>
         </CardContent>
@@ -27,7 +27,7 @@ export function DailyExpenseSummary({ expenses }: DailyExpenseSummaryProps) {
       <Card>
         <CardContent className="py-4">
           <p className="text-xs font-medium text-ink-faint">Filtered total</p>
-          <p className="mt-1 stamp text-2xl font-semibold text-ink">
+          <p className="mt-1 stamp text-xl sm:text-2xl font-semibold text-ink">
             {formatCurrency(total)}
           </p>
         </CardContent>
@@ -35,7 +35,7 @@ export function DailyExpenseSummary({ expenses }: DailyExpenseSummaryProps) {
       <Card className="hidden md:block">
         <CardContent className="py-4">
           <p className="text-xs font-medium text-ink-faint">Entries shown</p>
-          <p className="mt-1 stamp text-2xl font-semibold text-ink">
+          <p className="mt-1 stamp text-xl sm:text-2xl font-semibold text-ink">
             {expenses.length}
           </p>
         </CardContent>
