@@ -94,7 +94,7 @@ export function EmployeeDetailModal({ employee, open, onOpenChange, onEdit }: Pr
                   <p className="text-sm text-ink-soft">Crew member since {formatDate(employee.hireDate)}</p>
                 </div>
                 {onEdit && (
-                  <Button variant="ghost" size="icon" className="ml-auto h-8 w-8 shrink-0 text-ink-faint" onClick={() => { onEdit(employee); onOpenChange(false); }}>
+                  <Button variant="ghost" size="icon" className="ml-auto mr-10 h-8 w-8 shrink-0 text-ink-faint" onClick={() => { onEdit(employee); onOpenChange(false); }}>
                     <Pencil className="h-4 w-4" />
                   </Button>
                 )}
