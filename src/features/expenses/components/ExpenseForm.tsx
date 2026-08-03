@@ -231,8 +231,11 @@ export function ExpenseForm({ onDone }: { onDone?: () => void }) {
           )}
 
           {items.map((item, index) => (
-              <div key={index} className="flex items-end gap-2 rounded-lg border border-line bg-surface p-3">
-                <div className="flex-1 min-w-0">
+              <div
+                key={index}
+                className="flex flex-col gap-2 rounded-lg border border-line bg-surface p-3 sm:flex-row sm:items-end sm:gap-2"
+              >
+                <div className="min-w-0 flex-1">
                   <Label className="text-xs">Product</Label>
                   <Select value={item.productId} onValueChange={(v) => updateItem(index, "productId", v)}>
                     <SelectTrigger>
@@ -247,26 +250,28 @@ export function ExpenseForm({ onDone }: { onDone?: () => void }) {
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="w-20 sm:w-24">
-                  <Label className="text-xs">Qty</Label>
-                  <Input
-                    type="text"
-                    inputMode="decimal"
-                    pattern="[0-9]*\.?[0-9]*"
-                    value={item._raw ?? (item.quantityPurchased || "")}
-                    onChange={(e) => updateItem(index, "quantityPurchased", e.target.value)}
-                    placeholder="0"
-                  />
+                <div className="flex items-end gap-2">
+                  <div className="flex-1 sm:w-24 sm:flex-none">
+                    <Label className="text-xs">Qty</Label>
+                    <Input
+                      type="text"
+                      inputMode="decimal"
+                      pattern="[0-9]*\.?[0-9]*"
+                      value={item._raw ?? (item.quantityPurchased || "")}
+                      onChange={(e) => updateItem(index, "quantityPurchased", e.target.value)}
+                      placeholder="0"
+                    />
+                  </div>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="h-9 w-9 shrink-0 text-ink-faint hover:text-danger"
+                    onClick={() => removeItem(index)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
                 </div>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  className="h-9 w-9 shrink-0 text-ink-faint hover:text-danger"
-                  onClick={() => removeItem(index)}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
               </div>
             ))}
           {errors.items && <p className="text-xs text-danger">{errors.items.message}</p>}
