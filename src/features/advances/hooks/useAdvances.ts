@@ -4,14 +4,26 @@ import { advanceRowToApp } from "@/lib/supabaseMappers";
 import type { NewCashAdvance } from "../types";
 
 const ADVANCES_KEY = ["advances"] as const;
+const DEDUCTED_RETENTION_DAYS = 5;
 export const advancesKeys = {
   all: ADVANCES_KEY,
 };
+
+async function cleanupExpiredDeductedAdvances() {
+  const cutoff = new Date(Date.now() - DEDUCTED_RETENTION_DAYS * 24 * 60 * 60 * 1000).toISOString();
+  const { error } = await supabase
+    .from("cash_advances")
+    .delete()
+    .eq("status", "deducted")
+    .lt("updated_at", cutoff);
+  if (error) throw error;
+}
 
 export function useAdvances() {
   return useQuery({
     queryKey: ADVANCES_KEY,
     queryFn: async () => {
+      await cleanupExpiredDeductedAdvances();
       const { data, error } = await supabase
         .from("cash_advances")
         .select("*")
@@ -34,23 +46,6 @@ export function useAddAdvance() {
           date: input.date,
           reason: input.reason ?? null,
         })
-        .select()
-        .single();
-      if (error) throw error;
-      return advanceRowToApp(data);
-    },
-    onSettled: () => queryClient.invalidateQueries({ queryKey: ADVANCES_KEY }),
-  });
-}
-
-export function useMarkAdvanceDeducted() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: async (id: string) => {
-      const { data, error } = await supabase
-        .from("cash_advances")
-        .update({ status: "deducted" })
-        .eq("id", id)
         .select()
         .single();
       if (error) throw error;

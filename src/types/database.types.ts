@@ -660,6 +660,7 @@ export type Database = {
           p_period_end: string
           p_period_start: string
           p_salaries_category_id: string
+          p_ready_run_id?: string | null
         }
         Returns: string
       }

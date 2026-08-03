@@ -33,8 +33,20 @@ export function usePayPayroll() {
       // Resolve Salaries category UUID
       const salariesCategoryId = await getCategoryIdByName("Salaries");
 
+      // If this period already has a 'ready' run (created when an advance
+      // deduction was confirmed), upgrade it to 'paid' instead of inserting
+      // a duplicate run for the same period.
+      const { data: readyRun } = await supabase
+        .from("payroll_runs")
+        .select("id")
+        .eq("employee_id", row.employeeId)
+        .eq("period_start", row.periodStart)
+        .eq("period_end", row.periodEnd)
+        .eq("status", "ready")
+        .maybeSingle();
+
       // Single atomic RPC — handles:
-      //   1. payroll_runs insert
+      //   1. payroll_runs insert (or upgrade an existing 'ready' run)
       //   2. cash_advances → status = 'deducted'
       //   3. loans → remaining_balance update + repayments insert
       //   4. expenses insert (salary payout)
@@ -54,6 +66,7 @@ export function usePayPayroll() {
         p_net_pay: Math.max(0, netPay),
         p_paid_at: paidAt,
         p_salaries_category_id: salariesCategoryId,
+        p_ready_run_id: readyRun?.id ?? null,
       });
 
       if (error) throw error;
