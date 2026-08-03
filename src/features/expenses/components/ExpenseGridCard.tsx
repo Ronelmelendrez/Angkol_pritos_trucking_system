@@ -52,9 +52,9 @@ export function ExpenseGridCard({ expense }: Props) {
 
       <p className="truncate text-sm text-ink">{expense.description}</p>
 
-      <div className="mt-auto flex items-center justify-between text-xs text-ink-faint">
-        <span>{formatDate(expense.date)}</span>
-        {expense.supplier && <span>{expense.supplier}</span>}
+      <div className="mt-auto flex items-center justify-between gap-2 text-xs text-ink-faint">
+        <span className="shrink-0">{formatDate(expense.date)}</span>
+        {expense.supplier && <span className="min-w-0 truncate">{expense.supplier}</span>}
       </div>
     </div>
   );
