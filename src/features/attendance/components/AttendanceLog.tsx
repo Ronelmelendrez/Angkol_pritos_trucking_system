@@ -66,8 +66,8 @@ export function AttendanceLog({ records, employees, isLoading }: Props) {
           <tbody className="divide-y divide-line">
             {pageItems.map((r) => (
               <tr key={r.id} className="bg-surface">
-                <td className="px-4 py-3 font-medium text-ink">{employeeName(r.employeeId)}</td>
-                <td className="px-4 py-3 text-ink-soft">{formatDate(r.date)}</td>
+                <td className="whitespace-nowrap px-4 py-3 font-medium text-ink">{employeeName(r.employeeId)}</td>
+                <td className="whitespace-nowrap px-4 py-3 text-ink-soft">{formatDate(r.date)}</td>
                 <td className="px-4 py-3">
                   {r.status === "present" ? (
                     <Badge variant="success" className="gap-1">
@@ -93,17 +93,17 @@ export function AttendanceLog({ records, employees, isLoading }: Props) {
                     <span className="text-ink-faint">—</span>
                   )}
                 </td>
-                <td className="px-4 py-3 text-ink-soft">{r.clockIn ? formatTime(r.clockIn) : "—"}</td>
+                <td className="whitespace-nowrap px-4 py-3 text-ink-soft">{r.clockIn ? formatTime(r.clockIn) : "—"}</td>
                 <td className="px-4 py-3">
                   {r.clockOut ? (
-                    <span className="text-ink-soft">{formatTime(r.clockOut)}</span>
+                    <span className="whitespace-nowrap text-ink-soft">{formatTime(r.clockOut)}</span>
                   ) : r.clockIn ? (
-                    <Badge variant="success">In progress</Badge>
+                    <Badge variant="success" className="whitespace-nowrap">In progress</Badge>
                   ) : (
                     <span className="text-ink-faint">—</span>
                   )}
                 </td>
-                <td className="px-4 py-3 text-right text-ink">
+                <td className="whitespace-nowrap px-4 py-3 text-right text-ink">
                   {r.hoursWorked != null ? `${r.hoursWorked.toFixed(2)} hrs` : "—"}
                 </td>
               </tr>
