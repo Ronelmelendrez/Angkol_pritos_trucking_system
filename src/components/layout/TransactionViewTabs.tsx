@@ -279,7 +279,7 @@ export function TransactionViewTabs<T>({
               <p className="text-xs text-ink-faint">Try clearing filters above.</p>
             </div>
           ) : (
-            <div className="space-y-2">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
               {groupedRows.map((row) => (
                 <GroupedRowCard
                   key={row.key}
@@ -313,15 +313,15 @@ function GroupedRowCard({
       type="button"
       onClick={onClick}
       className={cn(
-        "flex w-full items-center justify-between gap-4 rounded-xl border px-4 py-3 text-left transition-colors",
+        "flex w-full flex-col gap-3 rounded-xl border p-4 text-left transition-colors",
         isSelected
           ? "border-primary bg-primary/5"
           : "border-line bg-surface hover:bg-primary/[0.03]",
       )}
     >
-      <div className="flex min-w-0 flex-1 items-center gap-3">
+      <div className="flex items-center gap-3">
         <div
-          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-xs font-bold text-white"
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-xs font-bold text-white"
           style={{ backgroundColor: color ?? "#888" }}
         >
           {row.label.charAt(0).toUpperCase()}
@@ -331,17 +331,17 @@ function GroupedRowCard({
           <p className="text-xs text-ink-faint">{row.count} transaction{row.count === 1 ? "" : "s"}</p>
         </div>
       </div>
-      <div className="flex shrink-0 items-center gap-4">
-        <div className="w-20 sm:w-32">
+      <div className="flex items-end justify-between gap-3">
+        <div className="min-w-0 flex-1">
           <div className="h-2 overflow-hidden rounded-full bg-ink/5">
             <div
               className="h-full rounded-full transition-all"
               style={{ width: `${row.percentOfTotal}%`, backgroundColor: color ?? "#888" }}
             />
           </div>
-          <p className="mt-0.5 text-right text-[11px] text-ink-faint">{row.percentOfTotal.toFixed(0)}%</p>
+          <p className="mt-1 text-right text-[11px] text-ink-faint">{row.percentOfTotal.toFixed(0)}%</p>
         </div>
-        <span className="w-24 text-right font-semibold text-ink">{formatCurrency(row.total)}</span>
+        <span className="shrink-0 text-sm font-semibold text-ink">{formatCurrency(row.total)}</span>
       </div>
     </button>
   );
