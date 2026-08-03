@@ -135,8 +135,8 @@ export function EmployeeDetailModal({ employee, open, onOpenChange, onEdit }: Pr
               ) : (
                 <div className="divide-y divide-dashed divide-line rounded-lg border border-line">
                   {employeeAttendance.map((record) => (
-                    <div key={record.id} className="flex items-center justify-between px-4 py-2 text-sm">
-                      <span className="text-ink">{formatDate(record.date)}</span>
+                    <div key={record.id} className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 px-4 py-2 text-sm">
+                      <span className="whitespace-nowrap text-ink">{formatDate(record.date)}</span>
                       {record.shift && (
                         <Badge
                           variant={record.shift === "half" ? "warning" : "success"}
@@ -145,11 +145,11 @@ export function EmployeeDetailModal({ employee, open, onOpenChange, onEdit }: Pr
                           {record.shift === "half" ? "Half day" : "Full day"}
                         </Badge>
                       )}
-                      <span className="text-ink-soft">
+                      <span className="whitespace-nowrap text-ink-soft">
                         {record.clockIn ? formatTime(record.clockIn) : "—"}
                         {record.clockOut ? ` — ${formatTime(record.clockOut)}` : " (clocked in)"}
                       </span>
-                      <span className={cn("font-medium", record.hoursWorked ? "text-ink" : "text-warning")}>
+                      <span className={cn("whitespace-nowrap font-medium", record.hoursWorked ? "text-ink" : "text-warning")}>
                         {record.hoursWorked ? `${record.hoursWorked.toFixed(1)}h` : "—"}
                       </span>
                     </div>
