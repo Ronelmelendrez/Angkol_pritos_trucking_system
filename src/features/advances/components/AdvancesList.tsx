@@ -1,10 +1,14 @@
 import { useState } from "react";
-import { HandCoins } from "lucide-react";
+import { HandCoins, Trash2 } from "lucide-react";
+import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/components/ui/AlertDialog";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
 import { Pagination } from "@/components/ui/Pagination";
 import { formatCurrency } from "@/utils/currency";
 import { formatDate } from "@/utils/date";
+import { useDeleteAdvance } from "../hooks/useAdvances";
+import { useToast } from "@/components/ui/useToast";
 import type { CashAdvance } from "../types";
 import type { Employee } from "@/features/employees/types";
 
@@ -27,6 +31,9 @@ function initials(name: string) {
 
 export function AdvancesList({ advances, employees, isLoading }: Props) {
   const [page, setPage] = useState(1);
+  const [deleteTarget, setDeleteTarget] = useState<CashAdvance | null>(null);
+  const deleteAdvance = useDeleteAdvance();
+  const { toast } = useToast();
 
   const grouped = employees
     .map((emp) => ({
@@ -36,6 +43,18 @@ export function AdvancesList({ advances, employees, isLoading }: Props) {
         .sort((a, b) => b.date.localeCompare(a.date)),
     }))
     .filter((g) => g.records.length > 0);
+
+  async function handleDelete() {
+    if (!deleteTarget) return;
+    try {
+      await deleteAdvance.mutateAsync(deleteTarget.id);
+      toast({ title: "Advance removed", variant: "success" });
+    } catch {
+      toast({ title: "Couldn't remove advance", variant: "error" });
+    } finally {
+      setDeleteTarget(null);
+    }
+  }
 
   if (isLoading) {
     return (
@@ -99,6 +118,17 @@ export function AdvancesList({ advances, employees, isLoading }: Props) {
                       <Badge variant={adv.status === "pending" ? "warning" : "success"}>
                         {adv.status === "pending" ? "Pending" : "Deducted"}
                       </Badge>
+                      {adv.status === "deducted" && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-7 w-7 shrink-0 text-ink-faint hover:text-danger"
+                          onClick={() => setDeleteTarget(adv)}
+                          aria-label="Delete advance"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </Button>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -111,6 +141,21 @@ export function AdvancesList({ advances, employees, isLoading }: Props) {
       <div className="mt-6">
         <Pagination currentPage={safePage} totalPages={totalPages} onPageChange={setPage} />
       </div>
+
+      <AlertDialog open={!!deleteTarget} onOpenChange={(v) => !v && setDeleteTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete advance</AlertDialogTitle>
+            <AlertDialogDescription>
+              Remove this deducted advance from the record? This cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete}>Delete</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
