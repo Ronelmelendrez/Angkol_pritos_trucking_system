@@ -146,7 +146,7 @@ export function ExpenseForm({ onDone }: { onDone?: () => void }) {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       {/* Date + Category */}
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
           <Label htmlFor="date">Date</Label>
           <Input id="date" type="date" {...register("date")} />
@@ -247,7 +247,7 @@ export function ExpenseForm({ onDone }: { onDone?: () => void }) {
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="w-24">
+                <div className="w-20 sm:w-24">
                   <Label className="text-xs">Qty</Label>
                   <Input
                     type="text"
@@ -274,7 +274,7 @@ export function ExpenseForm({ onDone }: { onDone?: () => void }) {
       )}
 
       {/* Amount + Payment method */}
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
           <Label htmlFor="amount">Amount (₱)</Label>
           <Input
