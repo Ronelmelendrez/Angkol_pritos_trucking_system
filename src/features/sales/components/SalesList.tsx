@@ -74,14 +74,14 @@ export function SalesList({ sales }: Props) {
 
           return (
             <div key={date} className="overflow-hidden rounded-xl border border-line bg-surface">
-              <div className="flex items-center justify-between gap-3 bg-ink/[0.02] px-5 py-3">
-                <div className="flex items-center gap-3">
+              <div className="flex flex-wrap items-center justify-between gap-3 bg-ink/[0.02] px-5 py-3">
+                <div className="flex flex-wrap items-center gap-3">
                   <span className="stamp text-base font-semibold text-ink">{formatDate(date)}</span>
                   <span className="text-sm text-ink-soft">
                     {items.length} sale{items.length === 1 ? "" : "s"}
                   </span>
                 </div>
-              <span className="font-semibold text-ink">{formatCurrency(dayTotal)}</span>
+                <span className="font-semibold text-ink">{formatCurrency(dayTotal)}</span>
               </div>
 
               <div className="divide-y divide-dashed divide-line">
@@ -94,11 +94,11 @@ export function SalesList({ sales }: Props) {
                     >
                       <div className="flex min-w-0 flex-1 items-center gap-3">
                         {product && (
-                          <Badge variant="neutral" className="shrink-0 text-[10px]">
+                          <Badge variant="neutral" className="min-w-0 max-w-[9rem] truncate text-[10px]">
                             {product.name}
                           </Badge>
                         )}
-                        <span className="text-xs text-ink-faint">
+                        <span className="whitespace-nowrap text-xs text-ink-faint">
                           {sale.quantitySold} × {formatCurrency(sale.unitPrice)}
                         </span>
                         {sale.notes && (

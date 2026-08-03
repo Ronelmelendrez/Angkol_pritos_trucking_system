@@ -95,7 +95,7 @@ export function SalesPage() {
     <div className="space-y-5">
       <Card>
         <CardHeader>
-          <div>
+          <div className="min-w-0 flex-1">
             <CardTitle>Sales tracking</CardTitle>
             <CardDescription>
               {filtered.length} sale{filtered.length === 1 ? "" : "s"} · Total{" "}

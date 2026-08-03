@@ -229,7 +229,7 @@ export function TransactionViewTabs<T>({
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <TabsList>
+          <TabsList className="max-w-full overflow-x-auto">
             <TabsTrigger value="table">Table</TabsTrigger>
             <TabsTrigger value="grid">Grid</TabsTrigger>
             <TabsTrigger value="calendar">Calendar</TabsTrigger>
@@ -332,7 +332,7 @@ function GroupedRowCard({
         </div>
       </div>
       <div className="flex shrink-0 items-center gap-4">
-        <div className="w-32">
+        <div className="w-20 sm:w-32">
           <div className="h-2 overflow-hidden rounded-full bg-ink/5">
             <div
               className="h-full rounded-full transition-all"

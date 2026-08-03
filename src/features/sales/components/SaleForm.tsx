@@ -85,7 +85,7 @@ export function SaleForm({ onDone }: Props) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
           <Label htmlFor="sale-date">Date</Label>
           <Input id="sale-date" type="date" {...register("date")} />
@@ -115,7 +115,7 @@ export function SaleForm({ onDone }: Props) {
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <div>
           <Label htmlFor="sale-amount">Total sales (₱)</Label>
           <Input id="sale-amount" type="number" step="0.01" min="0" value={amount || ""} onChange={onAmountChange} placeholder="0" />
