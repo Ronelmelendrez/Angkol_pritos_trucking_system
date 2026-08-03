@@ -112,7 +112,7 @@ export function ExpenseList({ expenses, isLoading }: Props) {
                       >
                         {exp.category}
                       </Badge>
-                      <span className="truncate text-ink">{exp.description}</span>
+                      <span className="min-w-0 flex-1 truncate text-ink">{exp.description}</span>
                       {exp.supplier && (
                         <span className="hidden sm:inline shrink-0 text-ink-faint">· {exp.supplier}</span>
                       )}
