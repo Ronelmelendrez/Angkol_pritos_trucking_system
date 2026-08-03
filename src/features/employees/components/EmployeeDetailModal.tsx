@@ -138,7 +138,10 @@ export function EmployeeDetailModal({ employee, open, onOpenChange, onEdit }: Pr
                     <div key={record.id} className="flex items-center justify-between px-4 py-2 text-sm">
                       <span className="text-ink">{formatDate(record.date)}</span>
                       {record.shift && (
-                        <Badge variant={record.shift === "half" ? "warning" : "success"}>
+                        <Badge
+                          variant={record.shift === "half" ? "warning" : "success"}
+                          className="w-[4.75rem] justify-center whitespace-nowrap"
+                        >
                           {record.shift === "half" ? "Half day" : "Full day"}
                         </Badge>
                       )}
