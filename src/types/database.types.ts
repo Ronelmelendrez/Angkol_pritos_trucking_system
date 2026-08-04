@@ -341,6 +341,7 @@ export type Database = {
           payday_rules: Json
           rest_day_rate_multiplier: number
           round_hours_to: number
+          spoilage_rate_threshold: number
           standard_hours_per_day: number
           updated_at: string
         }
@@ -358,6 +359,7 @@ export type Database = {
           payday_rules?: Json
           rest_day_rate_multiplier?: number
           round_hours_to?: number
+          spoilage_rate_threshold?: number
           standard_hours_per_day?: number
           updated_at?: string
         }
@@ -375,6 +377,7 @@ export type Database = {
           payday_rules?: Json
           rest_day_rate_multiplier?: number
           round_hours_to?: number
+          spoilage_rate_threshold?: number
           standard_hours_per_day?: number
           updated_at?: string
         }
@@ -462,6 +465,7 @@ export type Database = {
         Row: {
           created_at: string
           default_price: number
+          estimated_cost_per_unit: number | null
           id: string
           is_active: boolean
           name: string
@@ -472,6 +476,7 @@ export type Database = {
         Insert: {
           created_at?: string
           default_price: number
+          estimated_cost_per_unit?: number | null
           id?: string
           is_active?: boolean
           name: string
@@ -482,6 +487,7 @@ export type Database = {
         Update: {
           created_at?: string
           default_price?: number
+          estimated_cost_per_unit?: number | null
           id?: string
           is_active?: boolean
           name?: string
@@ -605,6 +611,7 @@ export type Database = {
           note: string
           product_id: string
           quantity: number
+          reason: string
           source: string
           updated_at: string
         }
@@ -615,6 +622,7 @@ export type Database = {
           note: string
           product_id: string
           quantity: number
+          reason?: string
           source?: string
           updated_at?: string
         }
@@ -625,6 +633,7 @@ export type Database = {
           note?: string
           product_id?: string
           quantity?: number
+          reason?: string
           source?: string
           updated_at?: string
         }
