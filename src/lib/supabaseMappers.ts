@@ -1,6 +1,7 @@
 import type { Database } from "@/types/database.types";
 import type { ExpenseCategory, PaymentMethod } from "@/lib/constants";
 import type { PaydayRule } from "@/features/settings/types";
+import type { AdjustmentReason } from "@/features/inventory/types";
 
 type ExpenseRow = Database["public"]["Tables"]["expenses"]["Row"];
 type ProductRow = Database["public"]["Tables"]["products"]["Row"];
@@ -74,6 +75,7 @@ export function productRowToApp(row: ProductRow) {
     unit: row.unit,
     isActive: row.is_active,
     reorderThreshold: row.reorder_threshold ?? undefined,
+    estimatedCostPerUnit: row.estimated_cost_per_unit != null ? Number(row.estimated_cost_per_unit) : undefined,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
@@ -85,6 +87,7 @@ export function productAppToRow(input: {
   unit: string;
   isActive: boolean;
   reorderThreshold?: number;
+  estimatedCostPerUnit?: number;
 }) {
   return {
     name: input.name,
@@ -92,6 +95,7 @@ export function productAppToRow(input: {
     unit: input.unit,
     is_active: input.isActive,
     reorder_threshold: input.reorderThreshold ?? null,
+    estimated_cost_per_unit: input.estimatedCostPerUnit ?? null,
   };
 }
 
@@ -103,6 +107,7 @@ export function stockAdjRowToApp(row: StockAdjRow) {
     date: row.date,
     quantity: row.quantity,
     note: row.note,
+    reason: (row.reason ?? "other") as AdjustmentReason,
     source: (row.source ?? "adjustment") as "purchase" | "adjustment",
     createdAt: row.created_at,
     updatedAt: row.updated_at,
@@ -113,14 +118,16 @@ export function stockAdjAppToRow(input: {
   productId: string;
   date: string;
   quantity: number;
-  note: string;
+  note?: string;
+  reason?: AdjustmentReason;
   source?: "purchase" | "adjustment";
 }) {
   return {
     product_id: input.productId,
     date: input.date,
     quantity: input.quantity,
-    note: input.note,
+    note: input.note ?? "",
+    reason: input.reason ?? "other",
     source: input.source ?? "adjustment",
   };
 }
@@ -283,6 +290,7 @@ export function payRuleRowToApp(row: PayRuleRow) {
   return {
     id: row.id,
     defaultReorderThreshold: row.default_reorder_threshold,
+    spoilageRateThreshold: Number(row.spoilage_rate_threshold ?? 5),
     standardHoursPerDay: Number(row.standard_hours_per_day),
     halfDayThresholdHours: Number(row.half_day_threshold_hours),
     halfDayRateMultiplier: Number(row.half_day_rate_multiplier),
