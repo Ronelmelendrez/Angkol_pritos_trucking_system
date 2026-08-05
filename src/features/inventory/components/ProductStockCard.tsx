@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { ArrowUpDown } from "lucide-react";
+import { ArrowUpDown, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { useAllProductStock } from "../hooks/useAllProductStock";
+import { useSpoilageFlags } from "../hooks/useSpoilageFlags";
 import { StockAdjustmentDialog } from "./StockAdjustmentDialog";
 import { formatQty } from "@/utils/currency";
 
@@ -15,6 +16,8 @@ interface Props {
 export function ProductStockCard({ productId, productName, unit }: Props) {
   const stockData = useAllProductStock();
   const stock = stockData.find((s) => s.productId === productId);
+  const spoilageFlags = useSpoilageFlags();
+  const spoilageFlagged = spoilageFlags[productId];
   const [adjustOpen, setAdjustOpen] = useState(false);
 
   if (!stock) {
@@ -48,12 +51,22 @@ export function ProductStockCard({ productId, productName, unit }: Props) {
           <span className="text-sm font-normal text-ink-faint">{unit}</span>
         </p>
         <div className="mt-1 flex items-center justify-between">
-          <p className="text-xs text-ink-faint">
-            {isOut
-              ? "Out of stock"
-              : isLow
-                ? "Low stock"
-                : "On hand"}
+          <p className="flex items-center gap-1 text-xs font-medium">
+            {isOut ? (
+              <span className="text-danger">Out of stock</span>
+            ) : isLow ? (
+              <span className="text-warning">Low stock</span>
+            ) : (
+              <span className="text-success">On hand</span>
+            )}
+            {spoilageFlagged && (
+              <span
+                title="Spoilage rate is above this product's historical average"
+                className="text-warning"
+              >
+                <AlertTriangle className="h-3 w-3" />
+              </span>
+            )}
           </p>
           <Button
             variant="ghost"
