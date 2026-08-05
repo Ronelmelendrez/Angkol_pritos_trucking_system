@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabaseClient";
 import { stockAdjAppToRow } from "@/lib/supabaseMappers";
 import { useToast } from "@/components/ui/useToast";
+import type { AdjustmentReason } from "../types";
 import { stockAdjLogKey } from "./useAdjustmentsLog";
 import { stockAdjAllKey } from "./useAllProductStock";
 
@@ -10,7 +11,13 @@ export function useAddStockAdjustment() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (input: { productId: string; date: string; quantity: number; note: string }) => {
+    mutationFn: async (input: {
+      productId: string;
+      date: string;
+      quantity: number;
+      note?: string;
+      reason?: AdjustmentReason;
+    }) => {
       const { data, error } = await supabase
         .from("stock_adjustments")
         .insert(stockAdjAppToRow(input))
