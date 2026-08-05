@@ -5,10 +5,8 @@ import { Button } from "@/components/ui/Button";
 import { Pagination } from "@/components/ui/Pagination";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/Dialog";
 import { Badge } from "@/components/ui/Badge";
-import { Input } from "@/components/ui/Input";
 import { formatCurrency } from "@/utils/currency";
-import { useProducts, useUpdateProduct } from "../hooks/useProducts";
-import { useToast } from "@/components/ui/useToast";
+import { useProducts } from "../hooks/useProducts";
 import { ProductForm } from "./ProductForm";
 import type { Product } from "../types";
 
@@ -16,28 +14,12 @@ const PAGE_SIZE = 10;
 
 export function ProductList() {
   const { data: products = [], isLoading } = useProducts();
-  const updateProduct = useUpdateProduct();
-  const { toast } = useToast();
   const [editing, setEditing] = useState<Product | null>(null);
   const [page, setPage] = useState(1);
 
   const totalPages = Math.max(1, Math.ceil(products.length / PAGE_SIZE));
   const safePage = Math.min(page, totalPages);
   const pageItems = products.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
-
-  function saveCost(product: Product, raw: string) {
-    const trimmed = raw.trim();
-    const next = trimmed === "" ? undefined : Number(trimmed);
-    if (next !== undefined && (!Number.isFinite(next) || next <= 0)) return;
-    if (next === product.estimatedCostPerUnit) return;
-    updateProduct.mutate(
-      { id: product.id, estimatedCostPerUnit: next },
-      {
-        onSuccess: () => toast({ title: "Cost updated", description: product.name, variant: "success" }),
-        onError: () => toast({ title: "Couldn't update cost", variant: "error" }),
-      },
-    );
-  }
 
   if (isLoading) {
     return (
@@ -89,26 +71,7 @@ export function ProductList() {
                 </Badge>
               )}
             </div>
-            <div className="flex shrink-0 items-center gap-2">
-              <span className="flex items-center gap-1 text-xs text-ink-faint">
-                ₱
-                <Input
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  defaultValue={product.estimatedCostPerUnit ?? ""}
-                  placeholder="Cost"
-                  className="h-8 w-24 px-2 py-1 text-right text-sm font-medium text-ink"
-                  title={`Est. cost per ${product.unit} — used by the Spoilage report`}
-                  aria-label={`Est. cost for ${product.name}`}
-                  onBlur={(e) => saveCost(product, e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") (e.target as HTMLInputElement).blur();
-                  }}
-                />
-              </span>
-              <span className="shrink-0 font-semibold text-ink">{formatCurrency(product.defaultPrice)}</span>
-            </div>
+            <span className="shrink-0 font-semibold text-ink">{formatCurrency(product.defaultPrice)}</span>
             <Button
               variant="ghost"
               size="icon"
