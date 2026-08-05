@@ -43,6 +43,10 @@ export function SpoilageReportView({ dateRange, selectedProductId }: Props) {
 
   return (
     <div className="space-y-6">
+      <p className="text-sm text-ink-faint">
+        {report.incidents.length} incident{report.incidents.length === 1 ? "" : "s"} in period
+      </p>
+
       {showBanner && (
         <div className="flex items-start gap-3 rounded-xl border border-danger/30 bg-danger-bg p-4">
           <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-danger" />
@@ -62,10 +66,7 @@ export function SpoilageReportView({ dateRange, selectedProductId }: Props) {
         <SpoilageReasonDonut data={report.byReason} />
       </div>
 
-      <div>
-        <p className="mb-2 text-xs font-medium text-ink-faint">Incident log</p>
-        <SpoilageLog incidents={report.incidents} />
-      </div>
+      <SpoilageLog incidents={report.incidents} />
     </div>
   );
 }

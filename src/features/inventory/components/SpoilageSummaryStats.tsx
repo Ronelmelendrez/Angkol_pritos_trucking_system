@@ -1,4 +1,5 @@
 import { AlertTriangle, TrendingDown, Percent } from "lucide-react";
+import { Card } from "@/components/ui/Card";
 import { formatCurrency, formatQty } from "@/utils/currency";
 import type { SpoilageReportData } from "../hooks/useSpoilageReport";
 
@@ -14,7 +15,6 @@ export function SpoilageSummaryStats({ report }: Props) {
         label="Spoiled this period"
         value={`${formatQty(report.totalQty)}`}
         sub={`${report.incidents.length} incident${report.incidents.length === 1 ? "" : "s"}`}
-        accent="danger"
       />
       <StatCard
         icon={<AlertTriangle className="h-4 w-4" />}
@@ -27,14 +27,12 @@ export function SpoilageSummaryStats({ report }: Props) {
               : "based on purchase prices & product costs"
             : "no purchase history or product cost set"
         }
-        accent="danger"
       />
       <StatCard
         icon={<Percent className="h-4 w-4" />}
         label="Spoilage rate"
         value={report.spoilageRate != null ? `${report.spoilageRate.toFixed(1)}%` : "—"}
         sub="of stock purchased this period"
-        accent="danger"
       />
     </div>
   );
@@ -45,19 +43,17 @@ interface StatCardProps {
   label: string;
   value: string;
   sub: string;
-  accent: "danger";
 }
 
-function StatCard({ icon, label, value, sub, accent }: StatCardProps) {
-  const accentClass = accent === "danger" ? "border-l-danger" : "border-l-line";
+function StatCard({ icon, label, value, sub }: StatCardProps) {
   return (
-    <div className={`rounded-xl border border-line border-l-4 bg-surface p-4 ${accentClass}`}>
+    <Card>
       <div className="flex items-center gap-2 text-xs font-medium text-ink-faint">
         <span className="text-danger">{icon}</span>
         {label}
       </div>
       <p className="mt-1.5 text-2xl font-bold text-ink">{value}</p>
       <p className="mt-0.5 text-xs text-ink-faint">{sub}</p>
-    </div>
+    </Card>
   );
 }

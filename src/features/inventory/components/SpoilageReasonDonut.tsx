@@ -1,4 +1,5 @@
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
+import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card";
 import { formatCurrencyCompact } from "@/utils/currency";
 import { REASON_META } from "../utils/reasonMeta";
 import type { SpoilageByReasonRow } from "../hooks/useSpoilageReport";
@@ -11,10 +12,15 @@ export function SpoilageReasonDonut({ data }: Props) {
   const totalCost = data.reduce((sum, row) => sum + row.cost, 0);
 
   return (
-    <div className="space-y-2">
-      <p className="text-xs font-medium text-ink-faint">Losses by reason</p>
+    <Card>
+      <CardHeader>
+        <div>
+          <CardTitle>Losses by reason</CardTitle>
+          <CardDescription>Spoilage vs waste value</CardDescription>
+        </div>
+      </CardHeader>
       {totalCost <= 0 ? (
-        <p className="py-10 text-center text-xs text-ink-faint">
+        <p className="py-10 text-center text-sm text-ink-faint">
           Cost data unavailable — set a product cost or link purchase history to price losses.
         </p>
       ) : (
@@ -69,6 +75,6 @@ export function SpoilageReasonDonut({ data }: Props) {
           </ul>
         </div>
       )}
-    </div>
+    </Card>
   );
 }
