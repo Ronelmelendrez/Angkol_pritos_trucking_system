@@ -1,7 +1,14 @@
 import type { BadgeProps } from "@/components/ui/Badge";
 import type { AdjustmentReason } from "../types";
 
-export const ADJUSTMENT_REASONS: AdjustmentReason[] = ["spoilage", "waste", "theft", "recount", "other"];
+export const ADJUSTMENT_REASONS: AdjustmentReason[] = [
+  "spoilage",
+  "waste",
+  "theft",
+  "recount",
+  "owner_consumption",
+  "other",
+];
 
 export interface ReasonMeta {
   label: string;
@@ -14,6 +21,7 @@ export const REASON_META: Record<AdjustmentReason, ReasonMeta> = {
   waste: { label: "Waste", variant: "warning", color: "#E67E22" },
   theft: { label: "Theft", variant: "default", color: "#8E44AD" },
   recount: { label: "Recount", variant: "neutral", color: "#3498DB" },
+  owner_consumption: { label: "Owner consumption", variant: "default", color: "#16A085" },
   other: { label: "Other", variant: "neutral", color: "#95A5A6" },
 };
 

@@ -1,6 +1,6 @@
 import type { BaseRecord } from "@/types";
 
-export type AdjustmentReason = "spoilage" | "waste" | "theft" | "recount" | "other";
+export type AdjustmentReason = "spoilage" | "waste" | "theft" | "recount" | "owner_consumption" | "other";
 
 export interface InventoryLedgerEntry {
   productId: string;
