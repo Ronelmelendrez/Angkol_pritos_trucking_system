@@ -13,6 +13,7 @@ import type { PaydayRule } from "../types";
 
 const payRuleSettingsSchema = z.object({
   defaultReorderThreshold: z.coerce.number().min(0),
+  spoilageRateThreshold: z.coerce.number().min(0).max(100),
   standardHoursPerDay: z.coerce.number().min(1).max(24),
   halfDayThresholdHours: z.coerce.number().min(0),
   halfDayRateMultiplier: z.coerce.number().min(0).max(1),
@@ -67,6 +68,7 @@ export function PayRuleSettingsForm() {
     resolver: zodResolver(payRuleSettingsSchema) as unknown as Resolver<FormValues>,
     values: settings && {
       defaultReorderThreshold: settings.defaultReorderThreshold,
+      spoilageRateThreshold: settings.spoilageRateThreshold,
       standardHoursPerDay: settings.standardHoursPerDay,
       halfDayThresholdHours: settings.halfDayThresholdHours,
       halfDayRateMultiplier: settings.halfDayRateMultiplier,
@@ -112,12 +114,18 @@ export function PayRuleSettingsForm() {
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       <Card>
         <CardHeader><CardTitle>Inventory defaults</CardTitle></CardHeader>
-        <div className="p-6 pt-0">
+        <div className="grid grid-cols-1 gap-4 p-6 pt-0 sm:grid-cols-2">
           <div>
             <Label htmlFor="defaultReorderThreshold">Default reorder threshold</Label>
             <Input id="defaultReorderThreshold" type="number" min="0" {...register("defaultReorderThreshold")} />
             {errors.defaultReorderThreshold && <p className="mt-1 text-xs text-danger">{errors.defaultReorderThreshold.message}</p>}
             <p className="mt-1 text-xs text-ink-faint">Low-stock alert triggers when stock drops below this. Override per product.</p>
+          </div>
+          <div>
+            <Label htmlFor="spoilageRateThreshold">Spoilage warning threshold (%)</Label>
+            <Input id="spoilageRateThreshold" type="number" step="0.5" min="0" max="100" {...register("spoilageRateThreshold")} />
+            {errors.spoilageRateThreshold && <p className="mt-1 text-xs text-danger">{errors.spoilageRateThreshold.message}</p>}
+            <p className="mt-1 text-xs text-ink-faint">Spoilage Report shows a warning when spoiled stock exceeds this share of purchased stock.</p>
           </div>
         </div>
       </Card>

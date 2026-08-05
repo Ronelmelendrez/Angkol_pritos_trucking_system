@@ -31,6 +31,7 @@ export function useUpdatePayRuleSettings() {
         .from("pay_rule_settings")
         .update({
           default_reorder_threshold: input.defaultReorderThreshold,
+          spoilage_rate_threshold: input.spoilageRateThreshold,
           standard_hours_per_day: input.standardHoursPerDay,
           half_day_threshold_hours: input.halfDayThresholdHours,
           half_day_rate_multiplier: input.halfDayRateMultiplier,

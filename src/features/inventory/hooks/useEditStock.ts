@@ -28,6 +28,7 @@ export function useSetStock() {
             date: input.date,
             quantity: delta,
             note: input.note || `Stock set to ${input.targetQty}`,
+            reason: "recount",
           }),
         )
         .select()

@@ -6,6 +6,7 @@ export interface Product extends BaseRecord {
   unit: string;
   isActive: boolean;
   reorderThreshold?: number;
+  estimatedCostPerUnit?: number;
 }
 
 export type NewProduct = Omit<Product, "id" | "createdAt" | "updatedAt">;

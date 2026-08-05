@@ -63,6 +63,10 @@ export const productSchema = z.object({
   defaultPrice: z.coerce.number().positive("Price must be greater than ₱0"),
   unit: z.string().min(1, "Unit is required"),
   reorderThreshold: z.coerce.number().min(0, "Must be 0 or more").optional(),
+  estimatedCostPerUnit: z.preprocess(
+    (v) => (v === "" ? undefined : v),
+    z.coerce.number().positive("Must be greater than ₱0").optional(),
+  ),
 });
 export type ProductFormValues = z.infer<typeof productSchema>;
 

@@ -27,7 +27,7 @@ export function ProductForm({ initial, onDone }: Props) {
   } = useForm<ProductFormValues>({
     resolver: zodResolver(productSchema) as unknown as Resolver<ProductFormValues>,
     defaultValues: initial
-      ? { name: initial.name, defaultPrice: initial.defaultPrice, unit: initial.unit, reorderThreshold: initial.reorderThreshold }
+      ? { name: initial.name, defaultPrice: initial.defaultPrice, unit: initial.unit, reorderThreshold: initial.reorderThreshold, estimatedCostPerUnit: initial.estimatedCostPerUnit }
       : { name: "", defaultPrice: 0, unit: "order" },
   });
 
@@ -72,6 +72,13 @@ export function ProductForm({ initial, onDone }: Props) {
         <Input id="product-threshold" type="number" step="1" min="0" {...register("reorderThreshold")} placeholder="e.g. 5" />
         {errors.reorderThreshold && <p className="mt-1 text-xs text-danger">{errors.reorderThreshold.message}</p>}
         <p className="mt-1 text-xs text-ink-faint">Low-stock alert triggers when current qty drops below this.</p>
+      </div>
+
+      <div>
+        <Label htmlFor="product-cost">Est. cost per unit (₱, optional)</Label>
+        <Input id="product-cost" type="number" step="0.01" min="0" {...register("estimatedCostPerUnit")} placeholder="e.g. 120" />
+        {errors.estimatedCostPerUnit && <p className="mt-1 text-xs text-danger">{errors.estimatedCostPerUnit.message}</p>}
+        <p className="mt-1 text-xs text-ink-faint">Used by the Spoilage report to price losses when there's no purchase history.</p>
       </div>
 
       <Button type="submit" className="w-full" size="lg" disabled={addProduct.isPending || updateProduct.isPending}>
