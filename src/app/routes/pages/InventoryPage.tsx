@@ -62,8 +62,8 @@ export function InventoryPage() {
             </TabsList>
           </div>
 
-          {/* Filters shown only for Ledger and Reports tabs */}
-          {(tab === "ledger" || tab === "reports") && (
+          {/* Filters shown for Ledger, Reports, and Adjustments tabs */}
+          {(tab === "ledger" || tab === "reports" || tab === "adjustments") && (
             <InventoryFilters
               selectedProductId={selectedProductId}
               onProductChange={setSelectedProductId}
@@ -100,7 +100,7 @@ export function InventoryPage() {
 
           <TabsContent value="adjustments">
             <div className="px-4 pb-4">
-              <InventoryAdjustmentsTab />
+              <InventoryAdjustmentsTab dateRange={dateRange} selectedProductId={selectedProductId} />
             </div>
           </TabsContent>
 
