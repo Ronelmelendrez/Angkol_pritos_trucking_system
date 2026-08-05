@@ -19,6 +19,8 @@ import {
 } from "@/components/ui/Select";
 import { useProducts } from "@/features/products/hooks/useProducts";
 import { useAddStockAdjustment } from "../hooks/useAddStockAdjustment";
+import { ADJUSTMENT_REASONS, REASON_META } from "../utils/reasonMeta";
+import type { AdjustmentReason } from "../types";
 import { todayISO } from "@/utils/date";
 
 interface BatchItem {
@@ -38,12 +40,14 @@ export function BatchStockEntryForm({ open, onOpenChange }: Props) {
   const addAdjustment = useAddStockAdjustment();
 
   const [date, setDate] = useState(todayISO());
+  const [reason, setReason] = useState<AdjustmentReason>("recount");
   const [items, setItems] = useState<BatchItem[]>([
     { productId: "", quantity: 0, note: "" },
   ]);
 
   function reset() {
     setDate(todayISO());
+    setReason("recount");
     setItems([{ productId: "", quantity: 0, note: "" }]);
   }
 
@@ -74,6 +78,7 @@ export function BatchStockEntryForm({ open, onOpenChange }: Props) {
           productId: item.productId,
           date,
           quantity: item.quantity,
+          reason,
           note: item.note.trim(),
         });
       }
@@ -109,6 +114,22 @@ export function BatchStockEntryForm({ open, onOpenChange }: Props) {
               value={date}
               onChange={(e) => setDate(e.target.value)}
             />
+          </div>
+
+          <div>
+            <Label htmlFor="batch-reason">Reason</Label>
+            <Select value={reason} onValueChange={(v) => setReason(v as AdjustmentReason)}>
+              <SelectTrigger id="batch-reason">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {ADJUSTMENT_REASONS.map((r) => (
+                  <SelectItem key={r} value={r}>
+                    {REASON_META[r].label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="space-y-3">
