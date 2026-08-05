@@ -78,7 +78,7 @@ export function ProductForm({ initial, onDone }: Props) {
         <Label htmlFor="product-cost">Est. cost per unit (₱, optional)</Label>
         <Input id="product-cost" type="number" step="0.01" min="0" {...register("estimatedCostPerUnit")} placeholder="e.g. 120" />
         {errors.estimatedCostPerUnit && <p className="mt-1 text-xs text-danger">{errors.estimatedCostPerUnit.message}</p>}
-        <p className="mt-1 text-xs text-ink-faint">Used by the Spoilage report to price losses when there's no purchase history.</p>
+        <p className="mt-1 text-xs text-ink-faint">Used by the Adjustment report to price losses when there's no purchase history.</p>
       </div>
 
       <Button type="submit" className="w-full" size="lg" disabled={addProduct.isPending || updateProduct.isPending}>

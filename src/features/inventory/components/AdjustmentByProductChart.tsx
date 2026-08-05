@@ -1,12 +1,12 @@
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card";
 import { formatCurrencyCompact, formatQty } from "@/utils/currency";
-import type { SpoilageByProductRow } from "../hooks/useSpoilageReport";
+import type { AdjustmentByProductRow } from "../hooks/useAdjustmentReport";
 
 interface Props {
-  data: SpoilageByProductRow[];
+  data: AdjustmentByProductRow[];
 }
 
-export function SpoilageByProductChart({ data }: Props) {
+export function AdjustmentByProductChart({ data }: Props) {
   const maxMetric = Math.max(1, ...data.map((row) => row.cost ?? row.qty));
 
   return (

@@ -2,23 +2,23 @@ import { Badge } from "@/components/ui/Badge";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card";
 import { formatCurrency, formatQty } from "@/utils/currency";
 import { REASON_META } from "../utils/reasonMeta";
-import type { SpoilageIncident } from "../hooks/useSpoilageReport";
+import type { AdjustmentIncident } from "../hooks/useAdjustmentReport";
 
 interface Props {
-  incidents: SpoilageIncident[];
+  incidents: AdjustmentIncident[];
 }
 
-export function SpoilageLog({ incidents }: Props) {
+export function AdjustmentLog({ incidents }: Props) {
   return (
     <Card>
       <CardHeader>
         <div>
           <CardTitle>Incident log</CardTitle>
-          <CardDescription>Spoilage & waste recorded this period</CardDescription>
+          <CardDescription>Losses recorded this period — all reasons</CardDescription>
         </div>
       </CardHeader>
       {incidents.length === 0 ? (
-        <p className="py-8 text-center text-sm text-ink-faint">No spoilage/waste incidents this period.</p>
+        <p className="py-8 text-center text-sm text-ink-faint">No losses recorded this period.</p>
       ) : (
         <div className="overflow-x-auto">
           <table className="w-full min-w-[640px] text-sm">

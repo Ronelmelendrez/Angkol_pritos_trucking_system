@@ -122,10 +122,10 @@ export function PayRuleSettingsForm() {
             <p className="mt-1 text-xs text-ink-faint">Low-stock alert triggers when stock drops below this. Override per product.</p>
           </div>
           <div>
-            <Label htmlFor="spoilageRateThreshold">Spoilage warning threshold (%)</Label>
+            <Label htmlFor="spoilageRateThreshold">Loss warning threshold (%)</Label>
             <Input id="spoilageRateThreshold" type="number" step="0.5" min="0" max="100" {...register("spoilageRateThreshold")} />
             {errors.spoilageRateThreshold && <p className="mt-1 text-xs text-danger">{errors.spoilageRateThreshold.message}</p>}
-            <p className="mt-1 text-xs text-ink-faint">Spoilage Report shows a warning when spoiled stock exceeds this share of purchased stock.</p>
+            <p className="mt-1 text-xs text-ink-faint">Adjustment report shows a warning when lost stock exceeds this share of purchased stock.</p>
           </div>
         </div>
       </Card>

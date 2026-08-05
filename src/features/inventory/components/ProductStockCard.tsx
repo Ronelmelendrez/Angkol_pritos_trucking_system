@@ -3,7 +3,7 @@ import { ArrowUpDown, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { useAllProductStock } from "../hooks/useAllProductStock";
-import { useSpoilageFlags } from "../hooks/useSpoilageFlags";
+import { useAdjustmentFlags } from "../hooks/useAdjustmentFlags";
 import { StockAdjustmentDialog } from "./StockAdjustmentDialog";
 import { formatQty } from "@/utils/currency";
 
@@ -16,8 +16,8 @@ interface Props {
 export function ProductStockCard({ productId, productName, unit }: Props) {
   const stockData = useAllProductStock();
   const stock = stockData.find((s) => s.productId === productId);
-  const spoilageFlags = useSpoilageFlags();
-  const spoilageFlagged = spoilageFlags[productId];
+  const adjustmentFlags = useAdjustmentFlags();
+  const adjustmentFlagged = adjustmentFlags[productId];
   const [adjustOpen, setAdjustOpen] = useState(false);
 
   if (!stock) {
@@ -59,9 +59,9 @@ export function ProductStockCard({ productId, productName, unit }: Props) {
             ) : (
               <span className="text-success">On hand</span>
             )}
-            {spoilageFlagged && (
+            {adjustmentFlagged && (
               <span
-                title="Spoilage rate is above this product's historical average"
+                title="Stock loss rate is above this product's historical average"
                 className="text-warning"
               >
                 <AlertTriangle className="h-3 w-3" />

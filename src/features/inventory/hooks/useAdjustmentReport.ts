@@ -4,10 +4,10 @@ import { useAdjustmentsLog } from "./useAdjustmentsLog";
 import { useExpenses } from "@/features/expenses/hooks/useExpenses";
 import { useProducts } from "@/features/products/hooks/useProducts";
 import { estimateUnitCost } from "../utils/estimateUnitCost";
-import { LOSS_REASONS, REASON_META } from "../utils/reasonMeta";
+import { REASON_META } from "../utils/reasonMeta";
 import type { AdjustmentReason } from "../types";
 
-export interface SpoilageIncident {
+export interface AdjustmentIncident {
   id: string;
   date: string;
   productId: string;
@@ -18,36 +18,37 @@ export interface SpoilageIncident {
   cost: number | null;
 }
 
-export interface SpoilageTrendPoint {
+export interface AdjustmentTrendPoint {
   date: string;
   label: string;
   cost: number;
 }
 
-export interface SpoilageByProductRow {
+export interface AdjustmentByProductRow {
   productId: string;
   name: string;
   qty: number;
   cost: number | null;
 }
 
-export interface SpoilageByReasonRow {
+export interface AdjustmentByReasonRow {
   reason: AdjustmentReason;
-  qty: number;
-  cost: number;
+  qtyLost: number; // units written off (negative adjustments)
+  qtyFound: number; // units recovered (positive adjustments, e.g. recount)
+  cost: number; // est. ₱ lost
 }
 
-export interface SpoilageReportData {
-  incidents: SpoilageIncident[];
-  totalQty: number; // spoiled qty, positive
+export interface AdjustmentReportData {
+  incidents: AdjustmentIncident[];
+  totalQty: number; // lost qty, positive
   totalCost: number | null; // null when no cost data exists for any loss
   missingCostCount: number;
   purchasedQty: number; // purchased qty in the period
-  spoilageRate: number | null; // percent; null when there were no purchases
+  lossRate: number | null; // percent; null when there were no purchases
   priorRate: number | null; // percent for the window immediately before the period
-  trend: SpoilageTrendPoint[];
-  byProduct: SpoilageByProductRow[];
-  byReason: SpoilageByReasonRow[];
+  trend: AdjustmentTrendPoint[];
+  byProduct: AdjustmentByProductRow[];
+  byReason: AdjustmentByReasonRow[];
 }
 
 function inRange(date: string, start: string, end: string): boolean {
@@ -55,11 +56,14 @@ function inRange(date: string, start: string, end: string): boolean {
 }
 
 /**
- * Aggregates the spoilage/waste report for a date range (and optionally a
- * single product). Everything is computed client-side over the same
+ * Aggregates the stock loss/adjustment report for a date range (and
+ * optionally a single product). Covers every adjustment reason — spoilage,
+ * waste, theft, recount shortages and other write-offs all count as losses;
+ * positive adjustments (e.g. recount surpluses) are tracked separately as
+ * "found" stock. Everything is computed client-side over the same
  * `stock_adjustments` + `expenses` data the rest of Inventory already uses.
  */
-export function useSpoilageReport(dateRange: string[], selectedProductId: string): SpoilageReportData {
+export function useAdjustmentReport(dateRange: string[], selectedProductId: string): AdjustmentReportData {
   const { log: adjustments, purchases } = useAdjustmentsLog();
   const { data: expenses = [] } = useExpenses();
   const { data: products = [] } = useProducts();
@@ -70,15 +74,7 @@ export function useSpoilageReport(dateRange: string[], selectedProductId: string
 
     const productMatch = (productId: string) => !selectedProductId || productId === selectedProductId;
 
-    const lossIncidents = adjustments.filter(
-      (a) =>
-        LOSS_REASONS.includes(a.reason) &&
-        a.quantity < 0 &&
-        productMatch(a.productId) &&
-        inRange(a.date, rangeStart, rangeEnd),
-    );
-
-    const allLossAdjustments = adjustments.filter(
+    const losses = adjustments.filter(
       (a) => a.quantity < 0 && productMatch(a.productId) && inRange(a.date, rangeStart, rangeEnd),
     );
 
@@ -88,7 +84,7 @@ export function useSpoilageReport(dateRange: string[], selectedProductId: string
       return unitCosts.get(productId);
     };
 
-    const incidents: SpoilageIncident[] = lossIncidents.map((a) => {
+    const incidents: AdjustmentIncident[] = losses.map((a) => {
       const unitCost = costFor(a.productId);
       return {
         id: a.id,
@@ -102,7 +98,7 @@ export function useSpoilageReport(dateRange: string[], selectedProductId: string
       };
     });
 
-    const totalQty = lossIncidents.reduce((sum, a) => sum + Math.abs(a.quantity), 0);
+    const totalQty = losses.reduce((sum, a) => sum + Math.abs(a.quantity), 0);
     const costs = incidents.map((i) => i.cost).filter((c): c is number => c != null);
     const missingCostCount = incidents.filter((i) => i.cost == null).length;
     const totalCost = incidents.length > 0 && costs.length === 0 ? null : costs.reduce((sum, c) => sum + c, 0);
@@ -111,27 +107,27 @@ export function useSpoilageReport(dateRange: string[], selectedProductId: string
       (p) => p.quantity > 0 && productMatch(p.productId) && inRange(p.date, rangeStart, rangeEnd),
     );
     const purchasedQty = purchasesInRange.reduce((sum, p) => sum + p.quantity, 0);
-    const spoilageRate = purchasedQty > 0 ? (totalQty / purchasedQty) * 100 : null;
+    const lossRate = purchasedQty > 0 ? (totalQty / purchasedQty) * 100 : null;
 
     const periodLength = dateRange.length;
     const priorStart = format(subDays(new Date(`${rangeStart}T00:00:00`), periodLength), "yyyy-MM-dd");
     const priorEnd = format(subDays(new Date(`${rangeStart}T00:00:00`), 1), "yyyy-MM-dd");
-    const priorSpoiled = adjustments
-      .filter((a) => LOSS_REASONS.includes(a.reason) && a.quantity < 0 && productMatch(a.productId) && inRange(a.date, priorStart, priorEnd))
+    const priorLosses = adjustments
+      .filter((a) => a.quantity < 0 && productMatch(a.productId) && inRange(a.date, priorStart, priorEnd))
       .reduce((sum, a) => sum + Math.abs(a.quantity), 0);
     const priorPurchased = purchases
       .filter((p) => p.quantity > 0 && productMatch(p.productId) && inRange(p.date, priorStart, priorEnd))
       .reduce((sum, p) => sum + p.quantity, 0);
-    const priorRate = priorPurchased > 0 ? (priorSpoiled / priorPurchased) * 100 : null;
+    const priorRate = priorPurchased > 0 ? (priorLosses / priorPurchased) * 100 : null;
 
-    const trend: SpoilageTrendPoint[] = dateRange.map((date) => {
+    const trend: AdjustmentTrendPoint[] = dateRange.map((date) => {
       const cost = incidents
         .filter((i) => i.date === date)
         .reduce((sum, i) => sum + (i.cost ?? 0), 0);
       return { date, label: format(new Date(`${date}T00:00:00`), "MMM d"), cost };
     });
 
-    const byProductMap = new Map<string, SpoilageByProductRow>();
+    const byProductMap = new Map<string, AdjustmentByProductRow>();
     for (const incident of incidents) {
       const existing = byProductMap.get(incident.productId);
       if (existing) {
@@ -150,25 +146,30 @@ export function useSpoilageReport(dateRange: string[], selectedProductId: string
       (a, b) => (b.cost ?? -1) - (a.cost ?? -1) || b.qty - a.qty,
     );
 
-    const byReasonMap = new Map<AdjustmentReason, SpoilageByReasonRow>();
-    for (const a of allLossAdjustments) {
+    const byReasonMap = new Map<AdjustmentReason, AdjustmentByReasonRow>();
+    for (const a of adjustments) {
+      if (!productMatch(a.productId) || !inRange(a.date, rangeStart, rangeEnd)) continue;
       const unitCost = costFor(a.productId);
       const existing = byReasonMap.get(a.reason);
       if (existing) {
-        existing.qty += Math.abs(a.quantity);
-        existing.cost += unitCost != null ? Math.abs(a.quantity) * unitCost : 0;
+        if (a.quantity < 0) {
+          existing.qtyLost += Math.abs(a.quantity);
+          existing.cost += unitCost != null ? Math.abs(a.quantity) * unitCost : 0;
+        } else {
+          existing.qtyFound += a.quantity;
+        }
       } else {
         byReasonMap.set(a.reason, {
           reason: a.reason,
-          qty: Math.abs(a.quantity),
-          cost: unitCost != null ? Math.abs(a.quantity) * unitCost : 0,
+          qtyLost: a.quantity < 0 ? Math.abs(a.quantity) : 0,
+          qtyFound: a.quantity > 0 ? a.quantity : 0,
+          cost: a.quantity < 0 && unitCost != null ? Math.abs(a.quantity) * unitCost : 0,
         });
       }
     }
-    const byReason = Object.keys(REASON_META) as AdjustmentReason[];
-    const byReasonSorted = byReason
+    const byReason = (Object.keys(REASON_META) as AdjustmentReason[])
       .map((r) => byReasonMap.get(r))
-      .filter((r): r is SpoilageByReasonRow => r != null);
+      .filter((r): r is AdjustmentByReasonRow => r != null);
 
     return {
       incidents,
@@ -176,11 +177,11 @@ export function useSpoilageReport(dateRange: string[], selectedProductId: string
       totalCost,
       missingCostCount,
       purchasedQty,
-      spoilageRate,
+      lossRate,
       priorRate,
       trend,
       byProduct,
-      byReason: byReasonSorted,
+      byReason,
     };
   }, [adjustments, purchases, expenses, products, dateRange, selectedProductId]);
 }

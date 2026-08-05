@@ -1,20 +1,20 @@
 import { AlertTriangle, TrendingDown, Percent } from "lucide-react";
 import { Card } from "@/components/ui/Card";
 import { formatCurrency, formatQty } from "@/utils/currency";
-import type { SpoilageReportData } from "../hooks/useSpoilageReport";
+import type { AdjustmentReportData } from "../hooks/useAdjustmentReport";
 
 interface Props {
-  report: SpoilageReportData;
+  report: AdjustmentReportData;
 }
 
-export function SpoilageSummaryStats({ report }: Props) {
+export function AdjustmentSummaryStats({ report }: Props) {
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
       <StatCard
         icon={<TrendingDown className="h-4 w-4" />}
-        label="Spoiled this period"
+        label="Lost this period"
         value={`${formatQty(report.totalQty)}`}
-        sub={`${report.incidents.length} incident${report.incidents.length === 1 ? "" : "s"}`}
+        sub={`${report.incidents.length} loss entr${report.incidents.length === 1 ? "y" : "ies"}`}
       />
       <StatCard
         icon={<AlertTriangle className="h-4 w-4" />}
@@ -30,8 +30,8 @@ export function SpoilageSummaryStats({ report }: Props) {
       />
       <StatCard
         icon={<Percent className="h-4 w-4" />}
-        label="Spoilage rate"
-        value={report.spoilageRate != null ? `${report.spoilageRate.toFixed(1)}%` : "—"}
+        label="Loss rate"
+        value={report.lossRate != null ? `${report.lossRate.toFixed(1)}%` : "—"}
         sub="of stock purchased this period"
       />
     </div>

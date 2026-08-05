@@ -14,7 +14,7 @@ import { ADJUSTMENT_REASONS, REASON_META } from "../utils/reasonMeta";
 import type { AdjustmentReason } from "../types";
 import { StockAdjustmentDialog } from "./StockAdjustmentDialog";
 import { BatchStockEntryForm } from "./BatchStockEntryForm";
-import { SpoilageReportView } from "./SpoilageReportView";
+import { AdjustmentReportView } from "./AdjustmentReportView";
 import { formatCurrency, formatQty } from "@/utils/currency";
 
 const PAGE_SIZE = 10;
@@ -68,7 +68,7 @@ export function InventoryAdjustmentsTab({ dateRange, selectedProductId }: Props)
       <Tabs defaultValue="log">
         <TabsList>
           <TabsTrigger value="log">Log</TabsTrigger>
-          <TabsTrigger value="spoilage">Spoilage Report</TabsTrigger>
+          <TabsTrigger value="spoilage">Adjustment report</TabsTrigger>
         </TabsList>
 
         <TabsContent value="log">
@@ -177,7 +177,7 @@ export function InventoryAdjustmentsTab({ dateRange, selectedProductId }: Props)
         </TabsContent>
 
         <TabsContent value="spoilage">
-          <SpoilageReportView dateRange={dateRange} selectedProductId={selectedProductId} />
+          <AdjustmentReportView dateRange={dateRange} selectedProductId={selectedProductId} />
         </TabsContent>
       </Tabs>
 

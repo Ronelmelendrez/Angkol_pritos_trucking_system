@@ -1,14 +1,14 @@
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card";
-import { formatCurrencyCompact } from "@/utils/currency";
+import { formatCurrencyCompact, formatQty } from "@/utils/currency";
 import { REASON_META } from "../utils/reasonMeta";
-import type { SpoilageByReasonRow } from "../hooks/useSpoilageReport";
+import type { AdjustmentByReasonRow } from "../hooks/useAdjustmentReport";
 
 interface Props {
-  data: SpoilageByReasonRow[];
+  data: AdjustmentByReasonRow[];
 }
 
-export function SpoilageReasonDonut({ data }: Props) {
+export function AdjustmentReasonDonut({ data }: Props) {
   const totalCost = data.reduce((sum, row) => sum + row.cost, 0);
 
   return (
@@ -16,7 +16,7 @@ export function SpoilageReasonDonut({ data }: Props) {
       <CardHeader>
         <div>
           <CardTitle>Losses by reason</CardTitle>
-          <CardDescription>Spoilage vs waste value</CardDescription>
+          <CardDescription>Share of total value lost</CardDescription>
         </div>
       </CardHeader>
       {totalCost <= 0 ? (
@@ -65,9 +65,14 @@ export function SpoilageReasonDonut({ data }: Props) {
                       style={{ background: REASON_META[row.reason].color }}
                     />
                     <span className="truncate text-ink">{REASON_META[row.reason].label}</span>
+                    {row.qtyFound > 0 && (
+                      <span className="shrink-0 text-[10px] font-medium text-success">
+                        +{formatQty(row.qtyFound)} found
+                      </span>
+                    )}
                   </span>
                   <span className="shrink-0 font-medium text-ink-soft">
-                    {share.toFixed(0)}%
+                    {row.qtyLost > 0 && row.cost === 0 ? `${formatQty(row.qtyLost)} lost` : `${share.toFixed(0)}%`}
                   </span>
                 </li>
               );
