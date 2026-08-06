@@ -140,7 +140,7 @@ const expenseSeed: Expense[] = [
   {
     id: "exp_1",
     date: "2026-07-26",
-    category: EXPENSE_CATEGORIES[5],
+    category: EXPENSE_CATEGORIES[4],
     description: "Fuel refill",
     amount: 1800,
     supplier: "Petron",
@@ -164,7 +164,7 @@ const expenseSeed: Expense[] = [
   {
     id: "exp_3",
     date: "2026-07-25",
-    category: EXPENSE_CATEGORIES[7],
+    category: EXPENSE_CATEGORIES[5],
     description: "Staff salary — Juan",
     amount: 2500,
     supplier: undefined,
@@ -175,7 +175,7 @@ const expenseSeed: Expense[] = [
   {
     id: "exp_4",
     date: "2026-07-25",
-    category: EXPENSE_CATEGORIES[5],
+    category: EXPENSE_CATEGORIES[4],
     description: "Diesel for delivery truck",
     amount: 2200,
     supplier: "Shell",
@@ -221,7 +221,7 @@ const expenseSeed: Expense[] = [
   {
     id: "exp_8",
     date: "2026-07-22",
-    category: EXPENSE_CATEGORIES[4],
+    category: EXPENSE_CATEGORIES[3],
     description: "Takeout boxes (200 pcs)",
     amount: 950,
     supplier: "Shopee",
@@ -232,7 +232,7 @@ const expenseSeed: Expense[] = [
   {
     id: "exp_9",
     date: "2026-07-22",
-    category: EXPENSE_CATEGORIES[5],
+    category: EXPENSE_CATEGORIES[4],
     description: "Fuel — trip to market",
     amount: 600,
     supplier: "Caltex",
@@ -243,7 +243,7 @@ const expenseSeed: Expense[] = [
   {
     id: "exp_10",
     date: "2026-07-21",
-    category: EXPENSE_CATEGORIES[3],
+    category: EXPENSE_CATEGORIES[1],
     description: "Salt, pepper, magic sarap",
     amount: 320,
     supplier: "Palengke",
@@ -254,7 +254,7 @@ const expenseSeed: Expense[] = [
   {
     id: "exp_11",
     date: "2026-07-20",
-    category: EXPENSE_CATEGORIES[11],
+    category: EXPENSE_CATEGORIES[1],
     description: "1 gallon vinegar",
     amount: 180,
     supplier: "Sari-sari store",
@@ -265,7 +265,7 @@ const expenseSeed: Expense[] = [
   {
     id: "exp_12",
     date: "2026-07-19",
-    category: EXPENSE_CATEGORIES[10],
+    category: EXPENSE_CATEGORIES[4],
     description: "1 sack charcoal",
     amount: 350,
     supplier: "Vargas Charcoal",
@@ -276,7 +276,7 @@ const expenseSeed: Expense[] = [
   {
     id: "exp_13",
     date: "2026-07-18",
-    category: EXPENSE_CATEGORIES[7],
+    category: EXPENSE_CATEGORIES[5],
     description: "Staff salary — Pedro",
     amount: 2500,
     supplier: undefined,
@@ -287,7 +287,7 @@ const expenseSeed: Expense[] = [
   {
     id: "exp_14",
     date: "2026-07-17",
-    category: EXPENSE_CATEGORIES[12],
+    category: EXPENSE_CATEGORIES[1],
     description: "Soy sauce and garlic",
     amount: 280,
     supplier: "Palengke",
@@ -298,7 +298,7 @@ const expenseSeed: Expense[] = [
   {
     id: "exp_15",
     date: "2026-07-16",
-    category: EXPENSE_CATEGORIES[8],
+    category: EXPENSE_CATEGORIES[1],
     description: "5kg flour",
     amount: 240,
     supplier: "Baker's Supply",
@@ -309,7 +309,7 @@ const expenseSeed: Expense[] = [
   {
     id: "exp_16",
     date: "2026-07-15",
-    category: EXPENSE_CATEGORIES[9],
+    category: EXPENSE_CATEGORIES[4],
     description: "Gas tank refill (LPG)",
     amount: 750,
     supplier: "Gasul",

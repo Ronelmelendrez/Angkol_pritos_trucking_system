@@ -15,16 +15,15 @@ VALUES (
 
 -- ---- Expense categories ----
 INSERT INTO categories (name, type) VALUES
-  ('Raw Chicken',   'expense'),
-  ('Ketchup',       'expense'),
-  ('Oil',           'expense'),
-  ('Spices',        'expense'),
-  ('Packaging',     'expense'),
-  ('Fuel',          'expense'),
-  ('Repairs',       'expense'),
-  ('Salaries',      'expense'),
-  ('Flour',         'expense'),
-  ('Gus',           'expense'),
-  ('Charcoal',      'expense'),
-  ('Vinegar',       'expense'),
-  ('Ingredients',   'expense');
+  ('Raw Materials',        'expense'),
+  ('Ingredients',          'expense'),
+  ('Cooking Supplies',     'expense'),
+  ('Packaging Materials',  'expense'),
+  ('Fuel & Energy',        'expense'),
+  ('Employee Salaries',    'expense'),
+  ('Equipment Repairs',    'expense'),
+  ('Transportation',       'expense'),
+  ('Utilities',            'expense'),
+  ('Cleaning Supplies',    'expense'),
+  ('Miscellaneous',        'expense')
+ON CONFLICT (name, type) DO NOTHING;
