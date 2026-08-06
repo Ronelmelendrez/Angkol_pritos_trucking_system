@@ -56,14 +56,14 @@ function inRange(date: string, start: string, end: string): boolean {
 }
 
 /**
- * Aggregates the stock loss/adjustment report for a date range (and
- * optionally a single product). Covers every adjustment reason — spoilage,
- * waste, theft, recount shortages and other write-offs all count as losses;
- * positive adjustments (e.g. recount surpluses) are tracked separately as
- * "found" stock. Everything is computed client-side over the same
- * `stock_adjustments` + `expenses` data the rest of Inventory already uses.
+ * Aggregates the stock loss/adjustment report for a date range. Covers every
+ * adjustment reason — spoilage, waste, theft, recount shortages and other
+ * write-offs all count as losses; positive adjustments (e.g. recount
+ * surpluses) are tracked separately as "found" stock. Everything is computed
+ * client-side over the same `stock_adjustments` + `expenses` data the rest of
+ * Inventory already uses.
  */
-export function useAdjustmentReport(dateRange: string[], selectedProductId: string): AdjustmentReportData {
+export function useAdjustmentReport(dateRange: string[]): AdjustmentReportData {
   const { log: adjustments, purchases } = useAdjustmentsLog();
   const { data: expenses = [] } = useExpenses();
   const { data: products = [] } = useProducts();
@@ -72,10 +72,8 @@ export function useAdjustmentReport(dateRange: string[], selectedProductId: stri
     const rangeStart = dateRange[0];
     const rangeEnd = dateRange[dateRange.length - 1];
 
-    const productMatch = (productId: string) => !selectedProductId || productId === selectedProductId;
-
     const losses = adjustments.filter(
-      (a) => a.quantity < 0 && productMatch(a.productId) && inRange(a.date, rangeStart, rangeEnd),
+      (a) => a.quantity < 0 && inRange(a.date, rangeStart, rangeEnd),
     );
 
     const unitCosts = new Map<string, number | null>();
@@ -104,7 +102,7 @@ export function useAdjustmentReport(dateRange: string[], selectedProductId: stri
     const totalCost = incidents.length > 0 && costs.length === 0 ? null : costs.reduce((sum, c) => sum + c, 0);
 
     const purchasesInRange = purchases.filter(
-      (p) => p.quantity > 0 && productMatch(p.productId) && inRange(p.date, rangeStart, rangeEnd),
+      (p) => p.quantity > 0 && inRange(p.date, rangeStart, rangeEnd),
     );
     const purchasedQty = purchasesInRange.reduce((sum, p) => sum + p.quantity, 0);
     const lossRate = purchasedQty > 0 ? (totalQty / purchasedQty) * 100 : null;
@@ -113,10 +111,10 @@ export function useAdjustmentReport(dateRange: string[], selectedProductId: stri
     const priorStart = format(subDays(new Date(`${rangeStart}T00:00:00`), periodLength), "yyyy-MM-dd");
     const priorEnd = format(subDays(new Date(`${rangeStart}T00:00:00`), 1), "yyyy-MM-dd");
     const priorLosses = adjustments
-      .filter((a) => a.quantity < 0 && productMatch(a.productId) && inRange(a.date, priorStart, priorEnd))
+      .filter((a) => a.quantity < 0 && inRange(a.date, priorStart, priorEnd))
       .reduce((sum, a) => sum + Math.abs(a.quantity), 0);
     const priorPurchased = purchases
-      .filter((p) => p.quantity > 0 && productMatch(p.productId) && inRange(p.date, priorStart, priorEnd))
+      .filter((p) => p.quantity > 0 && inRange(p.date, priorStart, priorEnd))
       .reduce((sum, p) => sum + p.quantity, 0);
     const priorRate = priorPurchased > 0 ? (priorLosses / priorPurchased) * 100 : null;
 
@@ -148,7 +146,7 @@ export function useAdjustmentReport(dateRange: string[], selectedProductId: stri
 
     const byReasonMap = new Map<AdjustmentReason, AdjustmentByReasonRow>();
     for (const a of adjustments) {
-      if (!productMatch(a.productId) || !inRange(a.date, rangeStart, rangeEnd)) continue;
+      if (!inRange(a.date, rangeStart, rangeEnd)) continue;
       const unitCost = costFor(a.productId);
       const existing = byReasonMap.get(a.reason);
       if (existing) {
@@ -183,5 +181,5 @@ export function useAdjustmentReport(dateRange: string[], selectedProductId: stri
       byProduct,
       byReason,
     };
-  }, [adjustments, purchases, expenses, products, dateRange, selectedProductId]);
+  }, [adjustments, purchases, expenses, products, dateRange]);
 }

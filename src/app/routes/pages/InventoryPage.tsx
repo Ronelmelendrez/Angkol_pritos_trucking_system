@@ -69,6 +69,7 @@ export function InventoryPage() {
               onProductChange={setSelectedProductId}
               rangePreset={rangePreset}
               onDateRangeChange={setRangePreset}
+              showProduct={tab !== "adjustments"}
             />
           )}
 
@@ -100,7 +101,7 @@ export function InventoryPage() {
 
           <TabsContent value="adjustments">
             <div className="px-4 pb-4">
-              <InventoryAdjustmentsTab dateRange={dateRange} selectedProductId={selectedProductId} />
+              <InventoryAdjustmentsTab dateRange={dateRange} />
             </div>
           </TabsContent>
 

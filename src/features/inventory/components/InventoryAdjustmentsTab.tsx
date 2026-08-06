@@ -21,10 +21,9 @@ const PAGE_SIZE = 10;
 
 interface Props {
   dateRange: string[];
-  selectedProductId: string;
 }
 
-export function InventoryAdjustmentsTab({ dateRange, selectedProductId }: Props) {
+export function InventoryAdjustmentsTab({ dateRange }: Props) {
   const { log: adjustments } = useAdjustmentsLog();
   const deleteAdjustment = useDeleteStockAdjustment();
   const { data: expenses = [] } = useExpenses();
@@ -39,12 +38,11 @@ export function InventoryAdjustmentsTab({ dateRange, selectedProductId }: Props)
     const rangeStart = dateRange[0];
     const rangeEnd = dateRange[dateRange.length - 1];
     return adjustments.filter((adj) => {
-      if (selectedProductId && adj.productId !== selectedProductId) return false;
       if (adj.date < rangeStart || adj.date > rangeEnd) return false;
       if (reasonFilter !== "all" && adj.reason !== reasonFilter) return false;
       return true;
     });
-  }, [adjustments, selectedProductId, dateRange, reasonFilter]);
+  }, [adjustments, dateRange, reasonFilter]);
 
   const rows = useMemo(() => {
     const unitCosts = new Map<string, number | null>();
@@ -177,7 +175,7 @@ export function InventoryAdjustmentsTab({ dateRange, selectedProductId }: Props)
         </TabsContent>
 
         <TabsContent value="spoilage">
-          <AdjustmentReportView dateRange={dateRange} selectedProductId={selectedProductId} />
+          <AdjustmentReportView dateRange={dateRange} />
         </TabsContent>
       </Tabs>
 

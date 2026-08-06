@@ -9,11 +9,10 @@ import { AdjustmentLog } from "./AdjustmentLog";
 
 interface Props {
   dateRange: string[];
-  selectedProductId: string;
 }
 
-export function AdjustmentReportView({ dateRange, selectedProductId }: Props) {
-  const report = useAdjustmentReport(dateRange, selectedProductId);
+export function AdjustmentReportView({ dateRange }: Props) {
+  const report = useAdjustmentReport(dateRange);
   const { data: settings } = usePayRuleSettings();
   const threshold = settings?.spoilageRateThreshold ?? 5;
 
