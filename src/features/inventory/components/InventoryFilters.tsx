@@ -1,24 +1,32 @@
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/Select";
 import { Label } from "@/components/ui/Label";
-import { Button } from "@/components/ui/Button";
+import { DatePresets, type DatePreset } from "@/components/ui/DatePresets";
 import { useProducts } from "@/features/products/hooks/useProducts";
 import { formatCurrency } from "@/utils/currency";
 
 interface Props {
   selectedProductId: string;
   onProductChange: (id: string) => void;
-  rangePreset: "7d" | "14d" | "30d";
-  onDateRangeChange: (range: "7d" | "14d" | "30d") => void;
+  datePreset: DatePreset;
+  onDatePresetChange: (preset: DatePreset) => void;
+  customFrom: string;
+  customTo: string;
+  onCustomFromChange: (value: string) => void;
+  onCustomToChange: (value: string) => void;
   showProduct?: boolean;
 }
 
-const RANGE_LABELS: Record<string, string> = {
-  "7d": "Last 7 days",
-  "14d": "Last 14 days",
-  "30d": "Last 30 days",
-};
-
-export function InventoryFilters({ selectedProductId, onProductChange, rangePreset, onDateRangeChange, showProduct = true }: Props) {
+export function InventoryFilters({
+  selectedProductId,
+  onProductChange,
+  datePreset,
+  onDatePresetChange,
+  customFrom,
+  customTo,
+  onCustomFromChange,
+  onCustomToChange,
+  showProduct = true,
+}: Props) {
   const { data: products = [] } = useProducts();
   const activeProducts = products.filter((p) => p.isActive);
 
@@ -45,17 +53,15 @@ export function InventoryFilters({ selectedProductId, onProductChange, rangePres
       )}
       <div>
         <Label className="text-xs text-ink-faint">Period</Label>
-        <div className="mt-1 flex flex-wrap gap-1">
-          {(["7d", "14d", "30d"] as const).map((preset) => (
-            <Button
-              key={preset}
-              variant={rangePreset === preset ? "default" : "outline"}
-              size="sm"
-              onClick={() => onDateRangeChange(preset)}
-            >
-              {RANGE_LABELS[preset]}
-            </Button>
-          ))}
+        <div className="mt-1">
+          <DatePresets
+            value={datePreset}
+            onChange={onDatePresetChange}
+            customFrom={customFrom}
+            customTo={customTo}
+            onCustomFromChange={onCustomFromChange}
+            onCustomToChange={onCustomToChange}
+          />
         </div>
       </div>
     </div>

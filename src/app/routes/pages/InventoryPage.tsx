@@ -3,6 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import { ClipboardList } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/Tabs";
+import type { DatePreset } from "@/components/ui/DatePresets";
 import { useProducts } from "@/features/products/hooks/useProducts";
 import { useInventoryLedger } from "@/features/inventory/hooks/useInventoryLedger";
 import { InventoryLedgerTable } from "@/features/inventory/components/InventoryLedgerTable";
@@ -11,9 +12,9 @@ import { InventoryOverviewTab } from "@/features/inventory/components/InventoryO
 import { InventoryAdjustmentsTab } from "@/features/inventory/components/InventoryAdjustmentsTab";
 import { LowStockTab } from "@/features/inventory/components/LowStockTab";
 import { InventoryReportsTab } from "@/features/inventory/components/InventoryReportsTab";
-import { subDays, format as formatDateFns } from "date-fns";
-
-const RANGE_PRESETS = { "7d": 6, "14d": 13, "30d": 29 } as const;
+import { format, startOfMonth, endOfMonth } from "date-fns";
+import { startOfWeek } from "date-fns/startOfWeek";
+import { endOfWeek } from "date-fns/endOfWeek";
 
 export function InventoryPage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -23,16 +24,29 @@ export function InventoryPage() {
   const { data: products = [] } = useProducts();
   const activeProducts = products.filter((p) => p.isActive);
   const [selectedProductId, setSelectedProductId] = useState("");
-  const [rangePreset, setRangePreset] = useState<keyof typeof RANGE_PRESETS>("30d");
+  const [datePreset, setDatePreset] = useState<DatePreset>("this-month");
+  const [customFrom, setCustomFrom] = useState(format(new Date(), "yyyy-MM-dd"));
+  const [customTo, setCustomTo] = useState(format(new Date(), "yyyy-MM-dd"));
 
-  const today = formatDateFns(new Date(), "yyyy-MM-dd");
-  const daysBack = RANGE_PRESETS[rangePreset];
-  const dateFrom = formatDateFns(subDays(new Date(), daysBack), "yyyy-MM-dd");
+  const today = new Date();
+  const todayStr = format(today, "yyyy-MM-dd");
+
+  const dateFrom =
+    datePreset === "today" ? todayStr
+    : datePreset === "this-week" ? format(startOfWeek(today, { weekStartsOn: 1 }), "yyyy-MM-dd")
+    : datePreset === "this-month" ? format(startOfMonth(today), "yyyy-MM-dd")
+    : customFrom;
+
+  const dateTo =
+    datePreset === "today" ? todayStr
+    : datePreset === "this-week" ? format(endOfWeek(today, { weekStartsOn: 1 }), "yyyy-MM-dd")
+    : datePreset === "this-month" ? format(endOfMonth(today), "yyyy-MM-dd")
+    : customTo;
 
   const dateRange: string[] = [];
   const cursor = new Date(dateFrom);
-  while (cursor <= new Date(today)) {
-    dateRange.push(formatDateFns(cursor, "yyyy-MM-dd"));
+  while (cursor <= new Date(dateTo)) {
+    dateRange.push(format(cursor, "yyyy-MM-dd"));
     cursor.setDate(cursor.getDate() + 1);
   }
 
@@ -67,8 +81,12 @@ export function InventoryPage() {
             <InventoryFilters
               selectedProductId={selectedProductId}
               onProductChange={setSelectedProductId}
-              rangePreset={rangePreset}
-              onDateRangeChange={setRangePreset}
+              datePreset={datePreset}
+              onDatePresetChange={setDatePreset}
+              customFrom={customFrom}
+              customTo={customTo}
+              onCustomFromChange={setCustomFrom}
+              onCustomToChange={setCustomTo}
               showProduct={tab !== "adjustments"}
             />
           )}
