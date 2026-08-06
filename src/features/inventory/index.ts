@@ -18,7 +18,7 @@ export { AdjustmentReasonDonut } from "./components/AdjustmentReasonDonut";
 export { AdjustmentLog } from "./components/AdjustmentLog";
 export { useInventoryLedger } from "./hooks/useInventoryLedger";
 export { useAddStockAdjustment } from "./hooks/useAddStockAdjustment";
-export { useDeleteStockAdjustment } from "./hooks/useDeleteStockAdjustment";
+export { useReverseStockAdjustment } from "./hooks/useReverseStockAdjustment";
 export { useSetStock, useCurrentStock } from "./hooks/useEditStock";
 export { useAllProductStock } from "./hooks/useAllProductStock";
 export { useAdjustmentsLog } from "./hooks/useAdjustmentsLog";

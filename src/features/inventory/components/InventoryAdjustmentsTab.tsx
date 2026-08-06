@@ -1,12 +1,22 @@
 import { useMemo, useState } from "react";
-import { ClipboardList, Plus, Trash2 } from "lucide-react";
+import { ClipboardList, Plus, Undo2 } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Pagination } from "@/components/ui/Pagination";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/Tabs";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/Select";
-import { useAdjustmentsLog } from "../hooks/useAdjustmentsLog";
-import { useDeleteStockAdjustment } from "../hooks/useDeleteStockAdjustment";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from "@/components/ui/AlertDialog";
+import { useAdjustmentsLog, type AdjustmentWithProduct } from "../hooks/useAdjustmentsLog";
+import { useReverseStockAdjustment } from "../hooks/useReverseStockAdjustment";
 import { useExpenses } from "@/features/expenses/hooks/useExpenses";
 import { useProducts } from "@/features/products/hooks/useProducts";
 import { estimateUnitCost } from "../utils/estimateUnitCost";
@@ -25,7 +35,7 @@ interface Props {
 
 export function InventoryAdjustmentsTab({ dateRange }: Props) {
   const { log: adjustments } = useAdjustmentsLog();
-  const deleteAdjustment = useDeleteStockAdjustment();
+  const reverseAdjustment = useReverseStockAdjustment();
   const { data: expenses = [] } = useExpenses();
   const { data: products = [] } = useProducts();
 
@@ -33,6 +43,7 @@ export function InventoryAdjustmentsTab({ dateRange }: Props) {
   const [batchOpen, setBatchOpen] = useState(false);
   const [page, setPage] = useState(1);
   const [reasonFilter, setReasonFilter] = useState<AdjustmentReason | "all">("all");
+  const [reverseTarget, setReverseTarget] = useState<AdjustmentWithProduct | null>(null);
 
   const filtered = useMemo(() => {
     const rangeStart = dateRange[0];
@@ -155,12 +166,13 @@ export function InventoryAdjustmentsTab({ dateRange }: Props) {
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="h-7 w-7 text-ink-faint hover:text-danger"
-                              onClick={() => deleteAdjustment.mutate(adj.id)}
-                              disabled={deleteAdjustment.isPending}
-                              aria-label={`Delete adjustment for ${adj.productName}`}
+                              className="h-7 w-7 text-ink-faint hover:text-primary"
+                              onClick={() => setReverseTarget(adj)}
+                              disabled={reverseAdjustment.isPending}
+                              aria-label={`Reverse adjustment for ${adj.productName}`}
+                              title="Reverse adjustment"
                             >
-                              <Trash2 className="h-3.5 w-3.5" />
+                              <Undo2 className="h-3.5 w-3.5" />
                             </Button>
                           </td>
                         </tr>
@@ -181,6 +193,33 @@ export function InventoryAdjustmentsTab({ dateRange }: Props) {
 
       <StockAdjustmentDialog open={addOpen} onOpenChange={setAddOpen} />
       <BatchStockEntryForm open={batchOpen} onOpenChange={setBatchOpen} />
+
+      <AlertDialog open={reverseTarget != null} onOpenChange={(v) => !v && setReverseTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Reverse adjustment?</AlertDialogTitle>
+            <AlertDialogDescription>
+              The original entry stays for history and an offsetting{" "}
+              <span className="font-semibold text-ink">
+                {reverseTarget ? (reverseTarget.quantity > 0 ? "-" : "+") + formatQty(Math.abs(reverseTarget.quantity)) : ""}
+              </span>{" "}
+              entry is posted for <span className="font-medium text-ink">{reverseTarget?.productName}</span> today. Stock is
+              corrected without deleting anything.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (reverseTarget) reverseAdjustment.mutate(reverseTarget.id);
+                setReverseTarget(null);
+              }}
+            >
+              Reverse
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
