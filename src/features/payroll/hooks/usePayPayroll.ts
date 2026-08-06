@@ -30,8 +30,8 @@ export function usePayPayroll() {
 
       const netPay = row.grossPay - advanceTotal - loanRepayAmount + row.adjustments;
 
-      // Resolve Salaries category UUID
-      const salariesCategoryId = await getCategoryIdByName("Salaries");
+      // Resolve Employee Salaries category UUID
+      const salariesCategoryId = await getCategoryIdByName("Employee Salaries");
 
       // If this period already has a 'ready' run (created when an advance
       // deduction was confirmed), upgrade it to 'paid' instead of inserting
