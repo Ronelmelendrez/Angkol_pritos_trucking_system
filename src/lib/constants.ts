@@ -1,17 +1,15 @@
 export const EXPENSE_CATEGORIES = [
-  "Raw Chicken",
-  "Ketchup",
-  "Oil",
-  "Spices",
-  "Packaging",
-  "Fuel",
-  "Repairs",
-  "Salaries",
-  "Flour",
-  "Gus",
-  "Charcoal",
-  "Vinegar",
+  "Raw Materials",
   "Ingredients",
+  "Cooking Supplies",
+  "Packaging Materials",
+  "Fuel & Energy",
+  "Employee Salaries",
+  "Equipment Repairs",
+  "Transportation",
+  "Utilities",
+  "Cleaning Supplies",
+  "Miscellaneous",
 ] as const;
 export type ExpenseCategory = (typeof EXPENSE_CATEGORIES)[number];
 
@@ -19,19 +17,17 @@ export const PAYMENT_METHODS = ["Cash", "GCash", "Bank Transfer", "Credit"] as c
 export type PaymentMethod = (typeof PAYMENT_METHODS)[number];
 
 export const CATEGORY_COLORS: Record<ExpenseCategory, string> = {
-  "Raw Chicken": "#E67E22",
-  "Ketchup": "#C0392B",
-  "Oil": "#F1C40F",
-  "Spices": "#D35400",
-  "Packaging": "#8D6E63",
-  "Fuel": "#6D4C41",
-  "Repairs": "#B8860B",
-  "Salaries": "#2ECC71",
-  "Flour": "#A08D86",
-  "Gus": "#3498DB",
-  "Charcoal": "#34495E",
-  "Vinegar": "#1ABC9C",
-  "Ingredients": "#9B59B6",
+  "Raw Materials": "#E67E22",
+  "Ingredients": "#C0392B",
+  "Cooking Supplies": "#F1C40F",
+  "Packaging Materials": "#8D6E63",
+  "Fuel & Energy": "#6D4C41",
+  "Employee Salaries": "#2ECC71",
+  "Equipment Repairs": "#B8860B",
+  "Transportation": "#3498DB",
+  "Utilities": "#34495E",
+  "Cleaning Supplies": "#1ABC9C",
+  "Miscellaneous": "#9B59B6",
 };
 
 export const USER_ROLES = ["manager", "staff"] as const;
