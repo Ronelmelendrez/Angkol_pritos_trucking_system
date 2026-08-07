@@ -6,6 +6,7 @@ import { useDailyCash } from "../hooks/useDailyCash";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { Button } from "@/components/ui/Button";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/Card";
 import type { CashMovementItem } from "../types";
 
 function SummaryCard({
@@ -111,7 +112,7 @@ export function DailyCashReport({ date }: { date: string }) {
         </Button>
       </div>
 
-      <div className="print-report-area">
+      <div className="print-report-area space-y-5">
         {/* Summary cards */}
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
           <SummaryCard label="Opening cash" value={formatCurrency(data.openingCash ?? 0)} tone="neutral" />
@@ -128,14 +129,14 @@ export function DailyCashReport({ date }: { date: string }) {
 
         <div className="grid gap-4 lg:grid-cols-2">
           {/* Statement layout */}
-          <div className="ticket p-5">
-            <div className="mb-4 border-b border-line pb-3 text-center">
-              <p className="stamp text-sm font-bold uppercase tracking-wide text-ink">Angkol Prito's</p>
-              <p className="text-xs text-ink-faint">Daily Cash Report</p>
-              <p className="text-xs text-ink-faint">{formatDate(date)}</p>
-            </div>
-
-            <div className="space-y-4">
+          <Card>
+            <CardHeader>
+              <div>
+                <CardTitle>Daily cash statement</CardTitle>
+                <CardDescription>Angkol Prito's · {formatDate(date)}</CardDescription>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
               <section>
                 <p className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-ink-faint">Opening cash</p>
                 <div className="flex items-center justify-between">
@@ -204,15 +205,21 @@ export function DailyCashReport({ date }: { date: string }) {
                   </div>
                 </div>
               )}
-            </div>
-          </div>
+            </CardContent>
+          </Card>
 
           {/* Timeline */}
-          <div className="ticket p-5">
-            <div className="mb-4 flex items-center gap-2">
-              <Scale className="h-4 w-4 text-primary-dark" />
-              <h4 className="stamp text-sm font-semibold text-ink">Cash movement timeline</h4>
-            </div>
+          <Card>
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <Scale className="h-4 w-4 text-primary-dark" />
+                <div>
+                  <CardTitle>Cash movement timeline</CardTitle>
+                  <CardDescription>Opening + cash in − cash out</CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
             {data.movements.length === 0 ? (
               <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-line py-12 text-center">
                 <p className="text-sm font-medium text-ink">No cash movements yet</p>
@@ -225,7 +232,8 @@ export function DailyCashReport({ date }: { date: string }) {
                 ))}
               </div>
             )}
-          </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>
