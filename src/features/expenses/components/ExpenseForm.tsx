@@ -3,7 +3,12 @@ import { useForm, Controller, useWatch, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, Plus, Trash2, Package, PackagePlus } from "lucide-react";
 import { expenseSchema, type ExpenseFormValues } from "@/utils/Validators";
-import { EXPENSE_CATEGORIES, PAYMENT_METHODS } from "@/lib/constants";
+import {
+  EXPENSE_CATEGORIES,
+  PAYMENT_METHODS,
+  EXPENSE_FUND_SOURCES,
+  FUND_SOURCE_LABELS,
+} from "@/lib/constants";
 import { useProducts } from "@/features/products/hooks/useProducts";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -39,6 +44,7 @@ export function ExpenseForm({ onDone }: { onDone?: () => void }) {
       amount: 0,
       supplier: "",
       paymentMethod: "Cash",
+      fundSource: "cash_drawer",
       productId: "",
       items: [],
     },
@@ -47,6 +53,8 @@ export function ExpenseForm({ onDone }: { onDone?: () => void }) {
   type ExpenseItem = NonNullable<ExpenseFormValues["items"]>[number] & { _raw?: string };
 
   const items = (useWatch({ control, name: "items" }) ?? []) as ExpenseItem[];
+  const paymentMethod = watch("paymentMethod");
+  const fundSource = watch("fundSource");
 
   function toggleStock() {
     const next = !trackStock;
@@ -115,6 +123,10 @@ export function ExpenseForm({ onDone }: { onDone?: () => void }) {
       values.items = [];
     }
 
+    if (values.paymentMethod !== "Cash") {
+      values.fundSource = undefined;
+    }
+
     try {
       await addExpense.mutateAsync(values);
       toast({
@@ -129,6 +141,7 @@ export function ExpenseForm({ onDone }: { onDone?: () => void }) {
         amount: 0,
         supplier: "",
         paymentMethod: "Cash",
+        fundSource: "cash_drawer",
         productId: "",
         items: [],
       });
@@ -313,6 +326,38 @@ export function ExpenseForm({ onDone }: { onDone?: () => void }) {
           />
         </div>
       </div>
+
+      {/* Fund source — only relevant when paying in cash */}
+      {paymentMethod === "Cash" && (
+        <div className="rounded-lg border border-primary/20 bg-primary/5 px-4 py-3">
+          <Label htmlFor="fundSource">Where is this paid from?</Label>
+          <div className="mt-2">
+            <Controller
+              control={control}
+              name="fundSource"
+              render={({ field }) => (
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <SelectTrigger id="fundSource">
+                    <SelectValue placeholder="Choose fund source" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {EXPENSE_FUND_SOURCES.map((s) => (
+                      <SelectItem key={s} value={s}>
+                        {FUND_SOURCE_LABELS[s]}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            />
+          </div>
+          <p className="mt-2 text-xs text-primary-dark/70">
+            {fundSource === "separate"
+              ? "Paid from separate money — NOT counted in the daily cash drawer report."
+              : "Paid from daily sales — counted in the daily cash drawer report."}
+          </p>
+        </div>
+      )}
 
       {/* Supplier */}
       <div>
