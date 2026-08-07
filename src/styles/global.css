@@ -142,3 +142,21 @@
     transition-duration: 0.001ms !important;
   }
 }
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .print-report-area,
+  .print-report-area * {
+    visibility: visible;
+  }
+  .print-report-area {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+  }
+  .ticket {
+    box-shadow: none;
+  }
+}
