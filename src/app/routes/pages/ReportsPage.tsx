@@ -217,11 +217,11 @@ function ReportsContent() {
 
       {/* KPI summary strip */}
       {isLoading ? (
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
           {Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-16 w-full" />)}
         </div>
       ) : (
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
           <KpiPill label="Total sales" value={formatCurrency(totals.totalSales)} icon={TrendingUp} tone="accent" />
           <KpiPill label="Total expenses" value={formatCurrency(totals.totalExpenses)} icon={Receipt} tone="secondary" />
           <KpiPill label="Net margin" value={`${totals.totalSales > 0 ? (((totals.totalSales - totals.totalExpenses) / totals.totalSales) * 100).toFixed(1) : 0}%`} icon={Percent} tone="primary" />
@@ -231,8 +231,8 @@ function ReportsContent() {
       )}
 
       <Tabs defaultValue="overview">
-        <div className="border-b border-line px-1">
-          <TabsList className="mb-2">
+        <div className="overflow-x-auto border-b border-line px-1">
+          <TabsList className="mb-2 w-max">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="expenses">Expenses</TabsTrigger>
             <TabsTrigger value="sales">Sales</TabsTrigger>
@@ -427,7 +427,7 @@ function KpiPill({
     <div className="flex items-start justify-between rounded-xl border border-line bg-surface px-3 py-2.5">
       <div className="min-w-0">
         <p className="truncate text-[11px] font-medium uppercase tracking-wide text-ink-faint">{label}</p>
-        <p className="stamp mt-0.5 text-lg font-semibold text-ink">{value}</p>
+        <p className="stamp mt-0.5 truncate text-lg font-semibold text-ink">{value}</p>
       </div>
       <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${toneClasses[tone]}`}>
         <Icon className="h-4 w-4" />

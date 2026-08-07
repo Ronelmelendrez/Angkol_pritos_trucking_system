@@ -45,14 +45,14 @@ export function Sidebar() {
     <aside
       className={cn(
         "hidden shrink-0 flex-col border-r border-line bg-surface transition-all duration-300 ease-out",
-        "md:flex md:sticky md:top-0 md:h-screen",
-        isSidebarCollapsed ? "md:w-[4.5rem]" : "md:w-64",
+        "lg:flex lg:sticky lg:top-0 lg:h-screen",
+        isSidebarCollapsed ? "lg:w-[4.5rem]" : "lg:w-64",
       )}
     >
       {/* Header */}
       <div
         className={cn(
-          "flex items-center py-4 md:py-5",
+          "flex items-center py-4 lg:py-5",
           isSidebarCollapsed
             ? "justify-center px-2"
             : "justify-between px-4",

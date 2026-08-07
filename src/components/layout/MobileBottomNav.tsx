@@ -18,7 +18,7 @@ const CORE_ITEMS = [
 
 export function MobileBottomNav() {
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-line bg-surface/95 backdrop-blur-sm md:hidden safe-bottom">
+    <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-line bg-surface/95 backdrop-blur-sm lg:hidden safe-bottom">
       <ul className="flex items-stretch">
         {CORE_ITEMS.map((item) => (
           <li key={item.path} className="flex-1 min-w-0">

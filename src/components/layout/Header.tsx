@@ -49,7 +49,7 @@ export function Header({ title }: { title: string }) {
         <div className="flex items-center gap-3">
           <button
             onClick={toggleSidebar}
-            className="rounded-lg p-2 text-ink-soft hover:bg-ink/5 md:hidden"
+            className="rounded-lg p-2 text-ink-soft hover:bg-ink/5 lg:hidden"
             aria-label="Open menu"
           >
             <Menu className="h-5 w-5" />
