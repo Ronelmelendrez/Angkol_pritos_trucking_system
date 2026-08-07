@@ -44,6 +44,13 @@ export const advanceSchema = z.object({
 });
 export type AdvanceFormValues = z.infer<typeof advanceSchema>;
 
+export const withdrawalSchema = z.object({
+  amount: z.coerce.number().positive("Amount must be greater than ₱0"),
+  date: z.string().min(1, "Date is required"),
+  reason: z.string().optional(),
+});
+export type WithdrawalFormValues = z.infer<typeof withdrawalSchema>;
+
 export const loanSchema = z.object({
   employeeId: z.string().min(1, "Choose an employee"),
   principal: z.coerce.number().positive("Amount must be greater than ₱0"),
