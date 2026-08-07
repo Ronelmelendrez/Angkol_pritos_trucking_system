@@ -1,5 +1,5 @@
 import type { BaseRecord } from "@/types";
-import type { ExpenseCategory, PaymentMethod } from "@/lib/constants";
+import type { ExpenseCategory, PaymentMethod, ExpenseFundSource } from "@/lib/constants";
 
 export interface ExpenseItem {
   productId: string;
@@ -13,6 +13,7 @@ export interface Expense extends BaseRecord {
   amount: number;
   supplier?: string;
   paymentMethod: PaymentMethod;
+  fundSource?: ExpenseFundSource;
   productId?: string;
   quantityPurchased?: number;
   items?: ExpenseItem[];

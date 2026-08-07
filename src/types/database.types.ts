@@ -295,6 +295,7 @@ export type Database = {
           created_at: string
           date: string
           description: string | null
+          fund_source: Database["public"]["Enums"]["expense_fund_source"] | null
           id: string
           payment_method: Database["public"]["Enums"]["payment_method"]
           product_id: string | null
@@ -308,6 +309,7 @@ export type Database = {
           created_at?: string
           date: string
           description?: string | null
+          fund_source?: Database["public"]["Enums"]["expense_fund_source"] | null
           id?: string
           payment_method: Database["public"]["Enums"]["payment_method"]
           product_id?: string | null
@@ -321,6 +323,7 @@ export type Database = {
           created_at?: string
           date?: string
           description?: string | null
+          fund_source?: Database["public"]["Enums"]["expense_fund_source"] | null
           id?: string
           payment_method?: Database["public"]["Enums"]["payment_method"]
           product_id?: string | null
@@ -775,6 +778,7 @@ export type Database = {
       advance_status: "pending" | "deducted"
       attendance_status: "present" | "absent" | "closed"
       category_type: "expense" | "stock"
+      expense_fund_source: "cash_drawer" | "separate"
       loan_status: "active" | "paid"
       pay_frequency: "weekly" | "semi_monthly" | "monthly"
       payment_method: "cash" | "gcash" | "bank_transfer" | "credit"

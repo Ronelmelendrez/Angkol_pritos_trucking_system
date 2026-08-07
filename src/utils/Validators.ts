@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { EXPENSE_CATEGORIES, PAYMENT_METHODS } from "@/lib/constants";
+import { EXPENSE_CATEGORIES, PAYMENT_METHODS, EXPENSE_FUND_SOURCES } from "@/lib/constants";
 
 export const expenseItemSchema = z.object({
   productId: z.string().min(1, "Choose a product"),
@@ -17,6 +17,7 @@ export const expenseSchema = z.object({
   paymentMethod: z.enum(PAYMENT_METHODS, {
     error: "Choose a payment method",
   }),
+  fundSource: z.enum(EXPENSE_FUND_SOURCES).optional(),
   productId: z.string().optional().or(z.literal("")),
   quantityPurchased: z.coerce.number().positive("Qty must be greater than 0").optional(),
   items: z.array(expenseItemSchema).optional(),

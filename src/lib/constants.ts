@@ -16,6 +16,13 @@ export type ExpenseCategory = (typeof EXPENSE_CATEGORIES)[number];
 export const PAYMENT_METHODS = ["Cash", "GCash", "Bank Transfer", "Credit"] as const;
 export type PaymentMethod = (typeof PAYMENT_METHODS)[number];
 
+export const EXPENSE_FUND_SOURCES = ["cash_drawer", "separate"] as const;
+export type ExpenseFundSource = (typeof EXPENSE_FUND_SOURCES)[number];
+export const FUND_SOURCE_LABELS: Record<ExpenseFundSource, string> = {
+  cash_drawer: "Cash drawer (from sales)",
+  separate: "Separate money",
+};
+
 export const CATEGORY_COLORS: Record<ExpenseCategory, string> = {
   "Raw Materials": "#E67E22",
   "Ingredients": "#C0392B",

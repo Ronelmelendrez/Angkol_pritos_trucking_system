@@ -1,5 +1,5 @@
 import type { Database } from "@/types/database.types";
-import type { ExpenseCategory, PaymentMethod } from "@/lib/constants";
+import type { ExpenseCategory, PaymentMethod, ExpenseFundSource } from "@/lib/constants";
 import type { PaydayRule } from "@/features/settings/types";
 import type { AdjustmentReason } from "@/features/inventory/types";
 
@@ -40,6 +40,7 @@ export function expenseRowToApp(row: ExpenseRow & { categories?: { name: string 
     amount: Number(row.amount),
     supplier: row.supplier ?? undefined,
     paymentMethod: (PM_DB_TO_APP[row.payment_method] ?? "Cash") as PaymentMethod,
+    fundSource: row.fund_source ?? undefined,
     productId: row.product_id ?? undefined,
     quantityPurchased: row.quantity_purchased ?? undefined,
     createdAt: row.created_at,
@@ -54,6 +55,7 @@ export function expenseAppToRow(input: {
   amount: number;
   supplier?: string;
   paymentMethod: string;
+  fundSource?: ExpenseFundSource | null;
   product_id?: string | null;
   quantity_purchased?: number | null;
 }) {
@@ -64,6 +66,7 @@ export function expenseAppToRow(input: {
     amount: input.amount,
     supplier: input.supplier || null,
     payment_method: (PM_APP_TO_DB[input.paymentMethod] ?? "cash") as ExpenseRow["payment_method"],
+    fund_source: input.fundSource ?? null,
     product_id: input.product_id || null,
     quantity_purchased: input.quantity_purchased ?? null,
   };
