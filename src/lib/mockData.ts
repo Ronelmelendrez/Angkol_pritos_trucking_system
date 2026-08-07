@@ -803,6 +803,7 @@ const payRuleSettingsSeed: PayRuleSettings[] = [
   {
     id: "global",
     defaultReorderThreshold: 5,
+    defaultOpeningCash: 2000,
     spoilageRateThreshold: 5,
     standardHoursPerDay: 8,
     halfDayThresholdHours: 4,
