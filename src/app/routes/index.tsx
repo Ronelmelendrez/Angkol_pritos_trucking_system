@@ -12,6 +12,8 @@ import { EmployeesPage } from "@/app/routes/pages/EmployeesPage"
 import { AttendancePage } from "@/app/routes/pages/AttendancePage"
 import { AdvancesPage } from "@/app/routes/pages/AdvancesPage"
 import { LoansPage } from "@/app/routes/pages/LoansPage"
+import { CashDrawerPage } from "@/app/routes/pages/CashDrawerPage"
+import { WithdrawalsPage } from "@/app/routes/pages/WithdrawalsPage"
 import { PayrollPage } from "@/app/routes/pages/PayrollPage"
 import { ReportsPage } from "@/app/routes/pages/ReportsPage"
 import { SettingsPage } from "@/app/routes/pages/SettingsPage"
@@ -42,6 +44,8 @@ export const router = createBrowserRouter([
       { path: "attendance", element: <AttendancePage /> },
       { path: "advances", element: <AdvancesPage /> },
       { path: "loans", element: <LoansPage /> },
+      { path: "cash", element: <CashDrawerPage /> },
+      { path: "withdrawals", element: <WithdrawalsPage /> },
       { path: "payroll", element: <PayrollPage /> },
       { path: "reports", element: <ReportsPage /> },
       { path: "settings", element: <SettingsPage /> },
