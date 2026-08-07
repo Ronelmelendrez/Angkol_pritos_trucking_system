@@ -11,6 +11,8 @@ import {
   DollarSign,
   BarChart3,
   Settings,
+  PiggyBank,
+  HandCoins,
   type LucideIcon,
 } from "lucide-react"
 
@@ -30,6 +32,8 @@ export const NAV_ITEMS: NavItem[] = [
   { path: "/dashboard/attendance", label: "Attendance", icon: Clock },
   { path: "/dashboard/advances", label: "Advances", icon: Wallet },
   { path: "/dashboard/loans", label: "Loans", icon: Banknote },
+  { path: "/dashboard/cash", label: "Cash Drawer", icon: PiggyBank },
+  { path: "/dashboard/withdrawals", label: "Withdrawals", icon: HandCoins },
   { path: "/dashboard/payroll", label: "Payroll", icon: DollarSign },
   { path: "/dashboard/reports", label: "Reports", icon: BarChart3 },
   { path: "/dashboard/settings", label: "Settings", icon: Settings },
