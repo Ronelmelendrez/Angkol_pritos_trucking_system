@@ -11,6 +11,7 @@ export interface PaydayRule {
 export interface PayRuleSettings {
   id: string;
   defaultReorderThreshold: number;
+  defaultOpeningCash: number;
   spoilageRateThreshold: number;
   standardHoursPerDay: number;
   halfDayThresholdHours: number;
