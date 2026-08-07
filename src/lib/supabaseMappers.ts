@@ -15,6 +15,9 @@ type RepaymentRow = Database["public"]["Tables"]["repayments"]["Row"];
 type SaleRow = Database["public"]["Tables"]["sales"]["Row"];
 type PayRuleRow = Database["public"]["Tables"]["pay_rule_settings"]["Row"];
 type OverrideRow = Database["public"]["Tables"]["employee_pay_overrides"]["Row"];
+type CashOpeningRow = Database["public"]["Tables"]["cash_openings"]["Row"];
+type CashCountRow = Database["public"]["Tables"]["cash_counts"]["Row"];
+type OwnerWithdrawalRow = Database["public"]["Tables"]["owner_withdrawals"]["Row"];
 
 // ── Payment method normalization ──────────────────────
 const PM_APP_TO_DB: Record<string, string> = {
@@ -290,6 +293,7 @@ export function payRuleRowToApp(row: PayRuleRow) {
   return {
     id: row.id,
     defaultReorderThreshold: row.default_reorder_threshold,
+    defaultOpeningCash: Number(row.default_opening_cash),
     spoilageRateThreshold: Number(row.spoilage_rate_threshold ?? 5),
     standardHoursPerDay: Number(row.standard_hours_per_day),
     halfDayThresholdHours: Number(row.half_day_threshold_hours),
@@ -316,5 +320,89 @@ export function overrideRowToApp(row: OverrideRow) {
     lateDeductionPerMinute: row.late_deduction_per_minute ?? undefined,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
+  };
+}
+
+// ── Cash Openings ─────────────────────────────────────────────
+export function cashOpeningRowToApp(row: CashOpeningRow) {
+  return {
+    id: row.id,
+    date: row.date,
+    openingCash: Number(row.opening_cash),
+    createdBy: row.created_by ?? undefined,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  };
+}
+
+export function cashOpeningAppToRow(input: {
+  date: string;
+  openingCash: number;
+  createdBy?: string;
+}) {
+  return {
+    date: input.date,
+    opening_cash: input.openingCash,
+    created_by: input.createdBy ?? null,
+  };
+}
+
+// ── Cash Counts ───────────────────────────────────────────────
+export function cashCountRowToApp(row: CashCountRow) {
+  return {
+    id: row.id,
+    date: row.date,
+    expectedCash: Number(row.expected_cash),
+    actualCash: Number(row.actual_cash),
+    difference: Number(row.difference),
+    remarks: row.remarks ?? undefined,
+    countedBy: row.counted_by ?? undefined,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  };
+}
+
+export function cashCountAppToRow(input: {
+  date: string;
+  expectedCash: number;
+  actualCash: number;
+  difference: number;
+  remarks?: string;
+  countedBy?: string;
+}) {
+  return {
+    date: input.date,
+    expected_cash: input.expectedCash,
+    actual_cash: input.actualCash,
+    difference: input.difference,
+    remarks: input.remarks ?? null,
+    counted_by: input.countedBy ?? null,
+  };
+}
+
+// ── Owner Withdrawals ─────────────────────────────────────────
+export function ownerWithdrawalRowToApp(row: OwnerWithdrawalRow) {
+  return {
+    id: row.id,
+    date: row.date,
+    amount: Number(row.amount),
+    reason: row.reason ?? undefined,
+    createdBy: row.created_by ?? undefined,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  };
+}
+
+export function ownerWithdrawalAppToRow(input: {
+  date: string;
+  amount: number;
+  reason?: string;
+  createdBy?: string;
+}) {
+  return {
+    date: input.date,
+    amount: input.amount,
+    reason: input.reason ?? null,
+    created_by: input.createdBy ?? null,
   };
 }
