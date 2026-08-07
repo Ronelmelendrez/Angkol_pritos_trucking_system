@@ -28,7 +28,12 @@ export function useDailyCash(date: string) {
       .filter((s) => s.date === date)
       .sort((a, b) => (a.createdAt ?? "").localeCompare(b.createdAt ?? ""));
     const dayExpenses = expenses
-      .filter((e) => e.date === date && e.paymentMethod === "Cash")
+      .filter(
+        (e) =>
+          e.date === date &&
+          e.paymentMethod === "Cash" &&
+          e.fundSource !== "separate",
+      )
       .sort((a, b) => (a.createdAt ?? "").localeCompare(b.createdAt ?? ""));
     const dayAdvances = advances
       .filter((a) => a.date === date)
