@@ -13,6 +13,7 @@ import type { PaydayRule } from "../types";
 
 const payRuleSettingsSchema = z.object({
   defaultReorderThreshold: z.coerce.number().min(0),
+  defaultOpeningCash: z.coerce.number().min(0),
   spoilageRateThreshold: z.coerce.number().min(0).max(100),
   standardHoursPerDay: z.coerce.number().min(1).max(24),
   halfDayThresholdHours: z.coerce.number().min(0),
@@ -68,6 +69,7 @@ export function PayRuleSettingsForm() {
     resolver: zodResolver(payRuleSettingsSchema) as unknown as Resolver<FormValues>,
     values: settings && {
       defaultReorderThreshold: settings.defaultReorderThreshold,
+      defaultOpeningCash: settings.defaultOpeningCash,
       spoilageRateThreshold: settings.spoilageRateThreshold,
       standardHoursPerDay: settings.standardHoursPerDay,
       halfDayThresholdHours: settings.halfDayThresholdHours,
@@ -126,6 +128,12 @@ export function PayRuleSettingsForm() {
             <Input id="spoilageRateThreshold" type="number" step="0.5" min="0" max="100" {...register("spoilageRateThreshold")} />
             {errors.spoilageRateThreshold && <p className="mt-1 text-xs text-danger">{errors.spoilageRateThreshold.message}</p>}
             <p className="mt-1 text-xs text-ink-faint">Adjustment report shows a warning when lost stock exceeds this share of purchased stock.</p>
+          </div>
+          <div>
+            <Label htmlFor="defaultOpeningCash">Default opening cash (₱)</Label>
+            <Input id="defaultOpeningCash" type="number" step="0.01" min="0" {...register("defaultOpeningCash")} />
+            {errors.defaultOpeningCash && <p className="mt-1 text-xs text-danger">{errors.defaultOpeningCash.message}</p>}
+            <p className="mt-1 text-xs text-ink-faint">Prefills the daily cash opening when the cashier starts the shift.</p>
           </div>
         </div>
       </Card>
