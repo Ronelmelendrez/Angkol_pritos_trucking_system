@@ -127,6 +127,69 @@ export type Database = {
           },
         ]
       }
+      cash_counts: {
+        Row: {
+          actual_cash: number
+          counted_by: string | null
+          created_at: string
+          date: string
+          difference: number
+          expected_cash: number
+          id: string
+          remarks: string | null
+          updated_at: string
+        }
+        Insert: {
+          actual_cash: number
+          counted_by?: string | null
+          created_at?: string
+          date: string
+          difference?: number
+          expected_cash?: number
+          id?: string
+          remarks?: string | null
+          updated_at?: string
+        }
+        Update: {
+          actual_cash?: number
+          counted_by?: string | null
+          created_at?: string
+          date?: string
+          difference?: number
+          expected_cash?: number
+          id?: string
+          remarks?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      cash_openings: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          date: string
+          id: string
+          opening_cash: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          date: string
+          id?: string
+          opening_cash: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          date?: string
+          id?: string
+          opening_cash?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       categories: {
         Row: {
           created_at: string
@@ -326,10 +389,41 @@ export type Database = {
           },
         ]
       }
+      owner_withdrawals: {
+        Row: {
+          amount: number
+          created_at: string
+          created_by: string | null
+          date: string
+          id: string
+          reason: string | null
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          created_by?: string | null
+          date: string
+          id?: string
+          reason?: string | null
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          created_by?: string | null
+          date?: string
+          id?: string
+          reason?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       pay_rule_settings: {
         Row: {
           absence_deduction_mode: Database["public"]["Enums"]["absence_deduction_mode"]
           created_at: string
+          default_opening_cash: number
           default_reorder_threshold: number
           half_day_rate_multiplier: number
           half_day_threshold_hours: number
@@ -348,6 +442,7 @@ export type Database = {
         Insert: {
           absence_deduction_mode?: Database["public"]["Enums"]["absence_deduction_mode"]
           created_at?: string
+          default_opening_cash?: number
           default_reorder_threshold?: number
           half_day_rate_multiplier?: number
           half_day_threshold_hours?: number
@@ -366,6 +461,7 @@ export type Database = {
         Update: {
           absence_deduction_mode?: Database["public"]["Enums"]["absence_deduction_mode"]
           created_at?: string
+          default_opening_cash?: number
           default_reorder_threshold?: number
           half_day_rate_multiplier?: number
           half_day_threshold_hours?: number
