@@ -39,6 +39,7 @@ export function useAddExpense() {
         amount: input.amount,
         supplier: input.supplier,
         paymentMethod: input.paymentMethod,
+        fundSource: input.fundSource ?? null,
         product_id: input.productId || null,
         quantity_purchased: input.quantityPurchased || null,
       });
@@ -109,6 +110,9 @@ export function useUpdateExpense() {
           Cash: "cash", GCash: "gcash", "Bank Transfer": "bank_transfer", Credit: "credit",
         };
         updateRow.payment_method = PM_MAP[patch.paymentMethod] as Database["public"]["Enums"]["payment_method"];
+      }
+      if (patch.fundSource !== undefined) {
+        updateRow.fund_source = patch.fundSource ?? null;
       }
 
       const { data, error } = await supabase
