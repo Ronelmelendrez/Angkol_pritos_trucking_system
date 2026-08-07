@@ -10,6 +10,7 @@ import {
   HandCoins,
   TrendingUp,
   TrendingDown,
+  ReceiptText,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { formatCurrency } from "@/utils/currency";
@@ -187,14 +188,20 @@ export function DailyCashReport({ date }: { date: string }) {
           {/* Statement */}
           <Card className="h-full">
             <CardHeader>
-              <div>
-                <CardTitle>Daily cash statement</CardTitle>
-                <CardDescription>Angkol Prito's · {formatDate(date)}</CardDescription>
+              <div className="flex w-full flex-col items-center gap-1 text-center pb-8">
+                <ReceiptText className="h-5 w-5 text-primary-dark" />
+                <div>
+                  <CardTitle>Daily cash statement</CardTitle>
+                  <CardDescription>Angkol Prito's · {formatDate(date)}</CardDescription>
+                </div>
               </div>
             </CardHeader>
             <CardContent className="px-6 pb-6">
               <div className="space-y-5">
-                <MoneyRow label="Opening cash" amount={data.openingCash ?? 0} />
+                <section className="space-y-2">
+                  <SectionLabel icon={Wallet} tone="neutral">Opening cash</SectionLabel>
+                  <MoneyRow label="Cash on hand" amount={data.openingCash ?? 0} />
+                </section>
 
                 <section className="space-y-2">
                   <SectionLabel icon={ArrowDownLeft} tone="success">Cash in</SectionLabel>
