@@ -5,9 +5,11 @@ import { ExpensePieChart } from "@/features/reports/components/ExpensesPieChart"
 import { ProfitLineChart } from "@/features/reports/components/profitLineChart";
 import { SalesByProductPieChart } from "@/features/reports/components/SalesByProductPieChart";
 import { PayrollSummary } from "@/features/reports/components/PayrollSummary";
+import { DailyCashReport } from "@/features/cash/components/DailyCashReport";
 import { TrendingUp, Receipt, Percent, CalendarDays, Wallet } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card";
 import { Skeleton } from "@/components/ui/Skeleton";
+import { Input } from "@/components/ui/Input";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/Tabs";
 import { DatePresets, type DatePreset } from "@/components/ui/DatePresets";
 import { HorizontalBarList } from "@/components/charts/HorizontalBarList";
@@ -100,6 +102,7 @@ function ReportsContent() {
   const [preset, setPreset] = useState<DatePreset>("this-month");
   const [customFrom, setCustomFrom] = useState(todayStr);
   const [customTo, setCustomTo] = useState(todayStr);
+  const [cashDate, setCashDate] = useState(todayStr);
 
   const labelCount = useChartLabelCount();
 
@@ -234,6 +237,7 @@ function ReportsContent() {
             <TabsTrigger value="expenses">Expenses</TabsTrigger>
             <TabsTrigger value="sales">Sales</TabsTrigger>
             <TabsTrigger value="payroll">Payroll</TabsTrigger>
+            <TabsTrigger value="cash">Daily Cash</TabsTrigger>
           </TabsList>
         </div>
 
@@ -377,6 +381,22 @@ function ReportsContent() {
                 <PayrollSummary />
               </>
             )}
+          </div>
+        </TabsContent>
+
+        <TabsContent value="cash">
+          <div className="space-y-4">
+            <div className="flex flex-wrap items-end justify-between gap-3">
+              <div>
+                <p className="text-sm font-semibold text-ink">Daily cash reconciliation</p>
+                <p className="text-xs text-ink-faint">Opening + cash in − cash out vs. actual drawer count</p>
+              </div>
+              <div className="w-full max-w-52">
+                <p className="mb-1 text-xs font-medium text-ink-soft">Report date</p>
+                <Input type="date" value={cashDate} onChange={(e) => setCashDate(e.target.value)} />
+              </div>
+            </div>
+            <DailyCashReport date={cashDate} />
           </div>
         </TabsContent>
       </Tabs>
