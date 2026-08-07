@@ -4,6 +4,7 @@ import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, A
 import { Badge } from "@/components/ui/Badge";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { Button } from "@/components/ui/Button";
+import { cn } from "@/utils/cn";
 import { Pagination } from "@/components/ui/Pagination";
 import { formatCurrency } from "@/utils/currency";
 import { formatDate } from "@/utils/date";
@@ -113,6 +114,18 @@ export function ExpenseList({ expenses, isLoading }: Props) {
                         {exp.category}
                       </Badge>
                       <span className="min-w-0 flex-1 truncate text-ink">{exp.description}</span>
+                      {exp.paymentMethod === "Cash" && exp.fundSource && (
+                        <span
+                          className={cn(
+                            "hidden shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium sm:inline",
+                            exp.fundSource === "separate"
+                              ? "bg-ink/5 text-ink-faint"
+                              : "bg-primary/10 text-primary-dark",
+                          )}
+                        >
+                          {exp.fundSource === "separate" ? "Separate money" : "From sales"}
+                        </span>
+                      )}
                       {exp.supplier && (
                         <span className="hidden sm:inline shrink-0 text-ink-faint">· {exp.supplier}</span>
                       )}
