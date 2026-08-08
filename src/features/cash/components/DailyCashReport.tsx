@@ -72,8 +72,11 @@ function MovementRow({ item, index, isLast }: { item: CashMovementItem; index: n
   const style = MOVEMENT_STYLES[item.type];
   return (
     <li className="relative flex items-center gap-3 py-2">
-      {index > 0 && !isLast && (
-        <span aria-hidden className="absolute left-[17px] top-0 h-full w-px bg-line" />
+      {index > 0 && (
+        <span aria-hidden className="absolute left-[17px] top-0 h-[calc(50%-18px)] w-px bg-line" />
+      )}
+      {!isLast && (
+        <span aria-hidden className="absolute left-[17px] top-[calc(50%+18px)] h-[calc(50%-18px)] w-px bg-line" />
       )}
       <span
         className={cn(
