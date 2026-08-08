@@ -272,8 +272,8 @@ export function DailyCashReport({ date }: { date: string }) {
           {/* Timeline */}
           <Card className="h-full">
             <CardHeader>
-              <div className="flex items-center gap-2">
-                <Scale className="h-4 w-4 text-primary-dark" />
+              <div className="flex w-full flex-col items-center gap-1 text-center pb-8">
+                <Scale className="h-5 w-5 text-primary-dark" />
                 <div>
                   <CardTitle>Cash movement</CardTitle>
                   <CardDescription>Opening + cash in − cash out</CardDescription>
