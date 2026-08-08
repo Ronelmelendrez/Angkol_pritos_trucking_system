@@ -20,11 +20,9 @@ export function InventoryLedgerTable({ entries, unit, isLoading }: Props) {
 
   const sorted = useMemo(
     () =>
-      [...entries].sort((a, b) => {
-        if (a.date === todayStr) return -1;
-        if (b.date === todayStr) return 1;
-        return b.date.localeCompare(a.date);
-      }),
+      entries
+        .filter((e) => e.date <= todayStr)
+        .sort((a, b) => b.date.localeCompare(a.date)),
     [entries, todayStr],
   );
 
@@ -42,7 +40,7 @@ export function InventoryLedgerTable({ entries, unit, isLoading }: Props) {
     );
   }
 
-  if (entries.length === 0) {
+  if (sorted.length === 0) {
     return (
       <p className="py-8 text-center text-sm text-ink-faint">No ledger entries for this period.</p>
     );
