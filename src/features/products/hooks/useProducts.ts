@@ -1,6 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabaseClient";
 import { productRowToApp, productAppToRow } from "@/lib/supabaseMappers";
+import { salesKeys } from "@/features/sales/hooks/useSales";
+import { expensesKeys } from "@/features/expenses/hooks/useExpenses";
 import type { Product, NewProduct, UpdateProduct } from "../types";
 
 const PRODUCTS_KEY = ["products"] as const;
@@ -74,6 +76,12 @@ export function useDeleteProduct() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (id: string) => {
+      const results = await Promise.all([
+        supabase.from("sales").delete().eq("product_id", id),
+        supabase.from("stock_adjustments").delete().eq("product_id", id),
+        supabase.from("expenses").update({ product_id: null }).eq("product_id", id),
+      ]);
+      for (const result of results) if (result.error) throw result.error;
       const { error } = await supabase.from("products").delete().eq("id", id);
       if (error) throw error;
     },
@@ -89,6 +97,11 @@ export function useDeleteProduct() {
     onError: (_err, _id, context) => {
       if (context?.previous) queryClient.setQueryData(PRODUCTS_KEY, context.previous);
     },
-    onSettled: () => queryClient.invalidateQueries({ queryKey: PRODUCTS_KEY }),
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: PRODUCTS_KEY });
+      queryClient.invalidateQueries({ queryKey: salesKeys.all });
+      queryClient.invalidateQueries({ queryKey: expensesKeys.all });
+      queryClient.invalidateQueries({ queryKey: ["stockAdjustments"] });
+    },
   });
 }
