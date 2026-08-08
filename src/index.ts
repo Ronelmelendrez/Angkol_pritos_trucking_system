@@ -3,7 +3,7 @@
  * Feature-specific types live in `src/features/<feature>/types/`.
  */
 
-/** Standard shape every mock/Supabase table row shares */
+/** Standard shape every table row shares */
 export interface BaseRecord {
   id: string;
   createdAt: string;

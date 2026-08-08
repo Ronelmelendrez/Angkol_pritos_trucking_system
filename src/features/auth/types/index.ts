@@ -19,10 +19,9 @@ export interface LoginCredentials {
 }
 
 /**
- * Contract every auth provider (mock or Supabase) must satisfy.
- * Swapping to Supabase Auth later means implementing this interface
- * against `supabase.auth.*` instead of localStorage — nothing that
- * consumes `useAuth()` needs to change.
+ * Contract every auth provider must satisfy. It is implemented
+ * against `supabase.auth.*` — nothing that consumes `useAuth()`
+ * needs to change.
  */
 export interface AuthProvider {
   getSession(): Promise<AuthUser | null>;

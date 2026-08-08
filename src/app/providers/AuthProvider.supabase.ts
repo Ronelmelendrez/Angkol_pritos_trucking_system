@@ -2,8 +2,8 @@ import { supabase } from "@/lib/supabaseClient";
 import type { AuthProvider, AuthUser, LoginCredentials } from "@/features/auth/types";
 
 /**
- * Supabase auth provider — implements the same AuthProvider contract
- * as the mock, so useAuth() and all consuming components need zero changes.
+ * Supabase auth provider — implements the AuthProvider contract against
+ * `supabase.auth.*`, so useAuth() and all consuming components need no changes.
  */
 export const supabaseAuthProvider: AuthProvider = {
   async getSession(): Promise<AuthUser | null> {

@@ -45,9 +45,3 @@ export type AdvanceStatus = (typeof ADVANCE_STATUSES)[number];
 
 export const LOAN_STATUSES = ["active", "paid"] as const;
 export type LoanStatus = (typeof LOAN_STATUSES)[number];
-
-/** Simulated network latency for mock services, in ms */
-export const MOCK_LATENCY = 350;
-
-/** Manual daily sales figure until POS integration exists */
-export const DEFAULT_DAILY_SALES = 18500;
