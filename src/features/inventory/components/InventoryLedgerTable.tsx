@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import { AlertTriangle } from "lucide-react";
+import { format } from "date-fns";
 import { Pagination } from "@/components/ui/Pagination";
 import { formatQty } from "@/utils/currency";
 import type { InventoryLedgerEntry } from "../types";
@@ -15,9 +16,16 @@ interface Props {
 export function InventoryLedgerTable({ entries, unit, isLoading }: Props) {
   const [page, setPage] = useState(1);
 
+  const todayStr = format(new Date(), "yyyy-MM-dd");
+
   const sorted = useMemo(
-    () => [...entries].sort((a, b) => b.date.localeCompare(a.date)),
-    [entries],
+    () =>
+      [...entries].sort((a, b) => {
+        if (a.date === todayStr) return -1;
+        if (b.date === todayStr) return 1;
+        return b.date.localeCompare(a.date);
+      }),
+    [entries, todayStr],
   );
 
   const totalPages = Math.max(1, Math.ceil(sorted.length / PAGE_SIZE));
