@@ -19,6 +19,7 @@ import {
   Layers,
   Database,
   Smartphone,
+  PiggyBank,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
@@ -34,6 +35,8 @@ const MODULES = [
   { icon: CalendarClock, title: "Attendance", desc: "Clock in/out from any phone. Hours worked feed directly into payroll — no manual timesheets." },
   { icon: HandCoins, title: "Cash advances", desc: "Record an advance the moment it's given, and deduct it automatically from the next payout." },
   { icon: Landmark, title: "Loans (utang)", desc: "Track principal, remaining balance, and every repayment per employee, over time." },
+  { icon: PiggyBank, title: "Cash Drawer", desc: "Open the day with cash on hand and count the drawer at closing — expected vs. actual, every day." },
+  { icon: HandCoins, title: "Withdrawals", desc: "Owner withdrawals logged the moment they happen, so money taken out of the business is never lost track of." },
   { icon: DollarSign, title: "Payroll", desc: "Weekly, semi-monthly, or monthly — hours × rate, minus advances and loan deductions, with a locked paid history." },
   { icon: BarChart3, title: "Reports", desc: "Sales vs. expenses over time, spending by category, and payroll summaries in one place." },
   { icon: Settings, title: "Settings", desc: "Company profile, work schedules, and the payroll rules that drive the whole system." },
@@ -127,7 +130,7 @@ export function LandingPage() {
                 <div className="flex items-center justify-between border-b border-dashed border-line pb-3">
                   <span className="stamp text-sm font-semibold text-ink">One system, one truck</span>
                   <span className="flex items-center gap-1 text-xs font-medium text-primary">
-                    <Layers className="h-3.5 w-3.5" /> 12 modules
+                    <Layers className="h-3.5 w-3.5" /> 14 modules
                   </span>
                 </div>
                 <div className="grid grid-cols-2 gap-2.5">
@@ -196,7 +199,7 @@ export function LandingPage() {
         <div className="mx-auto mb-12 max-w-xl text-center">
           <h2 className="stamp text-3xl font-bold text-ink sm:text-4xl">What's inside the system</h2>
           <p className="mt-3 text-ink-soft">
-            Twelve modules, all reading from and feeding into each other.
+            Fourteen modules, all reading from and feeding into each other.
           </p>
         </div>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">

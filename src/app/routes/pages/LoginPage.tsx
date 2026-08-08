@@ -91,7 +91,7 @@ export function LoginPage() {
         {/* bottom — trust strip */}
         <div className="relative flex items-center gap-6 text-white/60">
           <div>
-            <p className="stamp text-xl font-bold text-white">8</p>
+            <p className="stamp text-xl font-bold text-white">14</p>
             <p className="text-xs">modules</p>
           </div>
           <div className="h-8 w-px bg-white/15" />
