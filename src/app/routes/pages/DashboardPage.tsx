@@ -17,6 +17,7 @@ import { useAdvances } from "@/features/advances/hooks/useAdvances";
 import { useLoans } from "@/features/loans/hooks/useLoans";
 import { usePayRuleSettings } from "@/features/settings/hooks/usePayRuleSettings";
 import { useReports } from "@/features/reports/hooks/useReports";
+import { InsightsPanel, useInsights } from "@/features/insights";
 import { Sparkline } from "@/components/charts/Sparkline";
 import { TrendBadge } from "@/components/charts/TrendBadge";
 import { CalendarHeatmap } from "@/components/charts/CalendarHeatmap";
@@ -34,6 +35,7 @@ export function DashboardPage() {
   const { data: advances = [] } = useAdvances();
   const { data: loans = [] } = useLoans();
   const { data: settings } = usePayRuleSettings();
+  const { insights, isLoading: insightsLoading } = useInsights();
   const dateTo = formatDateFns(new Date(), "yyyy-MM-dd");
   const dateFrom = formatDateFns(subDays(new Date(), 29), "yyyy-MM-dd");
   const { dailyProfit, isLoading: reportsLoading } = useReports(dateFrom, dateTo);
@@ -233,6 +235,8 @@ export function DashboardPage() {
           isLoading={isLoading}
         />
       </div>
+
+      <InsightsPanel insights={insights} isLoading={insightsLoading} limit={6} />
 
       <Card>
         <CardHeader>

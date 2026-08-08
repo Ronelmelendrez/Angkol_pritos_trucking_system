@@ -26,6 +26,7 @@ import { startOfWeek } from "date-fns/startOfWeek";
 import { endOfWeek } from "date-fns/endOfWeek";
 import { useProducts } from "@/features/products/hooks/useProducts";
 import { useExpenses } from "@/features/expenses/hooks/useExpenses";
+import { InsightsPanel, useInsights } from "@/features/insights";
 import { groupByWeekday } from "@/utils/groupByWeekday";
 import type { RevenueByProduct } from "@/features/reports/types";
 import type { Sale } from "@/features/sales/types";
@@ -132,6 +133,7 @@ function ReportsContent() {
   const { categoryBreakdown, dailyProfit, filteredSales, totals, payroll, isLoading } = useReports(dateFrom, dateTo);
   const { data: allExpenses = [] } = useExpenses();
   const { data: products = [] } = useProducts();
+  const { insights, isLoading: insightsLoading } = useInsights(dateFrom, dateTo);
 
   // KPI summary
   const avgDailyExpense = dailyProfit.length > 0
@@ -234,6 +236,7 @@ function ReportsContent() {
         <div className="overflow-x-auto border-b border-line px-1">
           <TabsList className="mb-2 w-max">
             <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="insights">Insights</TabsTrigger>
             <TabsTrigger value="expenses">Expenses</TabsTrigger>
             <TabsTrigger value="sales">Sales</TabsTrigger>
             <TabsTrigger value="payroll">Payroll</TabsTrigger>
@@ -256,6 +259,15 @@ function ReportsContent() {
             )}
             {isLoading ? <Skeleton className="h-64 w-full" /> : <ProfitLineChart data={dailyProfit} />}
           </div>
+        </TabsContent>
+
+        <TabsContent value="insights">
+          <InsightsPanel
+            insights={insights}
+            isLoading={insightsLoading}
+            title="Key insights"
+            description={`Auto-generated from ${rangeLabel}`}
+          />
         </TabsContent>
 
         <TabsContent value="expenses">
