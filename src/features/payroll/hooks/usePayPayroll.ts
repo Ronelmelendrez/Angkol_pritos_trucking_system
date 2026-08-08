@@ -6,6 +6,7 @@ import type { PayrollRunDraftRow } from "./usePayrollRun";
 
 const PAYROLL_KEY = ["payroll_runs"] as const;
 const EXPENSES_KEY = ["expenses"] as const;
+const ADVANCES_KEY = ["advances"] as const;
 
 export function usePayPayroll() {
   const queryClient = useQueryClient();
@@ -74,6 +75,7 @@ export function usePayPayroll() {
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: PAYROLL_KEY });
       queryClient.invalidateQueries({ queryKey: EXPENSES_KEY });
+      queryClient.invalidateQueries({ queryKey: ADVANCES_KEY });
     },
     onError: () => {
       toast({
