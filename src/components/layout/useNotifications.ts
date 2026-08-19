@@ -5,8 +5,10 @@ import { usePayRuleSettings } from "@/features/settings/hooks/usePayRuleSettings
 import { usePayrollHistory } from "@/features/payroll/hooks/usePayrollHistory";
 import { useEmployees } from "@/features/employees/hooks/useEmployees";
 import { useAttendance } from "@/features/attendance/hooks/useAttendance";
+import { useAuth } from "@/features/auth/hooks/useAuth";
 import { formatQty, formatCurrencyCompact } from "@/utils/currency";
 import { todayISO } from "@/utils/date";
+import { ROLE_BASE_PATH } from "@/lib/constants";
 
 export type NotificationKind = "low-stock" | "payroll" | "employee" | "attendance";
 
@@ -69,6 +71,7 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 const RECENT_DAYS = 7;
 
 export function useNotifications(): AppNotification[] {
+  const { user } = useAuth();
   const stock = useAllProductStock();
   const { data: settings } = usePayRuleSettings();
   const { data: payroll = [] } = usePayrollHistory();
@@ -77,65 +80,70 @@ export function useNotifications(): AppNotification[] {
   const readIds = useNotificationStore((s) => s.readIds);
   const dismissedIds = useNotificationStore((s) => s.dismissedIds);
 
+  const isEmployee = user?.role === "staff";
+  const basePath = ROLE_BASE_PATH[user?.role ?? "manager"];
+
   return useMemo(() => {
     const notifications: Omit<AppNotification, "read">[] = [];
 
-    // Low stock alerts
-    const threshold = settings?.defaultReorderThreshold ?? 5;
-    const lowItems = stock
-      .filter((item) => item.closingQty >= 0 && item.closingQty <= threshold)
-      .sort((a, b) => a.closingQty - b.closingQty)
-      .slice(0, 5);
-    lowItems.forEach((item) => {
-      notifications.push({
-        id: `low-stock-${item.productId}`,
-        kind: "low-stock",
-        title: "Low stock alert",
-        description: `${item.productName} is down to ${formatQty(item.closingQty)} ${item.unit} (threshold ${threshold}).`,
-        timestamp: new Date().toISOString(),
-        link: "/dashboard/inventory",
+    // Low stock alerts — admin only
+    if (!isEmployee) {
+      const threshold = settings?.defaultReorderThreshold ?? 5;
+      const lowItems = stock
+        .filter((item) => item.closingQty >= 0 && item.closingQty <= threshold)
+        .sort((a, b) => a.closingQty - b.closingQty)
+        .slice(0, 5);
+      lowItems.forEach((item) => {
+        notifications.push({
+          id: `low-stock-${item.productId}`,
+          kind: "low-stock",
+          title: "Low stock alert",
+          description: `${item.productName} is down to ${formatQty(item.closingQty)} ${item.unit} (threshold ${threshold}).`,
+          timestamp: new Date().toISOString(),
+          link: `${basePath}/inventory`,
+        });
       });
-    });
 
-    // Payroll — most recently paid batch
-    const paid = payroll.filter((r) => r.status === "paid" && r.paidAt);
-    if (paid.length > 0) {
-      const latest = paid
-        .slice()
-        .sort((a, b) => (b.paidAt ?? "").localeCompare(a.paidAt ?? ""))[0];
-      const batch = paid.filter((r) => r.paidAt === latest.paidAt);
-      const total = batch.reduce((sum, r) => sum + r.netPay, 0);
-      notifications.push({
-        id: `payroll-${latest.paidAt}`,
-        kind: "payroll",
-        title: "Payroll completed",
-        description: `${batch.length} employee${batch.length === 1 ? "" : "s"} paid — total ${formatCurrencyCompact(total)}.`,
-        timestamp: latest.paidAt ?? new Date().toISOString(),
-        link: "/dashboard/payroll",
+      // Payroll — admin only
+      const paid = payroll.filter((r) => r.status === "paid" && r.paidAt);
+      if (paid.length > 0) {
+        const latest = paid
+          .slice()
+          .sort((a, b) => (b.paidAt ?? "").localeCompare(a.paidAt ?? ""))[0];
+        const batch = paid.filter((r) => r.paidAt === latest.paidAt);
+        const total = batch.reduce((sum, r) => sum + r.netPay, 0);
+        notifications.push({
+          id: `payroll-${latest.paidAt}`,
+          kind: "payroll",
+          title: "Payroll completed",
+          description: `${batch.length} employee${batch.length === 1 ? "" : "s"} paid — total ${formatCurrencyCompact(total)}.`,
+          timestamp: latest.paidAt ?? new Date().toISOString(),
+          link: `${basePath}/payroll`,
+        });
+      }
+
+      // Recently added employees — admin only
+      const now = new Date().getTime();
+      const recent = employees
+        .filter((e) => {
+          const created = e.createdAt ? Date.parse(e.createdAt) : Date.parse(e.hireDate);
+          return Number.isFinite(created) && now - created < RECENT_DAYS * DAY_MS;
+        })
+        .sort((a, b) => (b.createdAt ?? "").localeCompare(a.createdAt ?? ""))
+        .slice(0, 3);
+      recent.forEach((emp) => {
+        notifications.push({
+          id: `employee-${emp.id}`,
+          kind: "employee",
+          title: "New employee added",
+          description: `${emp.name} has been added to the team.`,
+          timestamp: emp.createdAt ?? emp.hireDate,
+          link: `${basePath}/employees`,
+        });
       });
     }
 
-    // Recently added employees
-    const now = new Date().getTime();
-    const recent = employees
-      .filter((e) => {
-        const created = e.createdAt ? Date.parse(e.createdAt) : Date.parse(e.hireDate);
-        return Number.isFinite(created) && now - created < RECENT_DAYS * DAY_MS;
-      })
-      .sort((a, b) => (b.createdAt ?? "").localeCompare(a.createdAt ?? ""))
-      .slice(0, 3);
-    recent.forEach((emp) => {
-      notifications.push({
-        id: `employee-${emp.id}`,
-        kind: "employee",
-        title: "New employee added",
-        description: `${emp.name} has been added to the team.`,
-        timestamp: emp.createdAt ?? emp.hireDate,
-        link: "/dashboard/employees",
-      });
-    });
-
-    // Today's attendance summary
+    // Today's attendance summary — both roles
     const today = todayISO();
     const activeCount = employees.filter((e) => e.isActive).length;
     const todayPresent = attendance.filter(
@@ -151,7 +159,7 @@ export function useNotifications(): AppNotification[] {
             ? `Today's attendance: ${todayPresent}/${activeCount} present.`
             : "No one has clocked in yet today.",
         timestamp: new Date().toISOString(),
-        link: "/dashboard/attendance",
+        link: `${basePath}/attendance`,
       });
     }
 
@@ -159,5 +167,5 @@ export function useNotifications(): AppNotification[] {
       .filter((n) => !dismissedIds.includes(n.id))
       .map((n) => ({ ...n, read: readIds.includes(n.id) }))
       .sort((a, b) => b.timestamp.localeCompare(a.timestamp));
-  }, [stock, settings, payroll, employees, attendance, readIds, dismissedIds]);
+  }, [isEmployee, basePath, stock, settings, payroll, employees, attendance, readIds, dismissedIds]);
 }
