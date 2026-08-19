@@ -3,7 +3,31 @@ import { Sidebar } from "@/components/layout/Sidebar"
 import { Header } from "@/components/layout/Header"
 import { MobileTopbar } from "@/components/layout/MobileTopbar"
 import { MobileBottomNav } from "@/components/layout/MobileBottomNav"
-import { NAV_ITEMS } from "@/components/layout/navConfig"
+import { useAuth } from "@/features/auth/hooks/useAuth"
+
+const MANAGER_NAV_ITEMS = [
+  { path: "/dashboard", label: "Dashboard" },
+  { path: "/dashboard/sales", label: "Sales" },
+  { path: "/dashboard/products", label: "Products" },
+  { path: "/dashboard/expenses", label: "Expenses" },
+  { path: "/dashboard/inventory", label: "Inventory" },
+  { path: "/dashboard/employees", label: "Employees" },
+  { path: "/dashboard/attendance", label: "Attendance" },
+  { path: "/dashboard/advances", label: "Advances" },
+  { path: "/dashboard/loans", label: "Loans" },
+  { path: "/dashboard/cash", label: "Cash Drawer" },
+  { path: "/dashboard/withdrawals", label: "Withdrawals" },
+  { path: "/dashboard/payroll", label: "Payroll" },
+  { path: "/dashboard/reports", label: "Reports" },
+  { path: "/dashboard/settings", label: "Settings" },
+]
+
+const EMPLOYEE_NAV_ITEMS = [
+  { path: "/employee/expenses", label: "Expenses" },
+  { path: "/employee/attendance", label: "Attendance" },
+  { path: "/employee/advances", label: "Cash Advances" },
+  { path: "/employee/cash", label: "Cash Drawer" },
+]
 
 /**
  * Main application layout.
@@ -13,7 +37,10 @@ import { NAV_ITEMS } from "@/components/layout/navConfig"
  */
 export function AppLayout() {
   const location = useLocation()
-  const title = NAV_ITEMS.find((item) => item.path === location.pathname)?.label ?? "Dashboard"
+  const { user } = useAuth()
+
+  const navItems = user?.role === "staff" ? EMPLOYEE_NAV_ITEMS : MANAGER_NAV_ITEMS
+  const title = navItems.find((item) => item.path === location.pathname)?.label ?? "Dashboard"
 
   return (
     <div className="flex h-screen overflow-hidden bg-bg">
