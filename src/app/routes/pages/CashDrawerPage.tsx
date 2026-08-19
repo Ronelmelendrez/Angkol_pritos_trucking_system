@@ -9,10 +9,36 @@ import { CashOpeningForm, CashCountForm } from "@/features/cash";
 import { useDailyCash } from "@/features/cash/hooks/useDailyCash";
 import { todayISO, formatDate } from "@/utils/date";
 import { formatCurrency } from "@/utils/currency";
+import { useAuth } from "@/features/auth/hooks/useAuth";
 
 export function CashDrawerPage() {
+  const { user } = useAuth();
+  const isEmployee = user?.role === "staff";
   const [date, setDate] = useState(todayISO);
   const { data, isLoading } = useDailyCash(date);
+
+  // Employee: only show opening cash form
+  if (isEmployee) {
+    return (
+      <div className="space-y-5">
+        <Card>
+          <CardHeader>
+            <div>
+              <CardTitle>Opening cash</CardTitle>
+              <CardDescription>Set the starting cash for today's shift.</CardDescription>
+            </div>
+            <div className="w-full max-w-52">
+              <Label htmlFor="cash-date">Business day</Label>
+              <Input id="cash-date" type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+            </div>
+          </CardHeader>
+          <div className="px-6 pb-6">
+            <CashOpeningForm date={date} />
+          </div>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-5">
@@ -86,4 +112,3 @@ export function CashDrawerPage() {
     </div>
   );
 }
-
