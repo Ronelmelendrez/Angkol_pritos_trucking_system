@@ -19,9 +19,10 @@ import {
 } from "lucide-react";
 import { cn } from "@/utils/cn";
 import { useUiStore } from "@/app/store/useUiStore";
+import { useAuth } from "@/features/auth/hooks/useAuth";
 import { Logo } from "@/components/brand/Logo";
 
-const NAV_ITEMS = [
+const MANAGER_NAV_ITEMS = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard, end: true },
   { to: "/dashboard/sales", label: "Sales", icon: ShoppingCart },
   { to: "/dashboard/products", label: "Products", icon: Package },
@@ -38,8 +39,18 @@ const NAV_ITEMS = [
   { to: "/dashboard/settings", label: "Settings", icon: Settings },
 ];
 
+const EMPLOYEE_NAV_ITEMS = [
+  { to: "/employee/expenses", label: "Expenses", icon: Receipt },
+  { to: "/employee/attendance", label: "Attendance", icon: CalendarClock },
+  { to: "/employee/advances", label: "Cash Advances", icon: HandCoins },
+  { to: "/employee/cash", label: "Cash Drawer", icon: PiggyBank },
+];
+
 export function Sidebar() {
   const { isSidebarCollapsed, toggleSidebarCollapse } = useUiStore();
+  const { user } = useAuth();
+
+  const navItems = user?.role === "staff" ? EMPLOYEE_NAV_ITEMS : MANAGER_NAV_ITEMS;
 
   return (
     <aside
@@ -75,7 +86,7 @@ export function Sidebar() {
           isSidebarCollapsed ? "px-2" : "px-3",
         )}
       >
-        {NAV_ITEMS.map((item) => (
+        {navItems.map((item) => (
           <NavLink
             key={item.to}
             to={item.to}
