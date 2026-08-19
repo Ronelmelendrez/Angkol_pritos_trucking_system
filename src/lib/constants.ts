@@ -40,6 +40,16 @@ export const CATEGORY_COLORS: Record<ExpenseCategory, string> = {
 export const USER_ROLES = ["manager", "staff"] as const;
 export type UserRole = (typeof USER_ROLES)[number];
 
+export const ROLE_LABELS: Record<UserRole, string> = {
+  manager: "Admin",
+  staff: "Employee",
+};
+
+export const ROLE_BASE_PATH: Record<UserRole, string> = {
+  manager: "/dashboard",
+  staff: "/employee",
+};
+
 export const ADVANCE_STATUSES = ["pending", "deducted"] as const;
 export type AdvanceStatus = (typeof ADVANCE_STATUSES)[number];
 
