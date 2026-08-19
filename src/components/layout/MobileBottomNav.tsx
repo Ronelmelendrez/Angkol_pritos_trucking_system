@@ -17,7 +17,7 @@ const MANAGER_CORE_ITEMS = [
   { path: "/dashboard/advances", label: "Advances", icon: HandCoins },
 ]
 
-const EMPLOYEE_CORE_ITEMS = [
+const EMPLOYEE_CORE_ITEMS: { path: string; label: string; icon: typeof Receipt; end?: boolean }[] = [
   { path: "/employee/expenses", label: "Expenses", icon: Receipt },
   { path: "/employee/attendance", label: "Attendance", icon: CalendarClock },
   { path: "/employee/advances", label: "Advances", icon: HandCoins },
@@ -35,7 +35,7 @@ export function MobileBottomNav() {
           <li key={item.path} className="flex-1 min-w-0">
             <NavLink
               to={item.path}
-              end={item.end}
+              end={item.end ?? false}
               className={({ isActive }) =>
                 cn(
                   "flex flex-col items-center justify-center gap-0.5 py-2 text-[10px] font-medium transition-colors min-h-[52px]",
