@@ -7,8 +7,9 @@ import {
   HandCoins,
 } from "lucide-react"
 import { cn } from "@/utils/cn"
+import { useAuth } from "@/features/auth/hooks/useAuth"
 
-const CORE_ITEMS = [
+const MANAGER_CORE_ITEMS = [
   { path: "/dashboard", label: "Home", icon: LayoutDashboard, end: true },
   { path: "/dashboard/expenses", label: "Expenses", icon: Receipt },
   { path: "/dashboard/attendance", label: "Attendance", icon: CalendarClock },
@@ -16,11 +17,21 @@ const CORE_ITEMS = [
   { path: "/dashboard/advances", label: "Advances", icon: HandCoins },
 ]
 
+const EMPLOYEE_CORE_ITEMS = [
+  { path: "/employee/expenses", label: "Expenses", icon: Receipt },
+  { path: "/employee/attendance", label: "Attendance", icon: CalendarClock },
+  { path: "/employee/advances", label: "Advances", icon: HandCoins },
+  { path: "/employee/cash", label: "Cash Drawer", icon: LayoutDashboard },
+]
+
 export function MobileBottomNav() {
+  const { user } = useAuth()
+  const items = user?.role === "staff" ? EMPLOYEE_CORE_ITEMS : MANAGER_CORE_ITEMS
+
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-line bg-surface/95 backdrop-blur-sm lg:hidden safe-bottom">
       <ul className="flex items-stretch">
-        {CORE_ITEMS.map((item) => (
+        {items.map((item) => (
           <li key={item.path} className="flex-1 min-w-0">
             <NavLink
               to={item.path}
