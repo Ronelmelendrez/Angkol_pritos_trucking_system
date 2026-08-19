@@ -18,8 +18,9 @@ import {
 } from "lucide-react";
 import { cn } from "@/utils/cn";
 import { useUiStore } from "@/app/store/useUiStore";
+import { useAuth } from "@/features/auth/hooks/useAuth";
 
-const NAV_ITEMS = [
+const MANAGER_NAV_ITEMS = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard, end: true },
   { to: "/dashboard/sales", label: "Sales", icon: ShoppingCart },
   { to: "/dashboard/products", label: "Products", icon: Package },
@@ -36,8 +37,19 @@ const NAV_ITEMS = [
   { to: "/dashboard/settings", label: "Settings", icon: Settings },
 ];
 
+const EMPLOYEE_NAV_ITEMS = [
+  { to: "/employee", label: "Dashboard", icon: LayoutDashboard, end: true },
+  { to: "/employee/expenses", label: "Expenses", icon: Receipt },
+  { to: "/employee/attendance", label: "Attendance", icon: CalendarClock },
+  { to: "/employee/advances", label: "Cash Advances", icon: HandCoins },
+  { to: "/employee/cash", label: "Cash Drawer", icon: PiggyBank },
+];
+
 export function MobileTopbar() {
   const { isSidebarOpen, closeSidebar } = useUiStore();
+  const { user } = useAuth();
+
+  const navItems = user?.role === "staff" ? EMPLOYEE_NAV_ITEMS : MANAGER_NAV_ITEMS;
 
   return (
     <div className="lg:hidden">
@@ -75,7 +87,7 @@ export function MobileTopbar() {
           </div>
           <nav className="max-h-[60vh] overflow-y-auto px-2 py-2">
             <div className="grid grid-cols-3 gap-1">
-              {NAV_ITEMS.map((item) => (
+              {navItems.map((item) => (
                 <NavLink
                   key={item.to}
                   to={item.to}
