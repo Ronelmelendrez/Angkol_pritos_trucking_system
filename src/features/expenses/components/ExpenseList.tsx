@@ -18,9 +18,10 @@ const PAGE_SIZE = 10;
 interface Props {
   expenses: Expense[];
   isLoading: boolean;
+  hideDelete?: boolean;
 }
 
-export function ExpenseList({ expenses, isLoading }: Props) {
+export function ExpenseList({ expenses, isLoading, hideDelete }: Props) {
   const [page, setPage] = useState(1);
   const [deleteTarget, setDeleteTarget] = useState<Expense | null>(null);
   const deleteExpense = useDeleteExpense();
@@ -131,15 +132,17 @@ export function ExpenseList({ expenses, isLoading }: Props) {
                       )}
                     </div>
                     <span className="shrink-0 font-semibold text-ink">{formatCurrency(exp.amount)}</span>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-7 w-7 shrink-0 text-ink-faint hover:text-danger"
-                      onClick={() => setDeleteTarget(exp)}
-                      aria-label={`Delete ${exp.description}`}
-                    >
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </Button>
+                    {!hideDelete && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7 shrink-0 text-ink-faint hover:text-danger"
+                        onClick={() => setDeleteTarget(exp)}
+                        aria-label={`Delete ${exp.description}`}
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </Button>
+                    )}
                   </div>
                 ))}
               </div>
