@@ -3,6 +3,7 @@ import { useAuth } from "@/features/auth"
 import { LoginForm } from "@/features/auth"
 import { Receipt, Users, HandCoins, BarChart3, Flame, ArrowLeft } from "lucide-react"
 import { Logo } from "@/components/brand/Logo"
+import { ROLE_BASE_PATH } from "@/lib/constants"
 
 const FEATURES = [
   {
@@ -31,7 +32,8 @@ export function LoginPage() {
   const { user } = useAuth()
 
   if (user) {
-    return <Navigate to="/dashboard" replace />
+    const homePath = ROLE_BASE_PATH[user.role] ?? "/dashboard"
+    return <Navigate to={homePath} replace />
   }
 
   return (
