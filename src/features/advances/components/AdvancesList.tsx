@@ -18,6 +18,7 @@ interface Props {
   advances: CashAdvance[];
   employees: Employee[];
   isLoading: boolean;
+  hideDelete?: boolean;
 }
 
 function initials(name: string) {
@@ -29,7 +30,7 @@ function initials(name: string) {
     .join("");
 }
 
-export function AdvancesList({ advances, employees, isLoading }: Props) {
+export function AdvancesList({ advances, employees, isLoading, hideDelete }: Props) {
   const [page, setPage] = useState(1);
   const [deleteTarget, setDeleteTarget] = useState<CashAdvance | null>(null);
   const deleteAdvance = useDeleteAdvance();
@@ -118,7 +119,7 @@ export function AdvancesList({ advances, employees, isLoading }: Props) {
                       <Badge variant={adv.status === "pending" ? "warning" : "success"}>
                         {adv.status === "pending" ? "Pending" : "Deducted"}
                       </Badge>
-                      {adv.status === "deducted" && (
+                      {!hideDelete && adv.status === "deducted" && (
                         <Button
                           variant="ghost"
                           size="icon"

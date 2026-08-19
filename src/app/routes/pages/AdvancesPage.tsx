@@ -7,8 +7,11 @@ import { useAdvances } from "@/features/advances/hooks/useAdvances";
 import { useEmployees } from "@/features/employees/hooks/useEmployees";
 import { AdvanceForm } from "@/features/advances/components/AdvanceForm";
 import { AdvancesList } from "@/features/advances/components/AdvancesList";
+import { useAuth } from "@/features/auth/hooks/useAuth";
 
 export function AdvancesPage() {
+  const { user } = useAuth();
+  const isEmployee = user?.role === "staff";
   const { data: advances = [], isLoading } = useAdvances();
   const { data: employees = [] } = useEmployees();
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -39,7 +42,7 @@ export function AdvancesPage() {
         </Dialog>
       </CardHeader>
 
-      <AdvancesList advances={advances} employees={employees} isLoading={isLoading} />
+      <AdvancesList advances={advances} employees={employees} isLoading={isLoading} hideDelete={isEmployee} />
     </Card>
   );
 }
