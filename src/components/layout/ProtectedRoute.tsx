@@ -2,6 +2,7 @@ import { Navigate } from "react-router-dom";
 import type { ReactNode } from "react";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import type { UserRole } from "@/lib/constants";
+import { ROLE_BASE_PATH } from "@/lib/constants";
 import { Drumstick } from "lucide-react";
 
 interface ProtectedRouteProps {
@@ -26,7 +27,8 @@ export function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) 
   }
 
   if (allowedRoles && user && !allowedRoles.includes(user.role)) {
-    return <Navigate to="/dashboard" replace />;
+    const fallbackPath = ROLE_BASE_PATH[user.role] ?? "/dashboard";
+    return <Navigate to={fallbackPath} replace />;
   }
 
   return <>{children}</>;
