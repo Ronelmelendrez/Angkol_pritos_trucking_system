@@ -8,7 +8,8 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "seed:admin": "tsx scripts/seed-admin.ts"
+    "seed:admin": "tsx scripts/seed-admin.ts",
+    "seed:employee": "tsx scripts/seed-employee.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.4.0",
