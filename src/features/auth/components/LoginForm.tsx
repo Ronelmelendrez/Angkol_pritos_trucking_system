@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Label } from "@/components/ui/Label";
 import { useToast } from "@/components/ui/useToast";
+import { ROLE_BASE_PATH } from "@/lib/constants";
 
 export function LoginForm() {
   const [email, setEmail] = useState("");
@@ -32,10 +33,11 @@ export function LoginForm() {
     }
 
     try {
-      await login({ email: trimmedEmail, password: trimmedPassword });
+      const user = await login({ email: trimmedEmail, password: trimmedPassword });
       reset();
-      toast({ title: "Welcome back!", description: "Logged in as manager.", variant: "success" });
-      navigate("/dashboard", { replace: true });
+      const homePath = ROLE_BASE_PATH[user.role] ?? "/dashboard";
+      toast({ title: "Welcome back!", description: `Logged in as ${user.role === "manager" ? "Admin" : "Employee"}.`, variant: "success" });
+      navigate(homePath, { replace: true });
     } catch (err) {
       recordFailure();
       const message = err instanceof Error ? err.message : "Something went wrong.";
