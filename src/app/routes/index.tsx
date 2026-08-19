@@ -27,6 +27,7 @@ export const router = createBrowserRouter([
     path: "/login",
     element: <LoginPage />,
   },
+  // Manager routes
   {
     path: "/dashboard",
     element: (
@@ -49,6 +50,22 @@ export const router = createBrowserRouter([
       { path: "payroll", element: <PayrollPage /> },
       { path: "reports", element: <ReportsPage /> },
       { path: "settings", element: <SettingsPage /> },
+    ],
+  },
+  // Employee routes
+  {
+    path: "/employee",
+    element: (
+      <ProtectedRoute allowedRoles={["staff"]}>
+        <AppLayout />
+      </ProtectedRoute>
+    ),
+    children: [
+      { index: true, element: <Navigate to="/employee/expenses" replace /> },
+      { path: "expenses", element: <ExpensesPage /> },
+      { path: "attendance", element: <AttendancePage /> },
+      { path: "advances", element: <AdvancesPage /> },
+      { path: "cash", element: <CashDrawerPage /> },
     ],
   },
   {
