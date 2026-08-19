@@ -6,6 +6,7 @@ import { useAuth } from "@/features/auth/hooks/useAuth";
 import { CommandSearch } from "@/components/layout/CommandSearch";
 import { NotificationPanel } from "@/components/layout/NotificationPanel";
 import { useNotifications } from "@/components/layout/useNotifications";
+import { ROLE_LABELS } from "@/lib/constants";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -42,6 +43,8 @@ export function Header({ title }: { title: string }) {
     navigate("/login", { replace: true });
   }
 
+  const isManager = user?.role === "manager";
+
   return (
     <>
       <header className="sticky top-0 z-30 flex items-center justify-between border-b border-line bg-bg/90 px-4 py-3 backdrop-blur sm:px-6">
@@ -55,7 +58,7 @@ export function Header({ title }: { title: string }) {
             <Menu className="h-5 w-5" />
           </button>
           <div className="flex items-center gap-1.5 text-sm text-ink-faint">
-            <span className="hidden sm:inline">Dashboard</span>
+            <span className="hidden sm:inline">{isManager ? "Dashboard" : "Employee"}</span>
             <ChevronRight className="hidden h-3 w-3 sm:inline" />
             <span className="font-medium text-ink">{title}</span>
           </div>
@@ -96,13 +99,15 @@ export function Header({ title }: { title: string }) {
             <DropdownMenuContent align="end" className="w-52">
               <div className="px-2.5 py-2">
                 <p className="text-sm font-medium text-ink">{user?.name}</p>
-                <p className="text-xs capitalize text-ink-faint">{user?.role}</p>
+                <p className="text-xs capitalize text-ink-faint">{user?.role ? ROLE_LABELS[user.role] : ""}</p>
               </div>
               <div className="my-1 h-px bg-line" />
-              <DropdownMenuItem onClick={() => navigate("/dashboard/settings")}>
-                <Settings className="h-4 w-4" />
-                Settings
-              </DropdownMenuItem>
+              {isManager && (
+                <DropdownMenuItem onClick={() => navigate("/dashboard/settings")}>
+                  <Settings className="h-4 w-4" />
+                  Settings
+                </DropdownMenuItem>
+              )}
               <DropdownMenuItem onClick={handleLogout}>
                 <LogOut className="h-4 w-4" />
                 Sign out
