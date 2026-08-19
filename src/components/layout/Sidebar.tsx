@@ -40,6 +40,7 @@ const MANAGER_NAV_ITEMS = [
 ];
 
 const EMPLOYEE_NAV_ITEMS = [
+  { to: "/employee", label: "Dashboard", icon: LayoutDashboard, end: true },
   { to: "/employee/expenses", label: "Expenses", icon: Receipt },
   { to: "/employee/attendance", label: "Attendance", icon: CalendarClock },
   { to: "/employee/advances", label: "Cash Advances", icon: HandCoins },

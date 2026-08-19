@@ -17,11 +17,11 @@ const MANAGER_CORE_ITEMS = [
   { path: "/dashboard/advances", label: "Advances", icon: HandCoins },
 ]
 
-const EMPLOYEE_CORE_ITEMS: { path: string; label: string; icon: typeof Receipt; end?: boolean }[] = [
+const EMPLOYEE_CORE_ITEMS = [
+  { path: "/employee", label: "Home", icon: LayoutDashboard, end: true },
   { path: "/employee/expenses", label: "Expenses", icon: Receipt },
   { path: "/employee/attendance", label: "Attendance", icon: CalendarClock },
   { path: "/employee/advances", label: "Advances", icon: HandCoins },
-  { path: "/employee/cash", label: "Cash Drawer", icon: LayoutDashboard },
 ]
 
 export function MobileBottomNav() {

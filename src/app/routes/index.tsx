@@ -17,6 +17,7 @@ import { WithdrawalsPage } from "@/app/routes/pages/WithdrawalsPage"
 import { PayrollPage } from "@/app/routes/pages/PayrollPage"
 import { ReportsPage } from "@/app/routes/pages/ReportsPage"
 import { SettingsPage } from "@/app/routes/pages/SettingsPage"
+import { EmployeeDashboardPage } from "@/app/routes/pages/EmployeeDashboardPage"
 
 export const router = createBrowserRouter([
   {
@@ -61,7 +62,7 @@ export const router = createBrowserRouter([
       </ProtectedRoute>
     ),
     children: [
-      { index: true, element: <Navigate to="/employee/expenses" replace /> },
+      { index: true, element: <EmployeeDashboardPage /> },
       { path: "expenses", element: <ExpensesPage /> },
       { path: "attendance", element: <AttendancePage /> },
       { path: "advances", element: <AdvancesPage /> },
