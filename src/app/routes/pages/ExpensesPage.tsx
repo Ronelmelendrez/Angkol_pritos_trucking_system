@@ -17,8 +17,11 @@ import { TransactionViewTabs } from "@/components/layout/TransactionViewTabs";
 import { formatCurrency } from "@/utils/currency";
 import { CATEGORY_COLORS } from "@/lib/constants";
 import type { ExpenseFilters as ExpenseFiltersType } from "@/features/expenses/types";
+import { useAuth } from "@/features/auth/hooks/useAuth";
 
 export function ExpensesPage() {
+  const { user } = useAuth();
+  const isEmployee = user?.role === "staff";
   const { data: expenses = [], isLoading } = useExpenses();
   const [filters, setFilters] = useState<ExpenseFiltersType>({});
   const [datePreset, setDatePreset] = useState<DatePreset>("this-month");
@@ -66,14 +69,33 @@ export function ExpensesPage() {
   const dailyTotal = filtered.reduce((sum, e) => sum + e.amount, 0);
 
   const renderTable = useCallback(
-    (data: Expense[]) => <ExpenseList expenses={data} isLoading={isLoading} />,
-    [isLoading],
+    (data: Expense[]) => <ExpenseList expenses={data} isLoading={isLoading} hideDelete={isEmployee} />,
+    [isLoading, isEmployee],
   );
 
   const renderGridCard = useCallback(
-    (expense: Expense) => <ExpenseGridCard expense={expense} />,
-    [],
+    (expense: Expense) => <ExpenseGridCard expense={expense} hideDelete={isEmployee} />,
+    [isEmployee],
   );
+
+  // Employee: only show the add expense form
+  if (isEmployee) {
+    return (
+      <div className="space-y-5">
+        <Card>
+          <CardHeader>
+            <div>
+              <CardTitle>Add new expense</CardTitle>
+              <CardDescription>Log an expense for the business.</CardDescription>
+            </div>
+          </CardHeader>
+          <div className="px-6 pb-6">
+            <ExpenseForm />
+          </div>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-5">
