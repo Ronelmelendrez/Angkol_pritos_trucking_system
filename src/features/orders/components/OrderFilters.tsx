@@ -22,7 +22,7 @@ export function OrderFiltersBar({ search, onSearchChange, statusFilter, onStatus
     <div className="flex flex-wrap items-center gap-3">
       <SearchInput placeholder="Search customer..." value={search} onChange={(e) => onSearchChange(e.target.value)} />
       <Select value={statusFilter} onValueChange={(v) => onStatusChange(v as OrderStatus | "all")}>
-        <SelectTrigger className="w-full sm:w-44">
+        <SelectTrigger className="min-w-0 flex-1 sm:w-44 sm:flex-none">
           <SelectValue placeholder="Status" />
         </SelectTrigger>
         <SelectContent>

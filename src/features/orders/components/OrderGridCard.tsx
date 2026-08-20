@@ -61,7 +61,7 @@ export function OrderGridCard({ order }: Props) {
 
       <p className="font-medium text-ink truncate">{order.customerName}</p>
 
-      <p className="text-lg font-bold text-ink">{formatCurrency(order.total)}</p>
+      <p className="text-lg font-bold text-ink sm:text-xl">{formatCurrency(order.total)}</p>
 
       <p className="text-sm text-ink truncate">
         {order.items.map((item) => {

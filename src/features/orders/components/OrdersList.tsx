@@ -110,7 +110,7 @@ export function OrdersList({ orders }: Props) {
 
           return (
             <div key={date} className="overflow-hidden rounded-xl border border-line bg-surface">
-              <div className="flex flex-wrap items-center justify-between gap-3 bg-ink/[0.02] px-5 py-3">
+              <div className="flex flex-wrap items-center justify-between gap-3 bg-ink/[0.02] px-4 py-3 sm:px-5">
                 <div className="flex flex-wrap items-center gap-3">
                   <span className="stamp text-base font-semibold text-ink">
                     {isToday ? "Today" : formatDate(date)}
@@ -128,18 +128,18 @@ export function OrdersList({ orders }: Props) {
                   return (
                     <div
                       key={order.id}
-                      className="flex items-center justify-between gap-3 px-5 py-2.5 text-sm hover:bg-primary/[0.02]"
+                      className="flex items-center justify-between gap-3 px-4 py-2.5 text-sm hover:bg-primary/[0.02] sm:px-5"
                     >
                       <div className="flex min-w-0 flex-1 items-center gap-3">
                         {urgency && (
                           <span className={`h-2 w-2 shrink-0 rounded-full ${URGENCY_DOT[urgency]}`} title={urgency === "overdue" ? "Past scheduled time" : urgency === "soon" ? "Due within 1 hour" : ""} />
                         )}
-                        <Badge className={`min-w-0 text-[10px] ${STATUS_BADGE[order.status]}`}>
+                        <Badge className={`min-w-0 shrink-0 text-[10px] ${STATUS_BADGE[order.status]}`}>
                           {ORDER_STATUS_LABELS[order.status]}
                         </Badge>
-                        <span className="font-medium text-ink truncate">{order.customerName}</span>
+                        <span className="min-w-0 flex-1 truncate font-medium text-ink">{order.customerName}</span>
                         {order.scheduledTime && (
-                          <span className={`hidden sm:inline whitespace-nowrap text-xs font-medium rounded-md px-1.5 py-0.5 ${
+                          <span className={`hidden shrink-0 sm:inline whitespace-nowrap text-xs font-medium rounded-md px-1.5 py-0.5 ${
                             urgency === "overdue"
                               ? "text-red-700 bg-red-50"
                               : urgency === "soon"
@@ -149,14 +149,14 @@ export function OrdersList({ orders }: Props) {
                             {formatTime12h(order.scheduledTime)}
                           </span>
                         )}
-                        <span className="hidden sm:inline truncate text-xs text-ink-faint">
+                        <span className="hidden min-w-0 flex-1 truncate text-xs text-ink-faint sm:inline">
                           {order.items.map((item) => {
                             const product = productMap.get(item.productId);
                             return `${product?.name ?? "Unknown"} ×${item.quantity}`;
                           }).join(", ")}
                         </span>
                         {order.notes && (
-                          <span className="hidden sm:inline truncate text-xs text-ink-faint">· {order.notes}</span>
+                          <span className="hidden shrink-0 sm:inline truncate text-xs text-ink-faint">· {order.notes}</span>
                         )}
                       </div>
                       <span className="shrink-0 font-semibold text-ink">{formatCurrency(order.total)}</span>
