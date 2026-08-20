@@ -28,6 +28,7 @@ interface Props {
 export function OrdersList({ orders }: Props) {
   const [page, setPage] = useState(1);
   const [deleteTarget, setDeleteTarget] = useState<Order | null>(null);
+  const [claimTarget, setClaimTarget] = useState<Order | null>(null);
   const { data: products = [] } = useProducts();
   const deleteOrder = useDeleteOrder();
   const claimOrder = useClaimOrder();
@@ -61,12 +62,15 @@ export function OrdersList({ orders }: Props) {
     }
   }
 
-  async function handleClaim(order: Order) {
+  async function handleClaim() {
+    if (!claimTarget) return;
     try {
-      await claimOrder.mutateAsync(order.id);
-      toast({ title: "Order claimed", description: `${order.customerName} — marked as completed`, variant: "success" });
+      await claimOrder.mutateAsync(claimTarget.id);
+      toast({ title: "Order confirmed", description: `${claimTarget.customerName} — marked as completed`, variant: "success" });
     } catch {
-      toast({ title: "Couldn't claim order", variant: "error" });
+      toast({ title: "Couldn't confirm order", variant: "error" });
+    } finally {
+      setClaimTarget(null);
     }
   }
 
@@ -130,8 +134,8 @@ export function OrdersList({ orders }: Props) {
                         variant="ghost"
                         size="icon"
                         className="h-7 w-7 shrink-0 text-ink-faint hover:text-green-600"
-                        onClick={() => handleClaim(order)}
-                        aria-label="Claim order"
+                        onClick={() => setClaimTarget(order)}
+                        aria-label="Confirm order"
                       >
                         <CheckCircle className="h-3.5 w-3.5" />
                       </Button>
@@ -166,6 +170,21 @@ export function OrdersList({ orders }: Props) {
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={handleDelete}>Delete</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={!!claimTarget} onOpenChange={(v) => !v && setClaimTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirm order</AlertDialogTitle>
+            <AlertDialogDescription>
+              Mark this order as completed? This will update the order status.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleClaim}>Confirm</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
