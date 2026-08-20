@@ -24,6 +24,7 @@ const MANAGER_NAV_ITEMS = [
 
 const EMPLOYEE_NAV_ITEMS = [
   { path: "/employee", label: "Dashboard" },
+  { path: "/employee/orders", label: "Orders" },
   { path: "/employee/expenses", label: "Expenses" },
   { path: "/employee/attendance", label: "Attendance" },
   { path: "/employee/advances", label: "Cash Advances" },
