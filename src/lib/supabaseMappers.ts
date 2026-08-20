@@ -342,7 +342,7 @@ export function orderAppToRow(input: {
   date: string;
   customer_name: string;
   scheduled_time?: string | null;
-  status?: string;
+  status?: "pending" | "confirmed" | "completed" | "cancelled";
   total?: number;
   notes?: string;
   created_by?: string;
@@ -351,7 +351,7 @@ export function orderAppToRow(input: {
     date: input.date,
     customer_name: input.customer_name,
     scheduled_time: input.scheduled_time ?? null,
-    status: input.status ?? "pending",
+    status: (input.status ?? "pending") as "pending" | "confirmed" | "completed" | "cancelled",
     total: input.total ?? 0,
     notes: input.notes ?? null,
     created_by: input.created_by ?? null,
