@@ -18,6 +18,7 @@ import { PayrollPage } from "@/app/routes/pages/PayrollPage"
 import { ReportsPage } from "@/app/routes/pages/ReportsPage"
 import { SettingsPage } from "@/app/routes/pages/SettingsPage"
 import { EmployeeDashboardPage } from "@/app/routes/pages/EmployeeDashboardPage"
+import { EmployeeOrdersPage } from "@/app/routes/pages/EmployeeOrdersPage"
 
 export const router = createBrowserRouter([
   {
@@ -62,8 +63,9 @@ export const router = createBrowserRouter([
       </ProtectedRoute>
     ),
     children: [
-      { index: true, element: <EmployeeDashboardPage /> },
-      { path: "expenses", element: <ExpensesPage /> },
+        { index: true, element: <EmployeeDashboardPage /> },
+        { path: "orders", element: <EmployeeOrdersPage /> },
+        { path: "expenses", element: <ExpensesPage /> },
       { path: "attendance", element: <AttendancePage /> },
       { path: "advances", element: <AdvancesPage /> },
       { path: "cash", element: <CashDrawerPage /> },
