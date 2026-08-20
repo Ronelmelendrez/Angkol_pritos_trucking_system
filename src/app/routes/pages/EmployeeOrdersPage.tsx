@@ -3,11 +3,11 @@ import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/Dialog";
-import { OrdersList } from "@/features/orders/components/OrdersList";
-import { OrderForm } from "@/features/orders/components/OrderForm";
+import { OrdersList, OrderStats, OrderForm } from "@/features/orders";
 import { useOrders } from "@/features/orders/hooks/useOrders";
+import { useAuth } from "@/features/auth/hooks/useAuth";
 import { formatCurrency } from "@/utils/currency";
-import type { OrderStatus } from "@/lib/constants";
+import { type OrderStatus } from "@/lib/constants";
 
 const STATUS_FILTERS: { label: string; value: OrderStatus | "all" }[] = [
   { label: "All", value: "all" },
@@ -19,12 +19,15 @@ const STATUS_FILTERS: { label: string; value: OrderStatus | "all" }[] = [
 
 export function EmployeeOrdersPage() {
   const { data: orders = [] } = useOrders();
+  const { user } = useAuth();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<OrderStatus | "all">("all");
 
+  const myOrders = useMemo(() => orders.filter((o) => !user?.id || o.createdBy === user.id), [orders, user]);
+
   const filtered = useMemo(() => {
-    return orders.filter((o) => {
+    return myOrders.filter((o) => {
       if (statusFilter !== "all" && o.status !== statusFilter) return false;
       if (search) {
         const q = search.toLowerCase();
@@ -32,16 +35,18 @@ export function EmployeeOrdersPage() {
       }
       return true;
     });
-  }, [orders, statusFilter, search]);
+  }, [myOrders, statusFilter, search]);
 
   const totalSales = filtered.reduce((sum, o) => sum + o.total, 0);
 
   return (
     <div className="space-y-5">
+      <OrderStats orders={myOrders} />
+
       <Card>
         <CardHeader>
           <div className="min-w-0 flex-1">
-            <CardTitle>Scheduled Orders</CardTitle>
+            <CardTitle>All Orders</CardTitle>
             <CardDescription>
               {filtered.length} order{filtered.length === 1 ? "" : "s"} · Total{" "}
               <span className="font-semibold text-ink">{formatCurrency(totalSales)}</span>

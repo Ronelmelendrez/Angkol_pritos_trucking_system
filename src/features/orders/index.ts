@@ -1,5 +1,6 @@
 export { OrderForm } from "./components/OrderForm";
 export { OrdersList } from "./components/OrdersList";
+export { OrderStats } from "./components/OrderStats";
 export {
   useOrders,
   useAddOrder,

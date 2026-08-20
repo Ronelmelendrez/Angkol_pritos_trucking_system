@@ -60,6 +60,30 @@ export function todayISO(): string {
   return `${year}-${month}-${day}`;
 }
 
+/** Convert a 24h "HH:mm" string to "h:mm AM/PM" */
+export function formatTime12h(time: string): string {
+  if (!time) return "";
+  const [hStr, mStr] = time.split(":");
+  const hour = parseInt(hStr, 10);
+  const min = mStr ?? "00";
+  const suffix = hour >= 12 ? "PM" : "AM";
+  const h12 = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
+  return `${h12}:${min} ${suffix}`;
+}
+
+/** Get urgency for a scheduled time relative to now */
+export function getTimeUrgency(time: string): "overdue" | "soon" | "upcoming" {
+  if (!time) return "upcoming";
+  const now = new Date();
+  const [hStr, mStr] = time.split(":");
+  const target = new Date(now);
+  target.setHours(parseInt(hStr, 10), parseInt(mStr ?? "0", 10), 0, 0);
+  const diffMs = target.getTime() - now.getTime();
+  if (diffMs < 0) return "overdue";
+  if (diffMs < 60 * 60 * 1000) return "soon";
+  return "upcoming";
+}
+
 export function nowISO(): string {
   return new Date().toISOString();
 }
