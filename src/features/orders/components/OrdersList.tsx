@@ -10,6 +10,7 @@ import { ORDER_STATUS_LABELS, type OrderStatus } from "@/lib/constants";
 import { useDeleteOrder, useClaimOrder } from "../hooks/useOrders";
 import { useProducts } from "@/features/products/hooks/useProducts";
 import { useToast } from "@/components/ui/useToast";
+import { OrderDetailDialog } from "./OrderDetailDialog";
 import type { Order } from "../types";
 
 const PAGE_SIZE = 10;
@@ -35,6 +36,7 @@ export function OrdersList({ orders }: Props) {
   const [page, setPage] = useState(1);
   const [deleteTarget, setDeleteTarget] = useState<Order | null>(null);
   const [claimTarget, setClaimTarget] = useState<Order | null>(null);
+  const [detailTarget, setDetailTarget] = useState<Order | null>(null);
   const { data: products = [] } = useProducts();
   const deleteOrder = useDeleteOrder();
   const claimOrder = useClaimOrder();
@@ -130,7 +132,7 @@ export function OrdersList({ orders }: Props) {
                       key={order.id}
                       className="flex items-center justify-between gap-3 px-4 py-2.5 text-sm hover:bg-primary/[0.02] sm:px-5"
                     >
-                      <div className="flex min-w-0 flex-1 items-center gap-3">
+                      <div className="flex min-w-0 flex-1 cursor-pointer items-center gap-3" onClick={() => setDetailTarget(order)}>
                         {urgency && (
                           <span className={`h-2 w-2 shrink-0 rounded-full ${URGENCY_DOT[urgency]}`} title={urgency === "overdue" ? "Past scheduled time" : urgency === "soon" ? "Due within 1 hour" : ""} />
                         )}
@@ -220,6 +222,8 @@ export function OrdersList({ orders }: Props) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <OrderDetailDialog order={detailTarget} onOpenChange={(v) => !v && setDetailTarget(null)} />
     </div>
   );
 }

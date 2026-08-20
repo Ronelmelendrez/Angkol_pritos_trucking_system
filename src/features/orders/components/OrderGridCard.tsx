@@ -9,6 +9,7 @@ import { ORDER_STATUS_LABELS, type OrderStatus } from "@/lib/constants";
 import { useDeleteOrder } from "../hooks/useOrders";
 import { useProducts } from "@/features/products/hooks/useProducts";
 import { useToast } from "@/components/ui/useToast";
+import { OrderDetailDialog } from "./OrderDetailDialog";
 import type { Order } from "../types";
 
 const STATUS_BADGE: Record<OrderStatus, string> = {
@@ -24,6 +25,7 @@ interface Props {
 
 export function OrderGridCard({ order }: Props) {
   const [deleteTarget, setDeleteTarget] = useState<Order | null>(null);
+  const [detailOpen, setDetailOpen] = useState(false);
   const deleteOrder = useDeleteOrder();
   const { data: products = [] } = useProducts();
   const { toast } = useToast();
@@ -43,7 +45,7 @@ export function OrderGridCard({ order }: Props) {
   const productMap = new Map(products.map((p) => [p.id, p]));
 
   return (
-    <div className="ticket ticket-perf flex flex-col gap-2 p-4">
+    <div className="ticket ticket-perf flex cursor-pointer flex-col gap-2 p-4 transition-colors hover:bg-primary/[0.03]" onClick={() => setDetailOpen(true)}>
       <div className="flex items-start justify-between gap-2">
         <Badge className={`shrink-0 text-[10px] ${STATUS_BADGE[order.status]}`}>
           {ORDER_STATUS_LABELS[order.status]}
@@ -52,7 +54,7 @@ export function OrderGridCard({ order }: Props) {
           variant="ghost"
           size="icon"
           className="h-7 w-7 shrink-0 text-ink-faint hover:text-danger"
-          onClick={() => setDeleteTarget(order)}
+          onClick={(e) => { e.stopPropagation(); setDeleteTarget(order); }}
           aria-label="Delete order"
         >
           <Trash2 className="h-3.5 w-3.5" />
@@ -93,6 +95,8 @@ export function OrderGridCard({ order }: Props) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <OrderDetailDialog order={detailOpen ? order : null} onOpenChange={setDetailOpen} />
     </div>
   );
 }

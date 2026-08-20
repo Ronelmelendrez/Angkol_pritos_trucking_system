@@ -3,6 +3,7 @@ export { OrdersList } from "./components/OrdersList";
 export { OrderStats } from "./components/OrderStats";
 export { OrderGridCard } from "./components/OrderGridCard";
 export { OrderFiltersBar } from "./components/OrderFilters";
+export { OrderDetailDialog } from "./components/OrderDetailDialog";
 export {
   useOrders,
   useAddOrder,
