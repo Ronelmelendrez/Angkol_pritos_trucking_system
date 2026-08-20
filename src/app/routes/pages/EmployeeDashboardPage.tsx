@@ -1,9 +1,10 @@
-import { Receipt, Clock, HandCoins, PiggyBank } from "lucide-react"
+import { Receipt, Clock, HandCoins, PiggyBank, ShoppingBag } from "lucide-react"
 import { Link } from "react-router-dom"
 import { Card } from "@/components/ui/Card"
 import { useAuth } from "@/features/auth/hooks/useAuth"
 
 const QUICK_LINKS = [
+  { to: "/employee/orders", label: "New Order", desc: "Create and track orders", icon: ShoppingBag, color: "bg-indigo-100 text-indigo-600" },
   { to: "/employee/expenses", label: "Add Expense", desc: "Log a new business expense", icon: Receipt, color: "bg-orange-100 text-orange-600" },
   { to: "/employee/attendance", label: "Attendance", desc: "Clock in/out and view records", icon: Clock, color: "bg-blue-100 text-blue-600" },
   { to: "/employee/advances", label: "Cash Advances", desc: "Request or view advances", icon: HandCoins, color: "bg-green-100 text-green-600" },
