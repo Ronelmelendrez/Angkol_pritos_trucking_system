@@ -5,6 +5,7 @@ import {
   CalendarClock,
   ShoppingCart,
   HandCoins,
+  ShoppingBag,
 } from "lucide-react"
 import { cn } from "@/utils/cn"
 import { useAuth } from "@/features/auth/hooks/useAuth"
@@ -19,6 +20,7 @@ const MANAGER_CORE_ITEMS = [
 
 const EMPLOYEE_CORE_ITEMS = [
   { path: "/employee", label: "Home", icon: LayoutDashboard, end: true },
+  { path: "/employee/orders", label: "Orders", icon: ShoppingBag },
   { path: "/employee/expenses", label: "Expenses", icon: Receipt },
   { path: "/employee/attendance", label: "Attendance", icon: CalendarClock },
   { path: "/employee/advances", label: "Advances", icon: HandCoins },
