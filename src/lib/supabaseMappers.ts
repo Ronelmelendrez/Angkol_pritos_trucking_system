@@ -291,6 +291,73 @@ export function saleAppToRow(input: {
   };
 }
 
+// ── Orders ────────────────────────────────────────────
+type OrderRow = Database["public"]["Tables"]["orders"]["Row"];
+type OrderItemRow = Database["public"]["Tables"]["order_items"]["Row"];
+
+export function orderItemRowToApp(row: OrderItemRow) {
+  return {
+    id: row.id,
+    orderId: row.order_id,
+    productId: row.product_id,
+    quantity: row.quantity,
+    unitPrice: Number(row.unit_price),
+    amount: Number(row.amount),
+  };
+}
+
+export function orderItemAppToRow(input: {
+  productId?: string;
+  product_id?: string;
+  quantity: number;
+  unitPrice?: number;
+  unit_price?: number;
+  amount: number;
+}) {
+  return {
+    product_id: input.productId ?? input.product_id ?? "",
+    quantity: input.quantity,
+    unit_price: input.unitPrice ?? input.unit_price ?? 0,
+    amount: input.amount,
+  };
+}
+
+export function orderRowToApp(row: OrderRow, items: OrderItemRow[] = []) {
+  return {
+    id: row.id,
+    date: row.date,
+    scheduledTime: row.scheduled_time ?? undefined,
+    customerName: row.customer_name,
+    status: row.status,
+    total: Number(row.total),
+    notes: row.notes ?? undefined,
+    createdBy: row.created_by ?? undefined,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+    items: items.map(orderItemRowToApp),
+  };
+}
+
+export function orderAppToRow(input: {
+  date: string;
+  customer_name: string;
+  scheduled_time?: string | null;
+  status?: string;
+  total?: number;
+  notes?: string;
+  created_by?: string;
+}) {
+  return {
+    date: input.date,
+    customer_name: input.customer_name,
+    scheduled_time: input.scheduled_time ?? null,
+    status: input.status ?? "pending",
+    total: input.total ?? 0,
+    notes: input.notes ?? null,
+    created_by: input.created_by ?? null,
+  };
+}
+
 // ── Pay Rule Settings ─────────────────────────────────
 export function payRuleRowToApp(row: PayRuleRow) {
   return {

@@ -746,6 +746,98 @@ export type Database = {
           },
         ]
       }
+      orders: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          customer_name: string
+          date: string
+          id: string
+          notes: string | null
+          scheduled_time: string | null
+          status: Database["public"]["Enums"]["order_status"]
+          total: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          customer_name: string
+          date: string
+          id?: string
+          notes?: string | null
+          scheduled_time?: string | null
+          status?: Database["public"]["Enums"]["order_status"]
+          total?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          customer_name?: string
+          date?: string
+          id?: string
+          notes?: string | null
+          scheduled_time?: string | null
+          status?: Database["public"]["Enums"]["order_status"]
+          total?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      order_items: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          order_id: string
+          product_id: string
+          quantity: number
+          unit_price: number
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          id?: string
+          order_id: string
+          product_id: string
+          quantity: number
+          unit_price: number
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          order_id?: string
+          product_id?: string
+          quantity?: number
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -779,6 +871,7 @@ export type Database = {
       attendance_status: "present" | "absent" | "closed"
       category_type: "expense" | "stock"
       expense_fund_source: "cash_drawer" | "separate"
+      order_status: "pending" | "confirmed" | "completed" | "cancelled"
       loan_status: "active" | "paid"
       pay_frequency: "weekly" | "semi_monthly" | "monthly"
       payment_method: "cash" | "gcash" | "bank_transfer" | "credit"
@@ -921,6 +1014,7 @@ export const Constants = {
       attendance_status: ["present", "absent", "closed"],
       category_type: ["expense", "stock"],
       loan_status: ["active", "paid"],
+      order_status: ["pending", "confirmed", "completed", "cancelled"],
       pay_frequency: ["weekly", "semi_monthly", "monthly"],
       payment_method: ["cash", "gcash", "bank_transfer", "credit"],
       payroll_status: ["upcoming", "ready", "paid"],

@@ -87,3 +87,18 @@ export const saleSchema = z.object({
   notes: z.string().optional(),
 });
 export type SaleFormValues = z.infer<typeof saleSchema>;
+
+export const orderItemSchema = z.object({
+  productId: z.string().min(1, "Choose a product"),
+  quantity: z.number().positive("Qty must be greater than 0"),
+});
+
+export const orderSchema = z.object({
+  date: z.string().min(1, "Date is required"),
+  scheduledTime: z.string().optional(),
+  customerName: z.string().min(1, "Customer name is required"),
+  status: z.enum(["pending", "confirmed", "completed", "cancelled"]),
+  notes: z.string().optional(),
+  items: z.array(orderItemSchema).min(1, "Add at least one item"),
+});
+export type OrderFormValues = z.infer<typeof orderSchema>;
