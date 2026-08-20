@@ -16,11 +16,13 @@ import { Label } from "@/components/ui/Label";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/Select";
 import { useAddExpense } from "../hooks/useExpenses";
 import { useToast } from "@/components/ui/useToast";
+import { useAuth } from "@/features/auth/hooks/useAuth";
 import { todayISO } from "@/utils/date";
 import { formatCurrency } from "@/utils/currency";
 
 export function ExpenseForm({ onDone }: { onDone?: () => void }) {
   const { toast } = useToast();
+  const { user } = useAuth();
   const addExpense = useAddExpense();
   const [trackStock, setTrackStock] = useState(false);
 
@@ -128,7 +130,7 @@ export function ExpenseForm({ onDone }: { onDone?: () => void }) {
     }
 
     try {
-      await addExpense.mutateAsync(values);
+      await addExpense.mutateAsync({ ...values, createdBy: user?.id });
       toast({
         title: "Expense recorded",
         description: `${values.description} — added.`,

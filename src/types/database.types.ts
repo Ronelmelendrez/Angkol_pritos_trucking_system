@@ -293,6 +293,7 @@ export type Database = {
           amount: number
           category_id: string
           created_at: string
+          created_by: string | null
           date: string
           description: string | null
           fund_source: Database["public"]["Enums"]["expense_fund_source"] | null
@@ -307,6 +308,7 @@ export type Database = {
           amount: number
           category_id: string
           created_at?: string
+          created_by?: string | null
           date: string
           description?: string | null
           fund_source?: Database["public"]["Enums"]["expense_fund_source"] | null
@@ -321,6 +323,7 @@ export type Database = {
           amount?: number
           category_id?: string
           created_at?: string
+          created_by?: string | null
           date?: string
           description?: string | null
           fund_source?: Database["public"]["Enums"]["expense_fund_source"] | null

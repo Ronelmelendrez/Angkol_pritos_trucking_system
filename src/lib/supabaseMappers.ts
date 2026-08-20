@@ -43,6 +43,7 @@ export function expenseRowToApp(row: ExpenseRow & { categories?: { name: string 
     fundSource: row.fund_source ?? undefined,
     productId: row.product_id ?? undefined,
     quantityPurchased: row.quantity_purchased ?? undefined,
+    createdBy: row.created_by ?? undefined,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
@@ -58,6 +59,7 @@ export function expenseAppToRow(input: {
   fundSource?: ExpenseFundSource | null;
   product_id?: string | null;
   quantity_purchased?: number | null;
+  created_by?: string | null;
 }) {
   return {
     date: input.date,
@@ -69,6 +71,7 @@ export function expenseAppToRow(input: {
     fund_source: input.fundSource ?? null,
     product_id: input.product_id || null,
     quantity_purchased: input.quantity_purchased ?? null,
+    created_by: input.created_by ?? null,
   };
 }
 

@@ -1,5 +1,5 @@
-import { useMemo, useState } from "react";
-import { ShoppingBag, Receipt, Clock, HandCoins, PiggyBank, TrendingUp, ArrowRight, CheckCircle, Package } from "lucide-react";
+import { useMemo} from "react";
+import { ShoppingBag, Receipt, Clock, HandCoins, PiggyBank, ArrowRight, CheckCircle} from "lucide-react";
 import { Link } from "react-router-dom";
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend,
@@ -7,14 +7,13 @@ import {
 import { subDays, format as formatDateFns } from "date-fns";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card";
 import { Skeleton } from "@/components/ui/Skeleton";
-import { Badge } from "@/components/ui/Badge";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { useOrders } from "@/features/orders/hooks/useOrders";
 import { useExpenses } from "@/features/expenses/hooks/useExpenses";
 import { useAttendance } from "@/features/attendance/hooks/useAttendance";
 import { useAdvances } from "@/features/advances/hooks/useAdvances";
 import { Sparkline } from "@/components/charts/Sparkline";
-import { formatCurrency, formatCurrencyCompact } from "@/utils/currency";
+import { formatCurrency} from "@/utils/currency";
 import { useChartLabelCount, chartXInterval } from "@/utils/chartTicks";
 import { isDateToday, formatDate } from "@/utils/date";
 import { ORDER_STATUS_LABELS, type OrderStatus } from "@/lib/constants";
@@ -45,8 +44,10 @@ export function EmployeeDashboardPage() {
   const isLoading = ordersLoading || expensesLoading || attendanceLoading;
 
   // Today's data
-  const todaysOrders = useMemo(() => orders.filter((o) => isDateToday(o.date)), [orders]);
-  const todaysExpenses = useMemo(() => expenses.filter((e) => isDateToday(e.date)), [expenses]);
+  const myExpenses = useMemo(() => expenses.filter((e) => !user?.id || e.createdBy === user.id), [expenses, user]);
+  const myOrders = useMemo(() => orders.filter((o) => !user?.id || o.createdBy === user.id), [orders, user]);
+  const todaysOrders = useMemo(() => myOrders.filter((o) => isDateToday(o.date)), [myOrders]);
+  const todaysExpenses = useMemo(() => myExpenses.filter((e) => isDateToday(e.date)), [myExpenses]);
   const todaysOrderTotal = todaysOrders.reduce((sum, o) => sum + o.total, 0);
   const todaysExpensesTotal = todaysExpenses.reduce((sum, e) => sum + e.amount, 0);
   const pendingAdvances = advances.filter((a) => a.status === "pending");
@@ -75,21 +76,20 @@ export function EmployeeDashboardPage() {
     });
     return days.map((day) => ({
       label: day.label,
-      orders: orders.filter((o) => o.date === day.full).length,
-      total: orders.filter((o) => o.date === day.full).reduce((sum, o) => sum + o.total, 0),
+      orders: myOrders.filter((o) => o.date === day.full).length,
+      total: myOrders.filter((o) => o.date === day.full).reduce((sum, o) => sum + o.total, 0),
     }));
-  }, [orders]);
+  }, [myOrders]);
 
   const last7OrderCounts = last7.map((d) => d.orders);
-  const last7Totals = last7.map((d) => d.total);
 
   // Pending orders (upcoming)
   const pendingOrders = useMemo(() =>
-    orders
+    myOrders
       .filter((o) => o.status === "pending")
       .sort((a, b) => a.date.localeCompare(b.date))
       .slice(0, 5),
-  [orders]);
+  [myOrders]);
 
   return (
     <div className="space-y-6">
@@ -172,7 +172,7 @@ export function EmployeeDashboardPage() {
                   />
                   <YAxis allowDecimals={false} tick={{ fontSize: 11, fill: "var(--color-ink-soft)" }} axisLine={false} tickLine={false} width={28} />
                   <Tooltip
-                    formatter={(value: number, name: string) => name === "Orders" ? [`${value} orders`] : [formatCurrency(value)]}
+                    formatter={(value, name) => name === "Orders" ? [`${value} orders`] : [formatCurrency(Number(value ?? 0))]}
                     contentStyle={{ borderRadius: 12, border: "1px solid var(--color-line)", boxShadow: "0 6px 20px rgba(62,39,35,0.12)", fontSize: 13 }}
                   />
                   <Legend verticalAlign="top" height={32} iconType="circle" iconSize={8} formatter={(value) => <span className="text-xs text-ink-soft">{value}</span>} />

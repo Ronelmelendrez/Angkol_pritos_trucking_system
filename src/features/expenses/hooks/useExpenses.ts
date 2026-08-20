@@ -42,6 +42,7 @@ export function useAddExpense() {
         fundSource: input.fundSource ?? null,
         product_id: input.productId || null,
         quantity_purchased: input.quantityPurchased || null,
+        created_by: input.createdBy ?? null,
       });
       const { data, error } = await supabase
         .from("expenses")
