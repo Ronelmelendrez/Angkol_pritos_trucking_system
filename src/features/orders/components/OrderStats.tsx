@@ -7,8 +7,7 @@ import { ORDER_STATUS_LABELS, type OrderStatus } from "@/lib/constants";
 import type { Order } from "../types";
 
 const STATUS_BADGE: Record<OrderStatus, string> = {
-  pending: "bg-yellow-100 text-yellow-700",
-  confirmed: "bg-blue-100 text-blue-700",
+  scheduled: "bg-blue-100 text-blue-700",
   completed: "bg-green-100 text-green-700",
   cancelled: "bg-red-100 text-red-700",
 };
@@ -26,10 +25,10 @@ interface Props {
 export function OrderStats({ orders }: Props) {
   const stats = useMemo(() => {
     const today = orders.filter((o) => isDateToday(o.date));
-    const pending = today.filter((o) => o.status === "pending");
+    const scheduled = today.filter((o) => o.status === "scheduled");
     const completed = today.filter((o) => o.status === "completed");
     const total = today.reduce((sum, o) => sum + o.total, 0);
-    return { today, pending, completed, total };
+    return { today, scheduled, completed, total };
   }, [orders]);
 
   const sortedToday = useMemo(() => {
@@ -56,12 +55,12 @@ export function OrderStats({ orders }: Props) {
           </div>
         </div>
         <div className="flex items-center gap-3 rounded-xl border border-line bg-surface px-3 py-3 sm:px-4">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-yellow-100 text-yellow-700">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-100 text-blue-700">
             <Clock className="h-4 w-4" />
           </div>
           <div className="min-w-0">
-            <p className="text-[11px] text-ink-faint">Pending</p>
-            <p className="text-xl font-bold text-ink sm:text-2xl">{stats.pending.length}</p>
+            <p className="text-[11px] text-ink-faint">Scheduled</p>
+            <p className="text-xl font-bold text-ink sm:text-2xl">{stats.scheduled.length}</p>
           </div>
         </div>
         <div className="flex items-center gap-3 rounded-xl border border-line bg-surface px-3 py-3 sm:px-4">
@@ -97,7 +96,7 @@ export function OrderStats({ orders }: Props) {
 
         <div className="divide-y divide-dashed divide-line">
           {sortedToday.map((order) => {
-            const urgency = order.status === "pending" ? getTimeUrgency(order.scheduledTime ?? "") : null;
+            const urgency = order.status === "scheduled" ? getTimeUrgency(order.scheduledTime ?? "") : null;
             return (
               <div
                 key={order.id}
