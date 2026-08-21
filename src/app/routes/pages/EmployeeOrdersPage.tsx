@@ -19,8 +19,7 @@ import { ORDER_STATUS_LABELS, type OrderStatus } from "@/lib/constants";
 import { formatCurrency } from "@/utils/currency";
 
 const STATUS_COLORS: Record<OrderStatus, string> = {
-  pending: "#F59E0B",
-  confirmed: "#3B82F6",
+  scheduled: "#3B82F6",
   completed: "#22C55E",
   cancelled: "#EF4444",
 };
@@ -65,7 +64,7 @@ export function EmployeeOrdersPage() {
       if (statusFilter !== "all" && o.status !== statusFilter) return false;
       if (search) {
         const q = search.toLowerCase();
-        if (!o.customerName.toLowerCase().includes(q) && !o.notes?.toLowerCase().includes(q)) return false;
+        if (!o.customerName.toLowerCase().includes(q) && !o.orderNumber.toLowerCase().includes(q) && !o.notes?.toLowerCase().includes(q)) return false;
       }
       return true;
     });
