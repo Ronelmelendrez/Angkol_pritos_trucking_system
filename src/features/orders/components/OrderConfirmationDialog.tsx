@@ -19,13 +19,16 @@ export function OrderConfirmationDialog({ order, onClose }: Props) {
 
   if (!order) return null;
 
+  // Captured so TypeScript keeps the non-null narrowing inside callbacks
+  const confirmedOrder = order;
+
   function handlePrint() {
     const content = slipRef.current;
     if (!content) return;
     const win = window.open("", "_blank", "width=400,height=600");
     if (!win) return;
     win.document.write(`
-      <html><head><title>Order ${order.orderNumber}</title>
+      <html><head><title>Order ${confirmedOrder.orderNumber}</title>
       <style>
         body { font-family: 'Courier New', monospace; padding: 16px; font-size: 12px; }
         .header { text-align: center; border-bottom: 2px dashed #000; padding-bottom: 8px; margin-bottom: 8px; }
