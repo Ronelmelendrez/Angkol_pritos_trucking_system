@@ -10,11 +10,11 @@ import { useDeleteOrder } from "../hooks/useOrders";
 import { useProducts } from "@/features/products/hooks/useProducts";
 import { useToast } from "@/components/ui/useToast";
 import { OrderDetailDialog } from "./OrderDetailDialog";
+import { OrderCancellationDialog } from "./OrderCancellationDialog";
 import type { Order } from "../types";
 
 const STATUS_BADGE: Record<OrderStatus, string> = {
-  pending: "bg-yellow-100 text-yellow-700",
-  confirmed: "bg-blue-100 text-blue-700",
+  scheduled: "bg-blue-100 text-blue-700",
   completed: "bg-green-100 text-green-700",
   cancelled: "bg-red-100 text-red-700",
 };
@@ -25,6 +25,7 @@ interface Props {
 
 export function OrderGridCard({ order }: Props) {
   const [deleteTarget, setDeleteTarget] = useState<Order | null>(null);
+  const [cancelTarget, setCancelTarget] = useState<Order | null>(null);
   const [detailOpen, setDetailOpen] = useState(false);
   const deleteOrder = useDeleteOrder();
   const { data: products = [] } = useProducts();
@@ -61,6 +62,7 @@ export function OrderGridCard({ order }: Props) {
         </Button>
       </div>
 
+      <p className="text-xs text-ink-faint">{order.orderNumber}</p>
       <p className="font-medium text-ink truncate">{order.customerName}</p>
 
       <p className="text-lg font-bold text-ink sm:text-xl">{formatCurrency(order.total)}</p>
@@ -96,7 +98,17 @@ export function OrderGridCard({ order }: Props) {
         </AlertDialogContent>
       </AlertDialog>
 
-      <OrderDetailDialog order={detailOpen ? order : null} onOpenChange={setDetailOpen} />
+      <OrderDetailDialog
+        order={detailOpen ? order : null}
+        onOpenChange={setDetailOpen}
+        onCancel={(o) => { setDetailOpen(false); setCancelTarget(o); }}
+      />
+
+      <OrderCancellationDialog
+        orderId={cancelTarget?.id ?? null}
+        orderNumber={cancelTarget?.orderNumber}
+        onClose={() => setCancelTarget(null)}
+      />
     </div>
   );
 }
