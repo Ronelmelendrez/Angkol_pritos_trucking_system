@@ -27,8 +27,7 @@ const QUICK_LINKS = [
 ];
 
 const STATUS_COLORS: Record<OrderStatus, string> = {
-  pending: "#F59E0B",
-  confirmed: "#3B82F6",
+  scheduled: "#3B82F6",
   completed: "#22C55E",
   cancelled: "#EF4444",
 };
@@ -54,7 +53,7 @@ export function EmployeeDashboardPage() {
 
   // Today's orders by status
   const todayStatusBreakdown = useMemo(() => {
-    const counts: Record<OrderStatus, number> = { pending: 0, confirmed: 0, completed: 0, cancelled: 0 };
+    const counts: Record<OrderStatus, number> = { scheduled: 0, completed: 0, cancelled: 0 };
     todaysOrders.forEach((o) => { counts[o.status]++; });
     return Object.entries(counts)
       .filter(([, count]) => count > 0)
@@ -83,10 +82,10 @@ export function EmployeeDashboardPage() {
 
   const last7OrderCounts = last7.map((d) => d.orders);
 
-  // Pending orders (upcoming)
-  const pendingOrders = useMemo(() =>
+  // Scheduled orders (upcoming)
+  const scheduledOrders = useMemo(() =>
     myOrders
-      .filter((o) => o.status === "pending")
+      .filter((o) => o.status === "scheduled")
       .sort((a, b) => a.date.localeCompare(b.date))
       .slice(0, 5),
   [myOrders]);
@@ -120,8 +119,8 @@ export function EmployeeDashboardPage() {
           isLoading={isLoading}
         />
         <StatCard
-          label="Pending orders"
-          value={`${pendingOrders.length}`}
+          label="Scheduled orders"
+          value={`${scheduledOrders.length}`}
           icon={CheckCircle}
           tone="accent"
           hint="Awaiting pickup"
@@ -217,12 +216,12 @@ export function EmployeeDashboardPage() {
         </Card>
       </div>
 
-      {/* Pending orders + Quick links */}
+      {/* Scheduled orders + Quick links */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <Card className="lg:col-span-2">
           <CardHeader>
             <div>
-              <CardTitle>Pending orders</CardTitle>
+              <CardTitle>Scheduled orders</CardTitle>
               <CardDescription>Upcoming pickups</CardDescription>
             </div>
             <Link to="/employee/orders" className="flex items-center gap-1 text-sm font-medium text-primary hover:underline">
@@ -233,11 +232,11 @@ export function EmployeeDashboardPage() {
             <div className="space-y-2">
               {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-12 w-full" />)}
             </div>
-          ) : pendingOrders.length === 0 ? (
-            <p className="py-8 text-center text-sm text-ink-faint">All caught up — no pending orders.</p>
+          ) : scheduledOrders.length === 0 ? (
+            <p className="py-8 text-center text-sm text-ink-faint">All caught up — no scheduled orders.</p>
           ) : (
             <div className="divide-y divide-line">
-              {pendingOrders.map((order) => (
+              {scheduledOrders.map((order) => (
                 <div key={order.id} className="flex items-center justify-between gap-3 py-2.5">
                   <div className="min-w-0">
                     <p className="truncate text-sm font-medium text-ink">{order.customerName}</p>
