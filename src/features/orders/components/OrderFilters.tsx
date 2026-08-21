@@ -11,8 +11,7 @@ interface BarProps {
 
 const STATUS_OPTIONS: { label: string; value: OrderStatus | "all" }[] = [
   { label: "All statuses", value: "all" },
-  { label: "Pending", value: "pending" },
-  { label: "Confirmed", value: "confirmed" },
+  { label: "Scheduled", value: "scheduled" },
   { label: "Completed", value: "completed" },
   { label: "Cancelled", value: "cancelled" },
 ];
