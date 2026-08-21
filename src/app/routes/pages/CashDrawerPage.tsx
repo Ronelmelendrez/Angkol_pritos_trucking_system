@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Wallet, ArrowDownLeft, ArrowUpRight, CircleDollarSign, Scale, PiggyBank } from "lucide-react";
+import { Wallet, ArrowDownLeft, ArrowUpRight, CircleDollarSign, Scale, PiggyBank, ShoppingBag } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { Label } from "@/components/ui/Label";
@@ -58,13 +58,16 @@ export function CashDrawerPage() {
       </Card>
 
       {isLoading ? (
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-          {Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-[68px] w-full" />)}
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-7">
+          {Array.from({ length: 7 }).map((_, i) => <Skeleton key={i} className="h-[68px] w-full" />)}
         </div>
       ) : (
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-7">
           <StatChip label="Opening cash" value={formatCurrency(data.openingCash ?? 0)} icon={Wallet} />
           <StatChip label="Cash in" value={formatCurrency(data.totalCashIn)} icon={ArrowDownLeft} tone="success" />
+          {data.orderDeposits > 0 && (
+            <StatChip label="Order deposits" value={formatCurrency(data.orderDeposits)} icon={ShoppingBag} tone="primary" />
+          )}
           <StatChip label="Cash out" value={formatCurrency(data.totalCashOut)} icon={ArrowUpRight} tone="danger" />
           <StatChip label="Expected cash" value={formatCurrency(data.expectedCash)} icon={PiggyBank} tone="primary" />
           <StatChip label="Actual cash" value={data.actualCash != null ? formatCurrency(data.actualCash) : "—"} icon={CircleDollarSign} />
