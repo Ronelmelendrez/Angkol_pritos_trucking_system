@@ -60,14 +60,15 @@ export function usePayPayroll() {
         p_gross_pay: row.grossPay,
         p_advance_ids: advanceIds,
         p_advance_deductions: advanceTotal,
-        p_loan_id: row.loanIds.length > 0 && loanRepayAmount > 0 ? row.loanIds[0] : null,
+        // Nullable uuid/text params in SQL; generated RPC types don't model nullability
+        p_loan_id: (row.loanIds.length > 0 && loanRepayAmount > 0 ? row.loanIds[0] : null) as string,
         p_loan_deduction: loanRepayAmount,
         p_adjustments: row.adjustments,
-        p_adjustment_note: row.adjustmentNote || null,
+        p_adjustment_note: (row.adjustmentNote || null) as string,
         p_net_pay: Math.max(0, netPay),
         p_paid_at: paidAt,
         p_salaries_category_id: salariesCategoryId,
-        p_ready_run_id: readyRun?.id ?? null,
+        p_ready_run_id: readyRun?.id ?? undefined,
       });
 
       if (error) throw error;
