@@ -94,10 +94,15 @@ export const orderItemSchema = z.object({
 });
 
 export const orderSchema = z.object({
+  orderNumber: z.string().optional(),
   date: z.string().min(1, "Date is required"),
   scheduledTime: z.string().optional(),
   customerName: z.string().min(1, "Customer name is required"),
-  status: z.enum(["pending", "confirmed", "completed", "cancelled"]),
+  contactNumber: z.string().min(1, "Contact number is required"),
+  status: z.enum(["scheduled", "completed", "cancelled"]),
+  total: z.number().optional(),
+  depositAmount: z.number().min(0, "Deposit must be 0 or more"),
+  balanceAmount: z.number().optional(),
   notes: z.string().optional(),
   items: z.array(orderItemSchema).min(1, "Add at least one item"),
 });
