@@ -2,6 +2,7 @@ import type { Database } from "@/types/database.types";
 import type { ExpenseCategory, PaymentMethod, ExpenseFundSource } from "@/lib/constants";
 import type { PaydayRule } from "@/features/settings/types";
 import type { AdjustmentReason } from "@/features/inventory/types";
+import type { PaymentType } from "@/features/orders/types";
 
 type ExpenseRow = Database["public"]["Tables"]["expenses"]["Row"];
 type ProductRow = Database["public"]["Tables"]["products"]["Row"];
@@ -271,6 +272,7 @@ export function saleRowToApp(row: SaleRow) {
     unitPrice: Number(row.unit_price),
     amount: Number(row.amount),
     notes: row.notes ?? undefined,
+    orderId: row.order_id ?? undefined,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
@@ -283,6 +285,7 @@ export function saleAppToRow(input: {
   unit_price: number;
   amount: number;
   notes?: string;
+  order_id?: string | null;
 }) {
   return {
     date: input.date,
@@ -291,6 +294,7 @@ export function saleAppToRow(input: {
     unit_price: input.unit_price,
     amount: input.amount,
     notes: input.notes ?? null,
+    order_id: input.order_id ?? null,
   };
 }
 
@@ -328,11 +332,16 @@ export function orderItemAppToRow(input: {
 export function orderRowToApp(row: OrderRow, items: OrderItemRow[] = []) {
   return {
     id: row.id,
+    orderNumber: (row as Record<string, unknown>).order_number as string ?? "SO-000000",
     date: row.date,
     scheduledTime: row.scheduled_time ?? undefined,
     customerName: row.customer_name,
-    status: row.status,
+    contactNumber: (row as Record<string, unknown>).contact_number as string ?? "",
+    status: row.status as "scheduled" | "completed" | "cancelled",
     total: Number(row.total),
+    depositAmount: (row as Record<string, unknown>).deposit_amount != null ? Number((row as Record<string, unknown>).deposit_amount) : 0,
+    balanceAmount: (row as Record<string, unknown>).balance_amount != null ? Number((row as Record<string, unknown>).balance_amount) : Number(row.total),
+    cancelReason: (row as Record<string, unknown>).cancel_reason as string ?? undefined,
     notes: row.notes ?? undefined,
     createdBy: row.created_by ?? undefined,
     createdAt: row.created_at,
@@ -344,18 +353,62 @@ export function orderRowToApp(row: OrderRow, items: OrderItemRow[] = []) {
 export function orderAppToRow(input: {
   date: string;
   customer_name: string;
+  contact_number?: string;
+  order_number?: string;
   scheduled_time?: string | null;
-  status?: "pending" | "confirmed" | "completed" | "cancelled";
+  status?: "scheduled" | "completed" | "cancelled";
   total?: number;
+  deposit_amount?: number;
+  balance_amount?: number;
+  cancel_reason?: string;
   notes?: string;
   created_by?: string;
 }) {
   return {
     date: input.date,
     customer_name: input.customer_name,
+    contact_number: input.contact_number ?? "",
+    order_number: input.order_number ?? null,
     scheduled_time: input.scheduled_time ?? null,
-    status: (input.status ?? "pending") as "pending" | "confirmed" | "completed" | "cancelled",
+    status: (input.status ?? "scheduled") as "scheduled" | "completed" | "cancelled",
     total: input.total ?? 0,
+    deposit_amount: input.deposit_amount ?? 0,
+    balance_amount: input.balance_amount ?? 0,
+    cancel_reason: input.cancel_reason ?? null,
+    notes: input.notes ?? null,
+    created_by: input.created_by ?? null,
+  };
+}
+
+// ── Scheduled Order Payments ──────────────────────────
+type OrderPaymentRow = Database["public"]["Tables"]["scheduled_order_payments"]["Row"];
+
+export function orderPaymentRowToApp(row: OrderPaymentRow) {
+  return {
+    id: row.id,
+    orderId: row.order_id,
+    paymentType: row.payment_type as "deposit" | "final" | "extra",
+    amount: Number(row.amount),
+    paymentDate: row.payment_date,
+    notes: row.notes ?? undefined,
+    createdBy: row.created_by ?? undefined,
+    createdAt: row.created_at,
+  };
+}
+
+export function orderPaymentAppToRow(input: {
+  order_id: string;
+  payment_type: PaymentType;
+  amount: number;
+  payment_date: string;
+  notes?: string;
+  created_by?: string;
+}) {
+  return {
+    order_id: input.order_id,
+    payment_type: input.payment_type,
+    amount: input.amount,
+    payment_date: input.payment_date,
     notes: input.notes ?? null,
     created_by: input.created_by ?? null,
   };
