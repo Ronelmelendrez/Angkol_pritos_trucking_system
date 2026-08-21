@@ -11,6 +11,7 @@ import {
   TrendingUp,
   TrendingDown,
   ReceiptText,
+  ShoppingBag,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { formatCurrency } from "@/utils/currency";
@@ -63,6 +64,7 @@ function SectionLabel({
 const MOVEMENT_STYLES: Record<CashMovementType, { icon: LucideIcon; chip: string }> = {
   opening: { icon: Wallet, chip: "bg-primary/15 text-primary-dark" },
   sale: { icon: ArrowDownLeft, chip: "bg-success-bg text-success" },
+  order_deposit: { icon: ShoppingBag, chip: "bg-blue-100 text-blue-700" },
   expense: { icon: ArrowUpRight, chip: "bg-danger-bg text-danger" },
   advance: { icon: HandCoins, chip: "bg-warning-bg text-warning" },
   withdrawal: { icon: CircleDollarSign, chip: "bg-ink/10 text-ink" },
@@ -209,6 +211,12 @@ export function DailyCashReport({ date }: { date: string }) {
                 <section className="space-y-2">
                   <SectionLabel icon={ArrowDownLeft} tone="success">Cash in</SectionLabel>
                   <MoneyRow label="Cash sales" amount={data.cashSales} />
+                  {data.orderDeposits > 0 && (
+                    <MoneyRow label="Order deposits" amount={data.orderDeposits} />
+                  )}
+                  {data.orderBalancePayments > 0 && (
+                    <MoneyRow label="Order balance payments" amount={data.orderBalancePayments} />
+                  )}
                   {data.otherIncome > 0 && <MoneyRow label="Other income" amount={data.otherIncome} />}
                   <MoneyRow label="Total cash in" amount={data.totalCashIn} total />
                 </section>
