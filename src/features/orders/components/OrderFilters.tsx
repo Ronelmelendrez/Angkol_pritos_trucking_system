@@ -1,6 +1,6 @@
 import { SearchInput } from "@/components/ui/SearchInput";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/Select";
-import { ORDER_STATUS_LABELS, type OrderStatus } from "@/lib/constants";
+import { type OrderStatus } from "@/lib/constants";
 
 interface BarProps {
   search: string;
