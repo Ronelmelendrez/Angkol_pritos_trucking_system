@@ -11,11 +11,16 @@ export interface OrderItem {
 }
 
 export interface Order extends BaseRecord {
+  orderNumber: string;
   date: string;
   scheduledTime?: string;
   customerName: string;
+  contactNumber: string;
   status: OrderStatus;
   total: number;
+  depositAmount: number;
+  balanceAmount: number;
+  cancelReason?: string;
   notes?: string;
   createdBy?: string;
   items: OrderItem[];
@@ -29,3 +34,18 @@ export type UpdateOrder = Partial<Omit<Order, "id" | "createdAt" | "updatedAt" |
   id: string;
   items?: Omit<OrderItem, "id" | "orderId">[];
 };
+
+export type PaymentType = "deposit" | "final" | "extra";
+
+export interface OrderPayment {
+  id: string;
+  orderId: string;
+  paymentType: PaymentType;
+  amount: number;
+  paymentDate: string;
+  notes?: string;
+  createdBy?: string;
+  createdAt: string;
+}
+
+export type NewOrderPayment = Omit<OrderPayment, "id" | "createdAt">;
