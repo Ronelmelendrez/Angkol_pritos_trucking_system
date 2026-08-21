@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Trash2, ShoppingBag, CheckCircle } from "lucide-react";
+import { Trash2, ShoppingBag } from "lucide-react";
 import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/components/ui/AlertDialog";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
@@ -7,17 +7,18 @@ import { Pagination } from "@/components/ui/Pagination";
 import { formatCurrency } from "@/utils/currency";
 import { formatDate, formatTime12h, getTimeUrgency, isDateToday } from "@/utils/date";
 import { ORDER_STATUS_LABELS, type OrderStatus } from "@/lib/constants";
-import { useDeleteOrder, useClaimOrder } from "../hooks/useOrders";
+import { useDeleteOrder } from "../hooks/useOrders";
 import { useProducts } from "@/features/products/hooks/useProducts";
 import { useToast } from "@/components/ui/useToast";
 import { OrderDetailDialog } from "./OrderDetailDialog";
+import { OrderCancellationDialog } from "./OrderCancellationDialog";
+import { OrderCompletionDialog } from "./OrderCompletionDialog";
 import type { Order } from "../types";
 
 const PAGE_SIZE = 10;
 
 const STATUS_BADGE: Record<OrderStatus, string> = {
-  pending: "bg-yellow-100 text-yellow-700",
-  confirmed: "bg-blue-100 text-blue-700",
+  scheduled: "bg-blue-100 text-blue-700",
   completed: "bg-green-100 text-green-700",
   cancelled: "bg-red-100 text-red-700",
 };
@@ -35,11 +36,11 @@ interface Props {
 export function OrdersList({ orders }: Props) {
   const [page, setPage] = useState(1);
   const [deleteTarget, setDeleteTarget] = useState<Order | null>(null);
-  const [claimTarget, setClaimTarget] = useState<Order | null>(null);
+  const [completeTarget, setCompleteTarget] = useState<Order | null>(null);
+  const [cancelTarget, setCancelTarget] = useState<Order | null>(null);
   const [detailTarget, setDetailTarget] = useState<Order | null>(null);
   const { data: products = [] } = useProducts();
   const deleteOrder = useDeleteOrder();
-  const claimOrder = useClaimOrder();
   const { toast } = useToast();
 
   const productMap = useMemo(() => new Map(products.map((p) => [p.id, p])), [products]);
@@ -81,18 +82,6 @@ export function OrdersList({ orders }: Props) {
     }
   }
 
-  async function handleClaim() {
-    if (!claimTarget) return;
-    try {
-      await claimOrder.mutateAsync(claimTarget.id);
-      toast({ title: "Order confirmed", description: `${claimTarget.customerName} — marked as completed`, variant: "success" });
-    } catch {
-      toast({ title: "Couldn't confirm order", variant: "error" });
-    } finally {
-      setClaimTarget(null);
-    }
-  }
-
   if (orders.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-line py-14 text-center">
@@ -126,7 +115,7 @@ export function OrdersList({ orders }: Props) {
 
               <div className="divide-y divide-dashed divide-line">
                 {items.map((order) => {
-                  const urgency = isToday && order.status === "pending" ? getTimeUrgency(order.scheduledTime ?? "") : null;
+                  const urgency = isToday && order.status === "scheduled" ? getTimeUrgency(order.scheduledTime ?? "") : null;
                   return (
                     <div
                       key={order.id}
@@ -162,16 +151,27 @@ export function OrdersList({ orders }: Props) {
                         )}
                       </div>
                       <span className="shrink-0 font-semibold text-ink">{formatCurrency(order.total)}</span>
-                      {order.status === "pending" && (
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-7 w-7 shrink-0 text-ink-faint hover:text-green-600"
-                          onClick={() => setClaimTarget(order)}
-                          aria-label="Confirm order"
-                        >
-                          <CheckCircle className="h-3.5 w-3.5" />
-                        </Button>
+                      {order.status === "scheduled" && (
+                        <>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-7 w-7 shrink-0 text-ink-faint hover:text-green-600"
+                            onClick={() => setCompleteTarget(order)}
+                            aria-label="Complete order"
+                          >
+                            <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="20 6 9 17 4 12" /></svg>
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-7 w-7 shrink-0 text-ink-faint hover:text-danger"
+                            onClick={() => setCancelTarget(order)}
+                            aria-label="Cancel order"
+                          >
+                            <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
+                          </Button>
+                        </>
                       )}
                       <Button
                         variant="ghost"
@@ -208,22 +208,23 @@ export function OrdersList({ orders }: Props) {
         </AlertDialogContent>
       </AlertDialog>
 
-      <AlertDialog open={!!claimTarget} onOpenChange={(v) => !v && setClaimTarget(null)}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Confirm order</AlertDialogTitle>
-            <AlertDialogDescription>
-              Mark this order as completed? This will update the order status.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleClaim}>Confirm</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <OrderCompletionDialog
+        order={completeTarget}
+        onClose={() => setCompleteTarget(null)}
+      />
 
-      <OrderDetailDialog order={detailTarget} onOpenChange={(v) => !v && setDetailTarget(null)} />
+      <OrderDetailDialog
+        order={detailTarget}
+        onOpenChange={(v) => !v && setDetailTarget(null)}
+        onComplete={(o) => { setDetailTarget(null); setCompleteTarget(o); }}
+        onCancel={(o) => { setDetailTarget(null); setCancelTarget(o); }}
+      />
+
+      <OrderCancellationDialog
+        orderId={cancelTarget?.id ?? null}
+        orderNumber={cancelTarget?.orderNumber}
+        onClose={() => setCancelTarget(null)}
+      />
     </div>
   );
 }
