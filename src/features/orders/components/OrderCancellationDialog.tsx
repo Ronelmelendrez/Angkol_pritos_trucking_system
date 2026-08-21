@@ -19,10 +19,12 @@ export function OrderCancellationDialog({ orderId, orderNumber, onClose }: Props
 
   if (!orderId) return null;
 
+  const activeOrderId = orderId;
+
   async function handleCancel() {
     if (!reason.trim()) return;
     try {
-      await cancelOrder.mutateAsync({ id: orderId, reason: reason.trim() });
+      await cancelOrder.mutateAsync({ id: activeOrderId, reason: reason.trim() });
       toast({ title: "Order cancelled", description: orderNumber, variant: "success" });
       setReason("");
       onClose();
