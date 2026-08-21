@@ -56,12 +56,11 @@ export type AdvanceStatus = (typeof ADVANCE_STATUSES)[number];
 export const LOAN_STATUSES = ["active", "paid"] as const;
 export type LoanStatus = (typeof LOAN_STATUSES)[number];
 
-export const ORDER_STATUSES = ["pending", "confirmed", "completed", "cancelled"] as const;
+export const ORDER_STATUSES = ["scheduled", "completed", "cancelled"] as const;
 export type OrderStatus = (typeof ORDER_STATUSES)[number];
 
 export const ORDER_STATUS_LABELS: Record<OrderStatus, string> = {
-  pending: "Pending",
-  confirmed: "Confirmed",
+  scheduled: "Scheduled",
   completed: "Completed",
   cancelled: "Cancelled",
 };
