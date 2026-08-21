@@ -19,7 +19,7 @@ export interface CashCount extends BaseRecord {
 
 export type NewCashCount = Omit<CashCount, "id" | "createdAt" | "updatedAt">;
 
-export type CashMovementType = "opening" | "sale" | "expense" | "advance" | "withdrawal";
+export type CashMovementType = "opening" | "sale" | "expense" | "advance" | "withdrawal" | "order_deposit";
 
 export interface CashMovementItem {
   id: string;
@@ -36,6 +36,9 @@ export interface DailyCashData {
   date: string;
   openingCash: number | null;
   cashSales: number;
+  orderDeposits: number;
+  /** Balance/final/extra order payments collected this day */
+  orderBalancePayments: number;
   cashExpenses: number;
   cashAdvances: number;
   ownerWithdrawals: number;
