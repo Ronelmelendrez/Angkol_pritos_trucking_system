@@ -6,6 +6,7 @@ import { useOwnerWithdrawals } from "@/features/withdrawals/hooks/useWithdrawals
 import { useCashOpenings } from "./useCashOpenings";
 import { useCashCounts } from "./useCashCounts";
 import { useProducts } from "@/features/products/hooks/useProducts";
+import { useAllOrderPayments } from "@/features/orders/hooks/useOrderPayments";
 import type { CashMovementItem, DailyCashData } from "../types";
 
 export function useDailyCash(date: string) {
@@ -16,16 +17,20 @@ export function useDailyCash(date: string) {
   const { data: openings = [], isLoading: openingsLoading } = useCashOpenings();
   const { data: counts = [], isLoading: countsLoading } = useCashCounts();
   const { data: products = [], isLoading: productsLoading } = useProducts();
+  const { data: orderPayments = [], isLoading: paymentsLoading } = useAllOrderPayments();
 
   const isLoading =
     salesLoading || expensesLoading || advancesLoading || withdrawalsLoading ||
-    openingsLoading || countsLoading || productsLoading;
+    openingsLoading || countsLoading || productsLoading || paymentsLoading;
 
   const data = useMemo<DailyCashData>(() => {
     const productNames = new Map(products.map((p) => [p.id, p.name]));
 
+    // Walk-in sales only. Sale rows linked to a scheduled order are excluded:
+    // that order's cash is already captured as deposit/balance payments on the
+    // days they were actually received.
     const daySales = sales
-      .filter((s) => s.date === date)
+      .filter((s) => s.date === date && !s.orderId)
       .sort((a, b) => (a.createdAt ?? "").localeCompare(b.createdAt ?? ""));
     const dayExpenses = expenses
       .filter(
@@ -42,16 +47,27 @@ export function useDailyCash(date: string) {
       .filter((w) => w.date === date)
       .sort((a, b) => (a.createdAt ?? "").localeCompare(b.createdAt ?? ""));
 
+    // All order payments received this day are real cash movements.
+    // Deposits are shown separately from balance/final payments so deposits
+    // are never double-counted as sales.
+    const dayOrderPayments = orderPayments
+      .filter((p) => p.paymentDate === date)
+      .sort((a, b) => (a.createdAt ?? "").localeCompare(b.createdAt ?? ""));
+    const dayDeposits = dayOrderPayments.filter((p) => p.paymentType === "deposit");
+    const dayBalancePayments = dayOrderPayments.filter((p) => p.paymentType !== "deposit");
+
     const opening = openings.find((o) => o.date === date) ?? null;
     const cashCount = counts.find((c) => c.date === date) ?? null;
 
     const cashSales = daySales.reduce((sum, s) => sum + s.amount, 0);
+    const depositTotal = dayDeposits.reduce((sum, p) => sum + p.amount, 0);
+    const balancePaymentsTotal = dayBalancePayments.reduce((sum, p) => sum + p.amount, 0);
     const cashExpenses = dayExpenses.reduce((sum, e) => sum + e.amount, 0);
     const cashAdvances = dayAdvances.reduce((sum, a) => sum + a.amount, 0);
     const ownerWithdrawals = dayWithdrawals.reduce((sum, w) => sum + w.amount, 0);
     const otherIncome = 0;
 
-    const totalCashIn = cashSales + otherIncome;
+    const totalCashIn = cashSales + depositTotal + balancePaymentsTotal + otherIncome;
     const totalCashOut = cashExpenses + cashAdvances + ownerWithdrawals;
     const expectedCash = (opening?.openingCash ?? 0) + totalCashIn - totalCashOut;
 
@@ -72,6 +88,24 @@ export function useDailyCash(date: string) {
         type: "sale",
         label: `Sale — ${productNames.get(s.productId) ?? "Unknown"}`,
         amount: s.amount,
+      });
+    }
+    for (const p of dayDeposits) {
+      events.push({
+        id: `deposit-${p.id}`,
+        time: p.createdAt ?? `${date}T00:00:00`,
+        type: "order_deposit",
+        label: "Order deposit",
+        amount: p.amount,
+      });
+    }
+    for (const p of dayBalancePayments) {
+      events.push({
+        id: `order-payment-${p.id}`,
+        time: p.createdAt ?? `${date}T00:00:00`,
+        type: "order_deposit",
+        label: p.paymentType === "final" ? "Order balance payment" : "Order extra payment",
+        amount: p.amount,
       });
     }
     for (const e of dayExpenses) {
@@ -115,6 +149,8 @@ export function useDailyCash(date: string) {
       date,
       openingCash: opening?.openingCash ?? null,
       cashSales,
+      orderDeposits: depositTotal,
+      orderBalancePayments: balancePaymentsTotal,
       cashExpenses,
       cashAdvances,
       ownerWithdrawals,
@@ -127,7 +163,7 @@ export function useDailyCash(date: string) {
       difference: cashCount?.difference ?? null,
       movements,
     };
-  }, [date, sales, expenses, advances, withdrawals, openings, counts, products]);
+  }, [date, sales, expenses, advances, withdrawals, openings, counts, products, orderPayments]);
 
   return { data, isLoading };
 }
