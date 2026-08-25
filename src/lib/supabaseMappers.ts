@@ -19,6 +19,8 @@ type OverrideRow = Database["public"]["Tables"]["employee_pay_overrides"]["Row"]
 type CashOpeningRow = Database["public"]["Tables"]["cash_openings"]["Row"];
 type CashCountRow = Database["public"]["Tables"]["cash_counts"]["Row"];
 type OwnerWithdrawalRow = Database["public"]["Tables"]["owner_withdrawals"]["Row"];
+type BranchRow = Database["public"]["Tables"]["branches"]["Row"];
+type ProfileRow = Database["public"]["Tables"]["profiles"]["Row"];
 
 // ── Payment method normalization ──────────────────────
 const PM_APP_TO_DB: Record<string, string> = {
@@ -180,6 +182,7 @@ export function employeeRowToApp(row: EmployeeRow) {
     isActive: row.is_active,
     avatarColor: row.avatar_color ?? "#888888",
     payFrequency: row.pay_frequency,
+    branchId: row.branch_id ?? "",
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
@@ -193,6 +196,7 @@ export function employeeAppToRow(input: {
   isActive: boolean;
   avatarColor?: string;
   payFrequency: string;
+  branchId?: string;
 }) {
   return {
     name: input.name,
@@ -202,6 +206,7 @@ export function employeeAppToRow(input: {
     is_active: input.isActive,
     avatar_color: input.avatarColor ?? null,
     pay_frequency: input.payFrequency as EmployeeRow["pay_frequency"],
+    branch_id: input.branchId ?? null,
   };
 }
 
@@ -273,6 +278,7 @@ export function saleRowToApp(row: SaleRow) {
     amount: Number(row.amount),
     notes: row.notes ?? undefined,
     orderId: row.order_id ?? undefined,
+    branchId: row.branch_id ?? "",
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
@@ -286,6 +292,7 @@ export function saleAppToRow(input: {
   amount: number;
   notes?: string;
   order_id?: string | null;
+  branch_id?: string | null;
 }) {
   return {
     date: input.date,
@@ -295,6 +302,7 @@ export function saleAppToRow(input: {
     amount: input.amount,
     notes: input.notes ?? null,
     order_id: input.order_id ?? null,
+    branch_id: input.branch_id ?? null,
   };
 }
 
@@ -530,5 +538,61 @@ export function ownerWithdrawalAppToRow(input: {
     amount: input.amount,
     reason: input.reason ?? null,
     created_by: input.createdBy ?? null,
+  };
+}
+
+// ── Branches ──────────────────────────────────────────
+export function branchRowToApp(row: BranchRow) {
+  return {
+    id: row.id,
+    name: row.name,
+    address: row.address ?? "",
+    phone: row.phone ?? "",
+    isActive: row.is_active,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  };
+}
+
+export function branchAppToRow(input: {
+  name: string;
+  address?: string;
+  phone?: string;
+  isActive?: boolean;
+}) {
+  return {
+    name: input.name,
+    address: input.address ?? null,
+    phone: input.phone ?? null,
+    is_active: input.isActive ?? true,
+  };
+}
+
+// ── Profiles ──────────────────────────────────────────
+export function profileRowToApp(row: ProfileRow) {
+  return {
+    id: row.id,
+    name: row.name,
+    email: row.email,
+    role: row.role,
+    branchId: row.branch_id ?? undefined,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  };
+}
+
+export function profileAppToRow(input: {
+  id: string;
+  name: string;
+  email: string;
+  role: "manager" | "staff";
+  branchId?: string | null;
+}) {
+  return {
+    id: input.id,
+    name: input.name,
+    email: input.email,
+    role: input.role,
+    branch_id: input.branchId ?? null,
   };
 }
