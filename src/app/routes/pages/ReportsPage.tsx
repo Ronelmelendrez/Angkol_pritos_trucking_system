@@ -29,6 +29,7 @@ import { useExpenses } from "@/features/expenses/hooks/useExpenses";
 import { useBranchSalesSummary } from "@/features/sales/hooks/useBranchSales";
 import { InsightsPanel, useInsights } from "@/features/insights";
 import { groupByWeekday } from "@/utils/groupByWeekday";
+import { cn } from "@/utils/cn";
 import type { RevenueByProduct } from "@/features/reports/types";
 import type { Sale } from "@/features/sales/types";
 
