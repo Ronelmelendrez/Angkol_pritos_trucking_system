@@ -12,7 +12,7 @@ export const supabaseAuthProvider: AuthProvider = {
 
     const { data: profile } = await supabase
       .from("profiles")
-      .select("id, name, email, role")
+      .select("id, name, email, role, branch_id")
       .eq("id", session.user.id)
       .single();
 
@@ -23,6 +23,7 @@ export const supabaseAuthProvider: AuthProvider = {
       name: profile.name,
       email: profile.email,
       role: profile.role,
+      branchId: profile.branch_id ?? undefined,
     };
   },
 
@@ -48,7 +49,7 @@ export const supabaseAuthProvider: AuthProvider = {
 
     const { data: profile, error: profileError } = await supabase
       .from("profiles")
-      .select("id, name, email, role")
+      .select("id, name, email, role, branch_id")
       .eq("id", data.user.id)
       .single();
 
@@ -62,6 +63,7 @@ export const supabaseAuthProvider: AuthProvider = {
       name: profile.name,
       email: profile.email,
       role: profile.role,
+      branchId: profile.branch_id ?? undefined,
     };
   },
 
