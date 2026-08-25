@@ -287,18 +287,21 @@ export type Database = {
         Row: {
           id: string;
           name: string;
+          type: string;
           created_at: string;
           updated_at: string;
         };
         Insert: {
           id?: string;
           name: string;
+          type?: string;
           created_at?: string;
           updated_at?: string;
         };
         Update: {
           id?: string;
           name?: string;
+          type?: string;
           created_at?: string;
           updated_at?: string;
         };
@@ -312,8 +315,8 @@ export type Database = {
           clock_in: string | null;
           clock_out: string | null;
           hours_worked: number | null;
-          shift: string | null;
-          status: string | null;
+          shift: "full" | "half" | null;
+          status: "present" | "absent" | "closed" | null;
           created_at: string;
           updated_at: string;
         };
@@ -324,8 +327,8 @@ export type Database = {
           clock_in?: string | null;
           clock_out?: string | null;
           hours_worked?: number | null;
-          shift?: string | null;
-          status?: string | null;
+          shift?: "full" | "half" | null;
+          status?: "present" | "absent" | "closed" | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -336,8 +339,8 @@ export type Database = {
           clock_in?: string | null;
           clock_out?: string | null;
           hours_worked?: number | null;
-          shift?: string | null;
-          status?: string | null;
+          shift?: "full" | "half" | null;
+          status?: "present" | "absent" | "closed" | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -357,7 +360,7 @@ export type Database = {
           employee_id: string;
           amount: number;
           date: string;
-          status: string;
+          status: "pending" | "deducted";
           reason: string | null;
           created_at: string;
           updated_at: string;
@@ -367,7 +370,7 @@ export type Database = {
           employee_id: string;
           amount: number;
           date: string;
-          status?: string;
+          status?: "pending" | "deducted";
           reason?: string | null;
           created_at?: string;
           updated_at?: string;
@@ -377,7 +380,7 @@ export type Database = {
           employee_id?: string;
           amount?: number;
           date?: string;
-          status?: string;
+          status?: "pending" | "deducted";
           reason?: string | null;
           created_at?: string;
           updated_at?: string;
@@ -399,7 +402,7 @@ export type Database = {
           principal: number;
           remaining_balance: number;
           date_issued: string;
-          status: string;
+          status: "active" | "paid";
           notes: string | null;
           created_at: string;
           updated_at: string;
@@ -410,7 +413,7 @@ export type Database = {
           principal: number;
           remaining_balance: number;
           date_issued: string;
-          status?: string;
+          status?: "active" | "paid";
           notes?: string | null;
           created_at?: string;
           updated_at?: string;
@@ -421,7 +424,7 @@ export type Database = {
           principal?: number;
           remaining_balance?: number;
           date_issued?: string;
-          status?: string;
+          status?: "active" | "paid";
           notes?: string | null;
           created_at?: string;
           updated_at?: string;
@@ -553,7 +556,7 @@ export type Database = {
           half_day_rate_multiplier: number;
           late_grace_minutes: number;
           late_deduction_per_minute: number;
-          absence_deduction_mode: string;
+          absence_deduction_mode: "full_day" | "none";
           rest_day_rate_multiplier: number;
           holiday_rate_multiplier: number;
           night_differential_percent: number;
@@ -572,7 +575,7 @@ export type Database = {
           half_day_rate_multiplier?: number;
           late_grace_minutes?: number;
           late_deduction_per_minute?: number;
-          absence_deduction_mode?: string;
+          absence_deduction_mode?: "full_day" | "none";
           rest_day_rate_multiplier?: number;
           holiday_rate_multiplier?: number;
           night_differential_percent?: number;
@@ -591,7 +594,7 @@ export type Database = {
           half_day_rate_multiplier?: number;
           late_grace_minutes?: number;
           late_deduction_per_minute?: number;
-          absence_deduction_mode?: string;
+          absence_deduction_mode?: "full_day" | "none";
           rest_day_rate_multiplier?: number;
           holiday_rate_multiplier?: number;
           night_differential_percent?: number;
@@ -777,11 +780,12 @@ export type Database = {
       orders: {
         Row: {
           id: string;
+          order_number: string;
           date: string;
           scheduled_time: string | null;
           customer_name: string;
           contact_number: string;
-          status: string;
+          status: "scheduled" | "completed" | "cancelled";
           total: number;
           deposit_amount: number;
           balance_amount: number;
@@ -793,11 +797,12 @@ export type Database = {
         };
         Insert: {
           id?: string;
+          order_number?: string;
           date: string;
           scheduled_time?: string | null;
           customer_name: string;
           contact_number?: string;
-          status?: string;
+          status?: "scheduled" | "completed" | "cancelled";
           total?: number;
           deposit_amount?: number;
           balance_amount?: number;
@@ -809,11 +814,12 @@ export type Database = {
         };
         Update: {
           id?: string;
+          order_number?: string;
           date?: string;
           scheduled_time?: string | null;
           customer_name?: string;
           contact_number?: string;
-          status?: string;
+          status?: "scheduled" | "completed" | "cancelled";
           total?: number;
           deposit_amount?: number;
           balance_amount?: number;
@@ -916,10 +922,31 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
-      [_ in never]: never;
+      pay_payroll_run: {
+        Args: {
+          p_employee_id: string;
+          p_period_start: string;
+          p_period_end: string;
+          p_hours_worked: number;
+          p_daily_rate: number;
+          p_gross_pay: number;
+          p_advance_ids: string[];
+          p_advance_deductions: number;
+          p_loan_id: string;
+          p_loan_deduction: number;
+          p_adjustments: number;
+          p_adjustment_note: string;
+          p_net_pay: number;
+          p_paid_at: string;
+          p_salaries_category_id: string;
+          p_ready_run_id?: string;
+        };
+        Returns: void;
+      };
     };
     Enums: {
       pay_frequency: "weekly" | "semi_monthly" | "monthly";
+      payment_method: "cash" | "gcash" | "bank_transfer" | "credit";
     };
     CompositeTypes: {
       [_ in never]: never;
