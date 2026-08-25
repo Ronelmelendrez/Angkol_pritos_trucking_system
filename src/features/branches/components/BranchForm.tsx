@@ -143,7 +143,7 @@ export function BranchForm({ branch, onDone }: Props) {
                       type="button"
                       variant="ghost"
                       size="icon"
-                      className="absolute right-2 top-[38px]"
+                      className="absolute right-2 top-9.5"
                       onClick={() => setShowPassword(!showPassword)}
                     >
                       {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -218,7 +218,7 @@ export function BranchForm({ branch, onDone }: Props) {
                 type="button"
                 variant="ghost"
                 size="icon"
-                className="absolute right-2 top-[38px]"
+                className="absolute right-2 top-9.5"
                 onClick={() => setShowPassword(!showPassword)}
               >
                 {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -247,7 +247,7 @@ export function BranchForm({ branch, onDone }: Props) {
                   type="button"
                   variant="ghost"
                   size="icon"
-                  className="absolute right-2 top-[38px]"
+                  className="absolute right-2 top-9.5"
                   onClick={() => setResetDialogOpen(true)}
                 >
                   <RotateCcw className="h-4 w-4" />
