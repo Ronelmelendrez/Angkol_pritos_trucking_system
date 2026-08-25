@@ -13,7 +13,7 @@ export interface BranchSalesSummary {
 
 export function useBranchSalesSummary(dateFrom?: string, dateTo?: string) {
   const { user } = useAuth();
-  const { data: branches = [] } = useBranches();
+  const { data: branches = [], isLoading: branchesLoading } = useBranches();
   
   const branchMap = Object.fromEntries(branches.map(b => [b.id, b.name]));
 
@@ -73,26 +73,26 @@ export function useBranchSalesSummary(dateFrom?: string, dateTo?: string) {
       
       return Object.values(summary).sort((a, b) => b.totalSales - a.totalSales);
     },
-    enabled: !(user?.role === "staff" && !user?.branchId),
+    enabled: !(user?.role === "staff" && !user?.branchId) && !branchesLoading,
   });
 }
 
 export function useBranchSalesComparison(period: "today" | "week" | "month" = "month") {
   const { user } = useAuth();
-  const { data: branches = [] } = useBranches();
+  const { data: branches = [], isLoading: branchesLoading } = useBranches();
   const branchMap = Object.fromEntries(branches.map(b => [b.id, b.name]));
-  
-  const dateFrom = period === "today" 
-    ? new Date().toISOString().split("T")[0]
-    : period === "week"
-      ? new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split("T")[0]
-      : new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
-  
-  const dateTo = new Date().toISOString().split("T")[0];
 
   return useQuery({
     queryKey: ["sales", "branch-comparison", period, user?.branchId],
     queryFn: async () => {
+      const now = new Date();
+      const dateTo = now.toISOString().split("T")[0];
+      const dateFrom = period === "today"
+        ? dateTo
+        : period === "week"
+          ? new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString().split("T")[0]
+          : new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
+
       if (user?.role === "staff" && user?.branchId) {
         const { data, error } = await supabase
           .from("sales")
@@ -140,6 +140,6 @@ export function useBranchSalesComparison(period: "today" | "week" | "month" = "m
       
       return Object.values(summary).sort((a, b) => b.totalSales - a.totalSales);
     },
-    enabled: !(user?.role === "staff" && !user?.branchId),
+    enabled: !(user?.role === "staff" && !user?.branchId) && !branchesLoading,
   });
 }
