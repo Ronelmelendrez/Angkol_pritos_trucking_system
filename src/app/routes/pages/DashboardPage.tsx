@@ -21,6 +21,7 @@ import { InsightsPanel, useInsights } from "@/features/insights";
 import { Sparkline } from "@/components/charts/Sparkline";
 import { TrendBadge } from "@/components/charts/TrendBadge";
 import { CalendarHeatmap } from "@/components/charts/CalendarHeatmap";
+import { BranchSalesDashboard } from "@/features/sales/components/BranchSalesDashboard";
 import { comparePeriods } from "@/utils/periodComparison";
 import { formatCurrency, formatCurrencyCompact } from "@/utils/currency";
 import { useChartLabelCount, chartXInterval } from "@/utils/chartTicks";
@@ -237,6 +238,9 @@ export function DashboardPage() {
       </div>
 
       <InsightsPanel insights={insights} isLoading={insightsLoading} limit={6} />
+
+      {/* Branch Performance */}
+      <BranchSalesDashboard />
 
       <Card>
         <CardHeader>
