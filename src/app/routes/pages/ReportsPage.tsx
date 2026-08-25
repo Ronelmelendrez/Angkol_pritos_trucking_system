@@ -6,7 +6,7 @@ import { ProfitLineChart } from "@/features/reports/components/profitLineChart";
 import { SalesByProductPieChart } from "@/features/reports/components/SalesByProductPieChart";
 import { PayrollSummary } from "@/features/reports/components/PayrollSummary";
 import { DailyCashReport } from "@/features/cash/components/DailyCashReport";
-import { TrendingUp, Receipt, Percent, CalendarDays, Wallet } from "lucide-react";
+import { TrendingUp, Receipt, Percent, CalendarDays, Wallet, Building2, Trophy, Target } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { Input } from "@/components/ui/Input";
@@ -26,6 +26,7 @@ import { startOfWeek } from "date-fns/startOfWeek";
 import { endOfWeek } from "date-fns/endOfWeek";
 import { useProducts } from "@/features/products/hooks/useProducts";
 import { useExpenses } from "@/features/expenses/hooks/useExpenses";
+import { useBranchSalesSummary } from "@/features/sales/hooks/useBranchSales";
 import { InsightsPanel, useInsights } from "@/features/insights";
 import { groupByWeekday } from "@/utils/groupByWeekday";
 import type { RevenueByProduct } from "@/features/reports/types";
@@ -134,6 +135,7 @@ function ReportsContent() {
   const { data: allExpenses = [] } = useExpenses();
   const { data: products = [] } = useProducts();
   const { insights, isLoading: insightsLoading } = useInsights(dateFrom, dateTo);
+  const { data: branchSales = [], isLoading: branchLoading } = useBranchSalesSummary(dateFrom, dateTo);
 
   // KPI summary
   const avgDailyExpense = dailyProfit.length > 0
@@ -241,6 +243,7 @@ function ReportsContent() {
             <TabsTrigger value="sales">Sales</TabsTrigger>
             <TabsTrigger value="payroll">Payroll</TabsTrigger>
             <TabsTrigger value="cash">Daily Cash</TabsTrigger>
+            <TabsTrigger value="branches">Branches</TabsTrigger>
           </TabsList>
         </div>
 
@@ -409,6 +412,122 @@ function ReportsContent() {
               </div>
             </div>
             <DailyCashReport date={cashDate} />
+          </div>
+        </TabsContent>
+
+        <TabsContent value="branches">
+          <div className="space-y-4">
+            {branchLoading ? (
+              <div className="space-y-3">
+                {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-16 w-full" />)}
+              </div>
+            ) : branchSales.length === 0 ? (
+              <Card>
+                <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-line py-14 text-center">
+                  <Building2 className="mb-2 h-8 w-8 text-ink-faint" />
+                  <p className="text-sm font-medium text-ink">No branch sales data</p>
+                  <p className="text-xs text-ink-faint">Sales will appear here once recorded by branch.</p>
+                </div>
+              </Card>
+            ) : (() => {
+              const totalSales = branchSales.reduce((s, b) => s + b.totalSales, 0);
+              const totalQty = branchSales.reduce((s, b) => s + b.totalQuantity, 0);
+              const totalTxns = branchSales.reduce((s, b) => s + b.transactionCount, 0);
+              const topBranch = branchSales[0];
+
+              return (
+                <>
+                  <div className="grid grid-cols-3 gap-3">
+                    <div className="rounded-lg border border-line bg-accent-subtle p-4 text-center">
+                      <Building2 className="mx-auto h-5 w-5 text-primary" />
+                      <p className="mt-1 text-xs text-ink-soft">Branches</p>
+                      <p className="text-lg font-bold text-ink">{branchSales.length}</p>
+                    </div>
+                    <div className="rounded-lg border border-line bg-accent-subtle p-4 text-center">
+                      <TrendingUp className="mx-auto h-5 w-5 text-primary" />
+                      <p className="mt-1 text-xs text-ink-soft">Total Sales</p>
+                      <p className="text-lg font-bold text-ink">{formatCurrency(totalSales)}</p>
+                    </div>
+                    <div className="rounded-lg border border-line bg-accent-subtle p-4 text-center">
+                      <Receipt className="mx-auto h-5 w-5 text-primary" />
+                      <p className="mt-1 text-xs text-ink-soft">Transactions</p>
+                      <p className="text-lg font-bold text-ink">{totalTxns}</p>
+                    </div>
+                  </div>
+
+                  {topBranch && (
+                    <div className="rounded-lg border border-primary/20 bg-primary/5 p-4">
+                      <div className="flex items-center gap-2 text-sm font-medium text-primary">
+                        <Trophy className="h-4 w-4" />
+                        Top Performing Branch: <span className="font-bold">{topBranch.branchName}</span>
+                      </div>
+                      <div className="mt-2 flex items-center justify-between">
+                        <span className="text-xs text-ink-soft">Sales</span>
+                        <span className="font-bold text-primary">{formatCurrency(topBranch.totalSales)}</span>
+                      </div>
+                      <div className="mt-1 h-2 w-full overflow-hidden rounded-full bg-ink/6">
+                        <div
+                          className="h-full rounded-full bg-primary transition-all"
+                          style={{ width: `${((topBranch.totalSales / totalSales) * 100).toFixed(0)}%` }}
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-base font-semibold">Branch breakdown</CardTitle>
+                      <CardDescription>{rangeLabel}</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-3">
+                        <div className="flex items-center gap-2 text-xs font-medium text-ink-soft uppercase tracking-wider">
+                          <div className="w-32">Branch</div>
+                          <div className="w-24 text-right">Sales</div>
+                          <div className="w-20 text-right">Qty</div>
+                          <div className="w-20 text-right">Txns</div>
+                          <div className="flex-1">Share</div>
+                        </div>
+                        {branchSales.map((branch, index) => (
+                          <div
+                            key={branch.branchId}
+                            className={cn(
+                              "flex items-center gap-2 text-sm",
+                              index === 0 && "bg-primary/5 rounded-lg px-3 py-2",
+                            )}
+                          >
+                            <span className="w-8 text-center">
+                              {index === 0 && <Trophy className="mx-auto h-4 w-4 text-yellow-500" />}
+                              {index === 1 && <Target className="mx-auto h-4 w-4 text-gray-400" />}
+                              {index === 2 && <Target className="mx-auto h-4 w-4 text-amber-600" />}
+                              {index > 2 && <span className="text-ink-faint">#{index + 1}</span>}
+                            </span>
+                            <div className="w-32 font-medium text-ink truncate">{branch.branchName}</div>
+                            <div className="w-24 text-right font-medium text-primary">{formatCurrency(branch.totalSales)}</div>
+                            <div className="w-20 text-right text-ink-soft">{branch.totalQuantity}</div>
+                            <div className="w-20 text-right text-ink-soft">{branch.transactionCount}</div>
+                            <div className="flex-1">
+                              <div className="h-2 w-full overflow-hidden rounded-full bg-ink/6">
+                                <div
+                                  className={cn(
+                                    "h-full rounded-full transition-all",
+                                    index === 0 ? "bg-primary" : "bg-ink/20",
+                                  )}
+                                  style={{ width: `${((branch.totalSales / totalSales) * 100).toFixed(1)}%` }}
+                                />
+                              </div>
+                            </div>
+                            <span className="w-12 text-right text-xs text-ink-soft">
+                              {((branch.totalSales / totalSales) * 100).toFixed(1)}%
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </>
+              );
+            })()}
           </div>
         </TabsContent>
       </Tabs>
