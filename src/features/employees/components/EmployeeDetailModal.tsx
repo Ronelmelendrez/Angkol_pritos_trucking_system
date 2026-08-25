@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { Phone, Wallet, Calendar, Clock, CircleDollarSign, Landmark, History, Pencil } from "lucide-react";
+import { Phone, Wallet, Calendar, Clock, CircleDollarSign, Landmark, History, Pencil, Building2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/Dialog";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
@@ -8,6 +8,7 @@ import { useAttendance } from "@/features/attendance/hooks/useAttendance";
 import { useAdvances } from "@/features/advances/hooks/useAdvances";
 import { useLoans, useRepayments } from "@/features/loans/hooks/useLoans";
 import { usePayrollHistory } from "@/features/payroll/hooks/usePayrollHistory";
+import { useBranchMap } from "@/features/branches/hooks/useBranches";
 import { formatCurrency } from "@/utils/currency";
 import { formatDate, formatTime } from "@/utils/date";
 import { cn } from "@/utils/cn";
@@ -35,6 +36,7 @@ export function EmployeeDetailModal({ employee, open, onOpenChange, onEdit }: Pr
   const { data: loans = [] } = useLoans();
   const { data: repayments = [] } = useRepayments();
   const { data: payrollRuns = [] } = usePayrollHistory();
+  const { data: branchMap } = useBranchMap();
 
   const employeeAttendance = useMemo(
     () =>
@@ -70,6 +72,8 @@ export function EmployeeDetailModal({ employee, open, onOpenChange, onEdit }: Pr
         .slice(0, 10),
     [payrollRuns, employee?.id],
   );
+
+  const branchName = branchMap?.[employee?.branchId ?? ""];
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -123,6 +127,15 @@ export function EmployeeDetailModal({ employee, open, onOpenChange, onEdit }: Pr
                 </div>
                 <p className="text-sm font-medium text-ink">{formatDate(employee.hireDate)}</p>
               </Card>
+              {branchName && (
+                <Card className="p-3.5 sm:col-span-3">
+                  <div className="flex items-center gap-1.5 text-xs text-ink-soft mb-1">
+                    <Building2 className="h-3.5 w-3.5" />
+                    Branch
+                  </div>
+                  <p className="text-sm font-medium text-ink">{branchName}</p>
+                </Card>
+              )}
             </div>
 
             <div className="mt-2">
