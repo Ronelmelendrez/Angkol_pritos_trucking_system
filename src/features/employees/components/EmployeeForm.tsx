@@ -9,6 +9,7 @@ import { Checkbox } from "@/components/ui/Checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/Select";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/Tabs";
 import { useAddEmployee, useUpdateEmployee } from "../hooks/useEmployees";
+import { useActiveBranches } from "@/features/branches/hooks/useBranches";
 import { useToast } from "@/components/ui/useToast";
 import { todayISO } from "@/utils/date";
 import { EmployeePayOverrideForm } from "./EmployeePayOverrideForm";
@@ -23,6 +24,7 @@ export function EmployeeForm({ employee, onDone }: Props) {
   const { toast } = useToast();
   const addEmployee = useAddEmployee();
   const updateEmployee = useUpdateEmployee();
+  const { data: branches = [] } = useActiveBranches();
   const isEditing = !!employee;
 
   const {
@@ -39,6 +41,7 @@ export function EmployeeForm({ employee, onDone }: Props) {
       hireDate: employee?.hireDate ?? todayISO(),
       isActive: employee?.isActive ?? true,
       payFrequency: employee?.payFrequency ?? "semi_monthly",
+      branchId: employee?.branchId ?? "",
     },
   });
 
@@ -81,6 +84,28 @@ export function EmployeeForm({ employee, onDone }: Props) {
           <Label htmlFor="hireDate">Hire date</Label>
           <Input id="hireDate" type="date" {...register("hireDate")} />
         </div>
+      </div>
+      <div>
+        <Label htmlFor="branchId">Branch</Label>
+        <Controller
+          control={control}
+          name="branchId"
+          render={({ field }) => (
+            <Select value={field.value} onValueChange={field.onChange}>
+              <SelectTrigger id="branchId">
+                <SelectValue placeholder="Select branch" />
+              </SelectTrigger>
+              <SelectContent>
+                {branches.map((branch) => (
+                  <SelectItem key={branch.id} value={branch.id}>
+                    {branch.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
+        />
+        {errors.branchId && <p className="mt-1 text-xs text-danger">{errors.branchId.message}</p>}
       </div>
       <div>
         <Label htmlFor="payFrequency">Pay frequency</Label>
