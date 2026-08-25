@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Label } from "@/components/ui/Label";
 import { Checkbox } from "@/components/ui/Checkbox";
-import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/Card";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/Card";
 import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/components/ui/AlertDialog";
 import { useAddBranchWithStaff, useUpdateBranch, useBranchStaffEmail, useResetBranchPassword, useCheckEmailExists } from "../hooks/useBranches";
 import { useToast } from "@/components/ui/useToast";
@@ -21,10 +21,6 @@ const branchSchema = z.object({
   // Branch login credentials (for employee dashboard access)
   branchEmail: z.string().min(1, "Login email is required"),
   branchPassword: z.string().optional(),
-}).refine((data) => {
-  // Only require password for new branches (when not editing)
-  // This is handled by the form logic - we only validate on submit
-  return true;
 });
 
 type BranchFormValues = z.infer<typeof branchSchema>;
@@ -39,7 +35,7 @@ export function BranchForm({ branch, onDone }: Props) {
   const addBranchWithStaff = useAddBranchWithStaff();
   const updateBranch = useUpdateBranch();
   const resetPassword = useResetBranchPassword();
-  const { data: staffEmail } = useBranchStaffEmail(branch?.id ?? "");
+  const staffEmail = useBranchStaffEmail(branch?.id ?? "").data;
   const isEditing = !!branch;
   const [showPassword, setShowPassword] = useState(false);
   const [credentials, setCredentials] = useState<{ email: string; password: string } | null>(null);
@@ -50,7 +46,6 @@ export function BranchForm({ branch, onDone }: Props) {
     handleSubmit,
     control,
     formState: { errors },
-    setValue,
     watch,
   } = useForm<BranchFormValues>({
     resolver: zodResolver(branchSchema) as unknown as Resolver<BranchFormValues>,
@@ -65,7 +60,7 @@ export function BranchForm({ branch, onDone }: Props) {
   });
 
   const watchedEmail = watch("branchEmail");
-  const { data: emailExists } = useCheckEmailExists(!isEditing ? watchedEmail : "");
+  const emailExists = useCheckEmailExists(!isEditing ? watchedEmail : "").data;
 
   const isPending = addBranchWithStaff.isPending || updateBranch.isPending || resetPassword.isPending;
 
@@ -279,6 +274,15 @@ export function BranchForm({ branch, onDone }: Props) {
         {isPending && <Loader2 className="h-4 w-4 animate-spin" />}
         {isPending ? "Saving..." : isEditing ? "Save changes" : "Create branch & login"}
       </Button>
+
+      {isEditing && staffEmail && (
+        <ResetPasswordDialog
+          open={resetDialogOpen}
+          onOpenChange={setResetDialogOpen}
+          email={staffEmail}
+          onConfirm={handleResetPassword}
+        />
+      )}
     </form>
   );
 }
