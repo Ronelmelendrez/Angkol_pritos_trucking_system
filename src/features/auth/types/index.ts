@@ -5,6 +5,7 @@ export interface AuthUser {
   name: string;
   email: string;
   role: UserRole;
+  branchId?: string;
 }
 
 export interface AuthState {
