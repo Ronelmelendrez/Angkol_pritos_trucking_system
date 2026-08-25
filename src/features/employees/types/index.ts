@@ -10,6 +10,7 @@ export interface Employee extends BaseRecord {
   isActive: boolean;
   avatarColor: string;
   payFrequency: PayFrequency;
+  branchId: string;
 }
 
 export type NewEmployee = Omit<Employee, "id" | "createdAt" | "updatedAt" | "avatarColor">;
