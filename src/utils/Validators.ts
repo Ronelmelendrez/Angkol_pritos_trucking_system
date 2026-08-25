@@ -34,6 +34,7 @@ export const employeeSchema = z.object({
   hireDate: z.string().min(1, "Hire date is required"),
   isActive: z.boolean(),
   payFrequency: z.enum(["weekly", "semi_monthly", "monthly"]),
+  branchId: z.string().min(1, "Branch is required"),
 });
 export type EmployeeFormValues = z.infer<typeof employeeSchema>;
 
@@ -85,6 +86,7 @@ export const saleSchema = z.object({
   unitPrice: z.number().positive("Price must be greater than ₱0"),
   amount: z.number().positive("Amount must be greater than ₱0"),
   notes: z.string().optional(),
+  branchId: z.string().optional(),
 });
 export type SaleFormValues = z.infer<typeof saleSchema>;
 
