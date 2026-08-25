@@ -1,4 +1,4 @@
-import { useForm, Controller, type Resolver } from "react-hook-form";
+import { useForm, useWatch, Controller, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, Eye, EyeOff, RotateCcw, AlertCircle } from "lucide-react";
 import { z } from "zod";
@@ -46,7 +46,6 @@ export function BranchForm({ branch, onDone }: Props) {
     handleSubmit,
     control,
     formState: { errors },
-    watch,
   } = useForm<BranchFormValues>({
     resolver: zodResolver(branchSchema) as unknown as Resolver<BranchFormValues>,
     defaultValues: {
@@ -59,7 +58,7 @@ export function BranchForm({ branch, onDone }: Props) {
     },
   });
 
-  const watchedEmail = watch("branchEmail");
+  const watchedEmail = useWatch({ control, name: "branchEmail" });
   const emailExists = useCheckEmailExists(!isEditing ? watchedEmail : "").data;
 
   const isPending = addBranchWithStaff.isPending || updateBranch.isPending || resetPassword.isPending;
