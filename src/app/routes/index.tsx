@@ -9,6 +9,7 @@ import { ProductsPage } from "@/app/routes/pages/ProductsPage"
 import { ExpensesPage } from "@/app/routes/pages/ExpensesPage"
 import { InventoryPage } from "@/app/routes/pages/InventoryPage"
 import { EmployeesPage } from "@/app/routes/pages/EmployeesPage"
+import { BranchesPage } from "@/app/routes/pages/BranchesPage"
 import { AttendancePage } from "@/app/routes/pages/AttendancePage"
 import { AdvancesPage } from "@/app/routes/pages/AdvancesPage"
 import { LoansPage } from "@/app/routes/pages/LoansPage"
@@ -44,6 +45,7 @@ export const router = createBrowserRouter([
       { path: "expenses", element: <ExpensesPage /> },
       { path: "inventory", element: <InventoryPage /> },
       { path: "employees", element: <EmployeesPage /> },
+      { path: "branches", element: <BranchesPage /> },
       { path: "attendance", element: <AttendancePage /> },
       { path: "advances", element: <AdvancesPage /> },
       { path: "loans", element: <LoansPage /> },
