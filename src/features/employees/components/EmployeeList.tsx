@@ -3,6 +3,7 @@ import { Users } from "lucide-react";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { Pagination } from "@/components/ui/Pagination";
 import { EmployeeCard } from "./EmployeeCard";
+import { useBranchMap } from "@/features/branches/hooks/useBranches";
 import type { Employee } from "../types";
 
 const PAGE_SIZE = 12;
@@ -17,6 +18,7 @@ interface Props {
 
 export function EmployeeList({ employees, isLoading, onSelect, onEdit, onDelete }: Props) {
   const [page, setPage] = useState(1);
+  const { data: branchMap } = useBranchMap();
 
   const totalPages = Math.max(1, Math.ceil(employees.length / PAGE_SIZE));
   const safePage = Math.min(page, totalPages);
@@ -46,7 +48,14 @@ export function EmployeeList({ employees, isLoading, onSelect, onEdit, onDelete 
     <div>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {pageItems.map((emp) => (
-          <EmployeeCard key={emp.id} employee={emp} onSelect={onSelect} onEdit={onEdit} onDelete={onDelete} />
+          <EmployeeCard
+            key={emp.id}
+            employee={emp}
+            onSelect={onSelect}
+            onEdit={onEdit}
+            onDelete={onDelete}
+            branchMap={branchMap}
+          />
         ))}
       </div>
 
