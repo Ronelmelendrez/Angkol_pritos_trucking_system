@@ -2,10 +2,16 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabaseClient";
 import { attendanceRowToApp } from "@/lib/supabaseMappers";
 import { hoursBetween, localISO, nowISO, todayISO } from "@/utils/date";
+import { useAuth } from "@/features/auth/hooks/useAuth";
+import { useEmployees } from "@/features/employees/hooks/useEmployees";
 import type { AttendanceRecord, AttendanceStatus, ShiftType } from "../types";
 import type { Database } from "@/types/database.types";
 
 const ATTENDANCE_KEY = ["attendance"] as const;
+export const attendanceKeys = {
+  all: ATTENDANCE_KEY,
+  byBranch: (branchId: string) => ["attendance", "branch", branchId] as const,
+};
 
 function detectShift(clockOut: string): ShiftType {
   const hour = new Date(clockOut).getHours();
@@ -13,16 +19,27 @@ function detectShift(clockOut: string): ShiftType {
 }
 
 export function useAttendance() {
+  const { user } = useAuth();
+  const { data: branchEmployees } = useEmployees();
+  const branchEmployeeIds = branchEmployees?.map((e) => e.id) ?? [];
+
   return useQuery({
-    queryKey: ATTENDANCE_KEY,
+    queryKey: user?.role === "manager" ? ATTENDANCE_KEY : attendanceKeys.byBranch(user?.branchId ?? ""),
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from("attendance_records")
         .select("*")
         .order("date", { ascending: false });
+
+      if (user?.role === "staff" && user?.branchId && branchEmployeeIds.length > 0) {
+        query = query.in("employee_id", branchEmployeeIds);
+      }
+
+      const { data, error } = await query;
       if (error) throw error;
       return data.map(attendanceRowToApp);
     },
+    enabled: !(user?.role === "staff" && !user?.branchId),
   });
 }
 

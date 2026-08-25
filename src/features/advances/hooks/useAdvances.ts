@@ -1,12 +1,15 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabaseClient";
 import { advanceRowToApp } from "@/lib/supabaseMappers";
+import { useAuth } from "@/features/auth/hooks/useAuth";
+import { useEmployees } from "@/features/employees/hooks/useEmployees";
 import type { NewCashAdvance } from "../types";
 
 const ADVANCES_KEY = ["advances"] as const;
 const DEDUCTED_RETENTION_DAYS = 5;
 export const advancesKeys = {
   all: ADVANCES_KEY,
+  byBranch: (branchId: string) => ["advances", "branch", branchId] as const,
 };
 
 async function cleanupExpiredDeductedAdvances() {
@@ -20,17 +23,29 @@ async function cleanupExpiredDeductedAdvances() {
 }
 
 export function useAdvances() {
+  const { user } = useAuth();
+  const { data: branchEmployees } = useEmployees();
+  const branchEmployeeIds = branchEmployees?.map((e) => e.id) ?? [];
+
   return useQuery({
-    queryKey: ADVANCES_KEY,
+    queryKey: user?.role === "manager" ? ADVANCES_KEY : advancesKeys.byBranch(user?.branchId ?? ""),
     queryFn: async () => {
       await cleanupExpiredDeductedAdvances();
-      const { data, error } = await supabase
+
+      let query = supabase
         .from("cash_advances")
         .select("*")
         .order("date", { ascending: false });
+
+      if (user?.role === "staff" && user?.branchId && branchEmployeeIds.length > 0) {
+        query = query.in("employee_id", branchEmployeeIds);
+      }
+
+      const { data, error } = await query;
       if (error) throw error;
       return data.map(advanceRowToApp);
     },
+    enabled: !(user?.role === "staff" && !user?.branchId),
   });
 }
 
