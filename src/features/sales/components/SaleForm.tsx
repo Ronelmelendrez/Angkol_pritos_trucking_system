@@ -4,6 +4,8 @@ import { useEffect } from "react";
 import { Loader2 } from "lucide-react";
 import { saleSchema, type SaleFormValues } from "@/utils/Validators";
 import { useProducts } from "@/features/products/hooks/useProducts";
+import { useActiveBranches } from "@/features/branches/hooks/useBranches";
+import { useAuth } from "@/features/auth/hooks/useAuth";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Label } from "@/components/ui/Label";
@@ -21,7 +23,12 @@ export function SaleForm({ onDone }: Props) {
   const { toast } = useToast();
   const addSale = useAddSale();
   const { data: products = [] } = useProducts();
+  const { data: branches = [] } = useActiveBranches();
+  const { user } = useAuth();
   const activeProducts = products.filter((p) => p.isActive);
+
+  const isStaff = user?.role === "staff";
+  const staffBranchId = user?.branchId;
 
   const {
     register,
@@ -29,6 +36,7 @@ export function SaleForm({ onDone }: Props) {
     control,
     reset,
     setValue,
+    getValues,
     formState: { errors },
   } = useForm<SaleFormValues>({
     resolver: zodResolver(saleSchema),
@@ -39,6 +47,7 @@ export function SaleForm({ onDone }: Props) {
       unitPrice: 0,
       amount: 0,
       notes: "",
+      branchId: staffBranchId ?? "",
     },
   });
 
@@ -73,10 +82,16 @@ export function SaleForm({ onDone }: Props) {
 
   async function onSubmit(values: SaleFormValues) {
     try {
-      await addSale.mutateAsync(values);
+      // Ensure branchId is set (required for NewSale)
+      const submitValues = {
+        ...values,
+        branchId: isStaff ? staffBranchId : values.branchId,
+      } as SaleFormValues & { branchId: string };
+      
+      await addSale.mutateAsync(submitValues);
       const product = activeProducts.find((p) => p.id === values.productId);
       toast({ title: "Sale recorded", description: `${product?.name ?? "Sale"} — ${formatCurrency(values.amount)}`, variant: "success" });
-      reset({ date: todayISO(), productId: "", quantitySold: 0, unitPrice: 0, amount: 0, notes: "" });
+      reset({ date: todayISO(), productId: "", quantitySold: 0, unitPrice: 0, amount: 0, notes: "", branchId: staffBranchId ?? "" });
       onDone?.();
     } catch {
       toast({ title: "Couldn't save sale", description: "Please try again.", variant: "error" });
@@ -85,6 +100,31 @@ export function SaleForm({ onDone }: Props) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      {!isStaff && branches.length > 0 && (
+        <div>
+          <Label htmlFor="sale-branch">Branch</Label>
+          <Controller
+            control={control}
+            name="branchId"
+            render={({ field }) => (
+              <Select value={field.value} onValueChange={field.onChange}>
+                <SelectTrigger id="sale-branch">
+                  <SelectValue placeholder="Select branch" />
+                </SelectTrigger>
+                <SelectContent>
+                  {branches.map((b) => (
+                    <SelectItem key={b.id} value={b.id}>
+                      {b.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+          />
+          {errors.branchId && <p className="mt-1 text-xs text-danger">{errors.branchId.message}</p>}
+        </div>
+      )}
+
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
           <Label htmlFor="sale-date">Date</Label>
@@ -137,7 +177,7 @@ export function SaleForm({ onDone }: Props) {
         <Input id="sale-notes" placeholder="e.g. Walk-in customer" {...register("notes")} />
       </div>
 
-      <Button type="submit" className="w-full" size="lg" disabled={addSale.isPending || !selectedProductId}>
+      <Button type="submit" className="w-full" size="lg" disabled={addSale.isPending || !selectedProductId || (!isStaff && !branches.some(b => b.id === getValues().branchId))}>
         {addSale.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
         {addSale.isPending ? "Saving..." : "Record sale"}
       </Button>
