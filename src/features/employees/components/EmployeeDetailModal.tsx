@@ -90,7 +90,7 @@ export function EmployeeDetailModal({ employee, open, onOpenChange, onEdit }: Pr
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
-                    <DialogTitle className="break-words">{employee.name}</DialogTitle>
+                    <DialogTitle className="wrap-break-word">{employee.name}</DialogTitle>
                     <Badge variant={employee.isActive ? "success" : "neutral"}>
                       {employee.isActive ? "Active" : "Inactive"}
                     </Badge>
@@ -153,7 +153,7 @@ export function EmployeeDetailModal({ employee, open, onOpenChange, onEdit }: Pr
                       {record.shift && (
                         <Badge
                           variant={record.shift === "half" ? "warning" : "success"}
-                          className="w-[4.75rem] justify-center whitespace-nowrap"
+                          className="w-19 justify-center whitespace-nowrap"
                         >
                           {record.shift === "half" ? "Half day" : "Full day"}
                         </Badge>

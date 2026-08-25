@@ -49,7 +49,7 @@ export function BranchSalesDashboard({ className }: Props) {
           Branch Performance
         </CardTitle>
         <Select value={period} onValueChange={setPeriod as (v: "today" | "week" | "month") => void}>
-          <SelectTrigger className="w-[160px]">
+          <SelectTrigger className="w-40">
             <SelectValue placeholder="Period" />
           </SelectTrigger>
           <SelectContent>
