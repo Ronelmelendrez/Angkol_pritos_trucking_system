@@ -11,7 +11,7 @@ interface Props {
 }
 
 export function BranchSalesDashboard({ className }: Props) {
-  const [period, setPeriod] = useState<"today" | "week" | "month">("month");
+  const [period, setPeriod] = useState<"today" | "week" | "month">("today");
   const { data: branchSales = [], isLoading } = useBranchSalesComparison(period);
 
   const topBranch = branchSales[0];
