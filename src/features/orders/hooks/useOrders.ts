@@ -3,6 +3,7 @@ import { supabase } from "@/lib/supabaseClient";
 import { orderRowToApp, orderAppToRow, orderItemAppToRow } from "@/lib/supabaseMappers";
 import { todayISO } from "@/utils/date";
 import { salesKeys } from "@/features/sales/hooks/useSales";
+import { useAuth } from "@/features/auth/hooks/useAuth";
 import type { Database } from "@/types/database.types";
 import type { Order, NewOrder, UpdateOrder } from "../types";
 
@@ -231,6 +232,7 @@ export function useDeleteOrder() {
 
 export function useCompleteOrder() {
   const queryClient = useQueryClient();
+  const { user } = useAuth();
   return useMutation({
     mutationFn: async (order: Order) => {
       // A completed order is an actual sale: record its items dated the
@@ -248,6 +250,7 @@ export function useCompleteOrder() {
               amount: item.amount,
               notes: `Scheduled order ${order.orderNumber}`,
               order_id: order.id,
+              branch_id: user?.branchId ?? null,
             })),
           );
         if (salesErr) throw salesErr;
