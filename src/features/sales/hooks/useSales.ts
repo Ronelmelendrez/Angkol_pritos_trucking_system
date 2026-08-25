@@ -3,23 +3,53 @@ import { supabase } from "@/lib/supabaseClient";
 import { saleRowToApp, saleAppToRow } from "@/lib/supabaseMappers";
 import type { Sale, NewSale, UpdateSale } from "../types";
 import type { Database } from "@/types/database.types";
+import { useAuth } from "@/features/auth/hooks/useAuth";
 
 const SALES_KEY = ["sales"] as const;
 export const salesKeys = {
   all: SALES_KEY,
+  byBranch: (branchId: string) => ["sales", "branch", branchId] as const,
+  byDate: (date: string) => ["sales", "date", date] as const,
+  byBranchAndDate: (branchId: string, date: string) => ["sales", "branch", branchId, "date", date] as const,
 };
 
 export function useSales() {
+  const { user } = useAuth();
+  
   return useQuery({
-    queryKey: SALES_KEY,
+    queryKey: user?.role === "manager" ? SALES_KEY : salesKeys.byBranch(user?.branchId ?? ""),
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("sales")
-        .select("*")
-        .order("date", { ascending: false });
+      let query = supabase.from("sales").select("*").order("date", { ascending: false });
+      
+      if (user?.role === "staff" && user?.branchId) {
+        query = query.eq("branch_id", user.branchId);
+      }
+      
+      const { data, error } = await query;
       if (error) throw error;
       return data.map(saleRowToApp);
     },
+    enabled: !(user?.role === "staff" && !user?.branchId),
+  });
+}
+
+export function useSalesByDate(date: string) {
+  const { user } = useAuth();
+  
+  return useQuery({
+    queryKey: user?.role === "manager" ? salesKeys.byDate(date) : salesKeys.byBranchAndDate(user?.branchId ?? "", date),
+    queryFn: async () => {
+      let query = supabase.from("sales").select("*").eq("date", date);
+      
+      if (user?.role === "staff" && user?.branchId) {
+        query = query.eq("branch_id", user.branchId);
+      }
+      
+      const { data, error } = await query;
+      if (error) throw error;
+      return data.map(saleRowToApp);
+    },
+    enabled: !!date && !(user?.role === "staff" && !user?.branchId),
   });
 }
 
@@ -36,6 +66,7 @@ export function useAddSale() {
           unit_price: input.unitPrice,
           amount: input.amount,
           notes: input.notes,
+          branch_id: input.branchId,
         }))
         .select()
         .single();
@@ -72,6 +103,7 @@ export function useUpdateSale() {
       if (patch.unitPrice !== undefined) row.unit_price = patch.unitPrice;
       if (patch.amount !== undefined) row.amount = patch.amount;
       if (patch.notes !== undefined) row.notes = patch.notes ?? null;
+      if (patch.branchId !== undefined) row.branch_id = patch.branchId;
 
       const { data, error } = await supabase
         .from("sales")
