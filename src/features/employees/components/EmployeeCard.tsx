@@ -1,4 +1,4 @@
-import { Phone, Wallet, Calendar, MoreVertical, Pencil, Trash2 } from "lucide-react";
+import { Phone, Wallet, Calendar, MoreVertical, Pencil, Trash2, Building2 } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -17,6 +17,7 @@ interface Props {
   onSelect: (employee: Employee) => void;
   onEdit: (employee: Employee) => void;
   onDelete: (employee: Employee) => void;
+  branchMap?: Record<string, string>;
 }
 
 function initials(name: string) {
@@ -28,7 +29,9 @@ function initials(name: string) {
     .toUpperCase();
 }
 
-export function EmployeeCard({ employee, onSelect, onEdit, onDelete }: Props) {
+export function EmployeeCard({ employee, onSelect, onEdit, onDelete, branchMap }: Props) {
+  const branchName = branchMap?.[employee.branchId];
+
   return (
     <Card
       className="ticket-hover ticket-perf cursor-pointer"
@@ -78,6 +81,11 @@ export function EmployeeCard({ employee, onSelect, onEdit, onDelete }: Props) {
         <div className="flex items-center gap-2">
           <Calendar className="h-3.5 w-3.5 text-ink-faint" /> Hired {formatDate(employee.hireDate)}
         </div>
+        {branchName && (
+          <div className="flex items-center gap-2">
+            <Building2 className="h-3.5 w-3.5 text-ink-faint" /> {branchName}
+          </div>
+        )}
       </div>
     </Card>
   );
