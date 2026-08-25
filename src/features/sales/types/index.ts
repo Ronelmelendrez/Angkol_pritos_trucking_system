@@ -9,6 +9,7 @@ export interface Sale extends BaseRecord {
   notes?: string;
   /** Set when this sale was derived from a completed scheduled order */
   orderId?: string;
+  branchId: string;
 }
 
 export type NewSale = Omit<Sale, "id" | "createdAt" | "updatedAt">;
