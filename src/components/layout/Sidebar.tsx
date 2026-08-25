@@ -62,7 +62,7 @@ export function Sidebar() {
       className={cn(
         "hidden shrink-0 flex-col border-r border-line bg-surface transition-all duration-300 ease-out",
         "lg:flex lg:sticky lg:top-0 lg:h-screen",
-        isSidebarCollapsed ? "lg:w-[4.5rem]" : "lg:w-64",
+        isSidebarCollapsed ? "lg:w-18" : "lg:w-64",
       )}
     >
       {/* Header */}
@@ -99,7 +99,7 @@ export function Sidebar() {
             className={({ isActive }) =>
               cn(
                 "flex items-center gap-3 rounded-xl py-2.5 text-sm font-medium transition-colors",
-                "min-h-[44px]",
+                "min-h-11",
                 isSidebarCollapsed
                   ? "justify-center px-2"
                   : "px-3",
@@ -129,7 +129,7 @@ export function Sidebar() {
           onClick={toggleSidebarCollapse}
           className={cn(
             "w-full items-center gap-3 rounded-xl py-2.5 text-sm font-medium transition-colors",
-            "min-h-[44px] text-ink-soft hover:bg-ink/5 hover:text-ink active:bg-ink/8",
+            "min-h-11 text-ink-soft hover:bg-ink/5 hover:text-ink active:bg-ink/8",
             "flex",
             isSidebarCollapsed ? "justify-center px-2" : "px-3",
           )}
