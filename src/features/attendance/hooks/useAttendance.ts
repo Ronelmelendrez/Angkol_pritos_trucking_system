@@ -20,12 +20,16 @@ function detectShift(clockOut: string): ShiftType {
 
 export function useAttendance() {
   const { user } = useAuth();
-  const { data: branchEmployees } = useEmployees();
+  const { data: branchEmployees, isLoading: employeesLoading } = useEmployees();
   const branchEmployeeIds = branchEmployees?.map((e) => e.id) ?? [];
 
   return useQuery({
     queryKey: user?.role === "manager" ? ATTENDANCE_KEY : attendanceKeys.byBranch(user?.branchId ?? ""),
     queryFn: async () => {
+      if (user?.role === "staff" && user?.branchId) {
+        if (branchEmployeeIds.length === 0) return [];
+      }
+
       let query = supabase
         .from("attendance_records")
         .select("*")
@@ -39,7 +43,7 @@ export function useAttendance() {
       if (error) throw error;
       return data.map(attendanceRowToApp);
     },
-    enabled: !(user?.role === "staff" && !user?.branchId),
+    enabled: user?.role === "manager" || (!!user?.branchId && !employeesLoading),
   });
 }
 

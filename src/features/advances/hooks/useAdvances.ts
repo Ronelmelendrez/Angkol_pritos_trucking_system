@@ -24,12 +24,16 @@ async function cleanupExpiredDeductedAdvances() {
 
 export function useAdvances() {
   const { user } = useAuth();
-  const { data: branchEmployees } = useEmployees();
+  const { data: branchEmployees, isLoading: employeesLoading } = useEmployees();
   const branchEmployeeIds = branchEmployees?.map((e) => e.id) ?? [];
 
   return useQuery({
     queryKey: user?.role === "manager" ? ADVANCES_KEY : advancesKeys.byBranch(user?.branchId ?? ""),
     queryFn: async () => {
+      if (user?.role === "staff" && user?.branchId) {
+        if (branchEmployeeIds.length === 0) return [];
+      }
+
       await cleanupExpiredDeductedAdvances();
 
       let query = supabase
@@ -45,7 +49,7 @@ export function useAdvances() {
       if (error) throw error;
       return data.map(advanceRowToApp);
     },
-    enabled: !(user?.role === "staff" && !user?.branchId),
+    enabled: user?.role === "manager" || (!!user?.branchId && !employeesLoading),
   });
 }
 
