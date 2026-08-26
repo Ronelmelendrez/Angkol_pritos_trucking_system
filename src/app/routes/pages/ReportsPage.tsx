@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/Input";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/Tabs";
 import { DatePresets, type DatePreset } from "@/components/ui/DatePresets";
 import { HorizontalBarList } from "@/components/charts/HorizontalBarList";
+import { BranchSalesLineChart } from "@/features/reports/components/BranchSalesLineChart";
 import {
   AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend,
 } from "recharts";
@@ -529,6 +530,7 @@ function ReportsContent() {
                 </>
               );
             })()}
+            <BranchSalesLineChart dateFrom={dateFrom} dateTo={dateTo} />
           </div>
         </TabsContent>
       </Tabs>

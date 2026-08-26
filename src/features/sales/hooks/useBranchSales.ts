@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabaseClient";
 import { useBranches } from "@/features/branches/hooks/useBranches";
 import { useAuth } from "@/features/auth/hooks/useAuth";
+import { format, eachDayOfInterval, parseISO } from "date-fns";
 
 export interface BranchSalesSummary {
   branchId: string;
@@ -77,6 +78,67 @@ export function useBranchSalesSummary(dateFrom?: string, dateTo?: string) {
   });
 }
 
+export interface BranchSalesOverTimePoint {
+  label: string;
+  [branchName: string]: string | number;
+}
+
+export function useBranchSalesOverTime(dateFrom: string, dateTo: string) {
+  const { user } = useAuth();
+  const { data: branches = [], isLoading: branchesLoading } = useBranches();
+  const branchMap = Object.fromEntries(branches.map(b => [b.id, b.name]));
+
+  return useQuery({
+    queryKey: ["sales", "branch-over-time", dateFrom, dateTo, user?.branchId],
+    queryFn: async () => {
+      let query = supabase
+        .from("sales")
+        .select("branch_id, amount, date")
+        .gte("date", dateFrom)
+        .lte("date", dateTo);
+
+      if (user?.role === "staff" && user?.branchId) {
+        query = query.eq("branch_id", user.branchId);
+      }
+
+      const { data, error } = await query;
+      if (error) throw error;
+
+      const branchNames = [...new Set(data.map(s => branchMap[s.branch_id] ?? "Unknown"))];
+      const dateMap = new Map<string, Record<string, number>>();
+
+      for (const sale of data) {
+        const branchName = branchMap[sale.branch_id] ?? "Unknown";
+        const label = sale.date;
+        if (!dateMap.has(label)) {
+          dateMap.set(label, {});
+        }
+        const row = dateMap.get(label)!;
+        row[branchName] = (row[branchName] ?? 0) + Number(sale.amount);
+      }
+
+      const days = eachDayOfInterval({
+        start: parseISO(dateFrom),
+        end: parseISO(dateTo),
+      });
+
+      return {
+        data: days.map(day => {
+          const label = format(day, "MMM d");
+          const isoDate = format(day, "yyyy-MM-dd");
+          const row = dateMap.get(isoDate) ?? {};
+          const point: BranchSalesOverTimePoint = { label };
+          for (const name of branchNames) {
+            point[name] = row[name] ?? 0;
+          }
+          return point;
+        }),
+        branchNames,
+      };
+    },
+    enabled: dateFrom <= dateTo && !(user?.role === "staff" && !user?.branchId) && !branchesLoading,
+  });
+}
 export function useBranchSalesComparison(period: "today" | "week" | "month" = "month") {
   const { user } = useAuth();
   const { data: branches = [], isLoading: branchesLoading } = useBranches();

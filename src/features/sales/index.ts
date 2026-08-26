@@ -10,5 +10,7 @@ export {
 export {
   useBranchSalesSummary,
   useBranchSalesComparison,
+  useBranchSalesOverTime,
 } from "./hooks/useBranchSales";
+export type { BranchSalesOverTimePoint } from "./hooks/useBranchSales";
 export type { Sale, NewSale, UpdateSale } from "./types";
