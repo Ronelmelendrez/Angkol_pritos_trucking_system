@@ -1,7 +1,5 @@
-import { useState } from "react";
 import { BarChart2 } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/Card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/Select";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { useBranchSalesComparison } from "@/features/sales/hooks/useBranchSales";
 import { formatCurrency } from "@/utils/currency";
@@ -21,8 +19,7 @@ const BAR_COLORS = [
 ];
 
 export function BranchSalesDashboard({ className }: Props) {
-  const [period, setPeriod] = useState<"today" | "week" | "month">("today");
-  const { data: branchSales = [], isLoading } = useBranchSalesComparison(period);
+  const { data: branchSales = [], isLoading } = useBranchSalesComparison("month");
 
   const maxSales = branchSales[0]?.totalSales ?? 0;
 
@@ -66,26 +63,12 @@ export function BranchSalesDashboard({ className }: Props) {
 
   return (
     <Card className={cn("h-full", className)}>
-      <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <div>
-          <CardTitle className="flex items-center gap-2">
-            <BarChart2 className="h-5 w-5" />
-            Branch Sales Performance
-          </CardTitle>
-          <CardDescription>
-            {period === "today" ? "Today" : period === "week" ? "This week" : "This month"}
-          </CardDescription>
-        </div>
-        <Select value={period} onValueChange={setPeriod as (v: "today" | "week" | "month") => void}>
-          <SelectTrigger className="w-36">
-            <SelectValue placeholder="Period" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="today">Today</SelectItem>
-            <SelectItem value="week">This Week</SelectItem>
-            <SelectItem value="month">This Month</SelectItem>
-          </SelectContent>
-        </Select>
+      <CardHeader className="pb-2">
+        <CardTitle className="flex items-center gap-2">
+          <BarChart2 className="h-5 w-5" />
+          Branch Sales Performance
+        </CardTitle>
+        <CardDescription>Last 30 days</CardDescription>
       </CardHeader>
 
       <CardContent>
