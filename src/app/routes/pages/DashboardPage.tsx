@@ -240,10 +240,8 @@ export function DashboardPage() {
       <InsightsPanel insights={insights} isLoading={insightsLoading} limit={6} />
 
       {/* Branch Sales + Sales vs Expenses — side by side */}
-      <div className="grid gap-5 lg:grid-cols-2">
-        <BranchSalesDashboard />
-
-        <Card>
+      <div className="grid gap-5 lg:grid-cols-3">
+        <Card className="lg:col-span-2">
         <CardHeader>
           <div>
             <CardTitle>Sales vs expenses</CardTitle>
@@ -311,6 +309,7 @@ export function DashboardPage() {
           </div>
         )}
       </Card>
+      <BranchSalesDashboard />
       </div>
 
       {/* New row: Busiest days + Cash flow + Payroll due */}
