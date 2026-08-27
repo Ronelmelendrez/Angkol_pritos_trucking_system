@@ -66,6 +66,21 @@ export function useAllEmployees() {
   });
 }
 
+export function useBranchEmployeeCount(branchId: string | null) {
+  return useQuery({
+    queryKey: ["employees", "count", "branch", branchId ?? ""],
+    enabled: !!branchId,
+    queryFn: async () => {
+      const { count, error } = await supabase
+        .from("employees")
+        .select("id", { count: "exact", head: true })
+        .eq("branch_id", branchId);
+      if (error) throw error;
+      return count ?? 0;
+    },
+  });
+}
+
 export function useAddEmployee() {
   const queryClient = useQueryClient();
   return useMutation({

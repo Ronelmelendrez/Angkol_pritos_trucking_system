@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/Button";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/Dialog";
 import { useBranches, useDeleteBranch } from "@/features/branches/hooks/useBranches";
+import { useBranchEmployeeCount } from "@/features/employees/hooks/useEmployees";
 import { BranchForm } from "@/features/branches/components/BranchForm";
 import { BranchList } from "@/features/branches/components/BranchList";
 import { useToast } from "@/components/ui/useToast";
@@ -17,6 +18,7 @@ export function BranchesPage() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState<Branch | undefined>(undefined);
   const [deleteTarget, setDeleteTarget] = useState<Branch | null>(null);
+  const { data: employeeCount = 0 } = useBranchEmployeeCount(deleteTarget?.id ?? null);
 
   function openAdd() {
     setEditing(undefined);
@@ -36,6 +38,17 @@ export function BranchesPage() {
 
   async function handleDeleteConfirm() {
     if (!deleteTarget) return;
+
+    if (employeeCount > 0) {
+      toast({
+        title: "Can't remove branch",
+        description: `${deleteTarget.name} still has ${employeeCount} ${employeeCount === 1 ? "employee" : "employees"}. Remove or transfer them first.`,
+        variant: "error",
+      });
+      setDeleteTarget(null);
+      return;
+    }
+
     try {
       await deleteBranch.mutateAsync(deleteTarget.id);
       toast({ title: "Branch removed", description: deleteTarget.name, variant: "success" });
