@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabaseClient";
 import { branchRowToApp, branchAppToRow } from "@/lib/supabaseMappers";
-import type { Branch, NewBranch, UpdateBranch } from "../types";
+import type { NewBranch, UpdateBranch } from "../types";
 
 const BRANCHES_KEY = ["branches"] as const;
 
@@ -184,8 +184,53 @@ export function useDeleteBranch() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from("branches").delete().eq("id", id);
-      if (error) throw error;
+      // 1. Check whether the branch has any transaction/employee history.
+      // If it does, we must NOT delete (data loss) — deactivate instead.
+      const { count: employeeCount } = await supabase
+        .from("employees")
+        .select("id", { count: "exact", head: true })
+        .eq("branch_id", id);
+
+      const { count: salesCount } = await supabase
+        .from("sales")
+        .select("id", { count: "exact", head: true })
+        .eq("branch_id", id);
+
+      const hasHistory = (employeeCount ?? 0) > 0 || (salesCount ?? 0) > 0;
+
+      if (hasHistory) {
+        // Deactivate (is_active = false) — preserves history, blocks new use.
+        const { error } = await supabase
+          .from("branches")
+          .update({ is_active: false })
+          .eq("id", id);
+        if (error) throw error;
+        return { deactivated: true, employeeCount: employeeCount ?? 0, salesCount: salesCount ?? 0 };
+      }
+
+      // 2. No history — safe to permanently delete (also cleans up staff account).
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const response = await fetch(`${supabaseUrl}/functions/v1/delete-branch-with-staff`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+        },
+        body: JSON.stringify({ branchId: id }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        const error = new Error(data.error ?? 'Failed to delete branch') as Error & { code?: string; employeeCount?: number; salesCount?: number };
+        if (response.status === 409) {
+          error.code = "23503";
+          error.employeeCount = data.employeeCount ?? 0;
+          error.salesCount = data.salesCount ?? 0;
+        }
+        throw error;
+      }
+      return { deactivated: false };
     },
     onSettled: () => queryClient.invalidateQueries({ queryKey: BRANCHES_KEY }),
   });

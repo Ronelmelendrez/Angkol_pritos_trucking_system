@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/Button";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/Dialog";
 import { useBranches, useDeleteBranch } from "@/features/branches/hooks/useBranches";
-import { useBranchEmployeeCount } from "@/features/employees/hooks/useEmployees";
 import { BranchForm } from "@/features/branches/components/BranchForm";
 import { BranchList } from "@/features/branches/components/BranchList";
 import { useToast } from "@/components/ui/useToast";
@@ -18,7 +17,6 @@ export function BranchesPage() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState<Branch | undefined>(undefined);
   const [deleteTarget, setDeleteTarget] = useState<Branch | null>(null);
-  const { data: employeeCount = 0 } = useBranchEmployeeCount(deleteTarget?.id ?? null);
 
   function openAdd() {
     setEditing(undefined);
@@ -39,22 +37,30 @@ export function BranchesPage() {
   async function handleDeleteConfirm() {
     if (!deleteTarget) return;
 
-    if (employeeCount > 0) {
-      toast({
-        title: "Can't remove branch",
-        description: `${deleteTarget.name} still has ${employeeCount} ${employeeCount === 1 ? "employee" : "employees"}. Remove or transfer them first.`,
-        variant: "error",
-      });
-      setDeleteTarget(null);
-      return;
-    }
-
     try {
-      await deleteBranch.mutateAsync(deleteTarget.id);
-      toast({ title: "Branch removed", description: deleteTarget.name, variant: "success" });
+      const result = await deleteBranch.mutateAsync(deleteTarget.id);
+
+      if (result.deactivated) {
+        toast({
+          title: "Branch deactivated",
+          description: `${deleteTarget.name} has existing transaction records and cannot be permanently deleted. It was set to Inactive instead. Historical sales and records are preserved, but no new transactions can be created while the branch is inactive.`,
+          variant: "success",
+        });
+      } else {
+        toast({ title: "Branch removed", description: deleteTarget.name, variant: "success" });
+      }
     } catch (err) {
+      const e = err as { code?: string };
+      if (e.code === "23503") {
+        toast({
+          title: "Can't remove branch",
+          description: `${deleteTarget.name} has existing transaction records and cannot be permanently deleted. You can deactivate the branch instead. Historical sales and records will be preserved, but no new transactions can be created while the branch is inactive.`,
+          variant: "error",
+        });
+      } else {
+        toast({ title: "Couldn't remove branch", variant: "error" });
+      }
       console.error("Delete branch error:", err);
-      toast({ title: "Couldn't remove branch", variant: "error" });
     } finally {
       setDeleteTarget(null);
     }
@@ -95,7 +101,7 @@ export function BranchesPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>Remove branch</AlertDialogTitle>
             <AlertDialogDescription>
-              Remove <span className="font-medium text-ink">{deleteTarget?.name}</span>? This action cannot be undone.
+              Remove <span className="font-medium text-ink">{deleteTarget?.name}</span>? If it has any employees or transaction records, it will be set to <span className="font-medium text-ink">Inactive</span> instead of deleted to preserve its history.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

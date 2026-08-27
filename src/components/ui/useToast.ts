@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { toast as sonnerToast } from "sonner";
 
 export interface Toast {
   id: string;
@@ -25,8 +26,20 @@ export const useToastStore = create<ToastStore>((set) => ({
   dismiss: (id) => set((state) => ({ toasts: state.toasts.filter((t) => t.id !== id) })),
 }));
 
-/** Convenience hook: `const { toast } = useToast(); toast({ title, description, variant })` */
+/**
+ * Toast helper backed by Sonner, which is mounted in AppProviders.
+ * `const { toast } = useToast(); toast({ title, description, variant })`
+ */
 export function useToast() {
-  const push = useToastStore((s) => s.push);
-  return { toast: push };
+  const toast = (opts: Omit<Toast, "id">) => {
+    if (opts.variant === "success") {
+      sonnerToast.success(opts.title, { description: opts.description });
+    } else if (opts.variant === "error") {
+      sonnerToast.error(opts.title, { description: opts.description });
+    } else {
+      sonnerToast(opts.title, { description: opts.description });
+    }
+  };
+
+  return { toast };
 }

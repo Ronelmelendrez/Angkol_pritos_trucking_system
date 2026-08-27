@@ -169,7 +169,7 @@ export function BranchForm({ branch, onDone }: Props) {
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <div>
         <Label htmlFor="name">Branch name</Label>
-        <Input id="name" placeholder="e.g. Main Branch" {...register("name")} />
+        <Input id="name" placeholder="e.g. Main Branch" autoComplete="off" {...register("name")} />
         {errors.name && <p className="mt-1 text-xs text-danger">{errors.name.message}</p>}
       </div>
       <div>
@@ -178,7 +178,7 @@ export function BranchForm({ branch, onDone }: Props) {
       </div>
       <div>
         <Label htmlFor="phone">Phone number</Label>
-        <Input id="phone" placeholder="0917 234 5678" {...register("phone")} />
+        <Input id="phone" placeholder="0917 234 5678" autoComplete="tel" {...register("phone")} />
       </div>
       <Controller
         control={control}
@@ -196,7 +196,7 @@ export function BranchForm({ branch, onDone }: Props) {
           <h4 className="mb-3 font-medium text-ink">Branch Login (for employee dashboard)</h4>
           <div>
             <Label htmlFor="branchEmail">Login email</Label>
-            <Input id="branchEmail" type="email" placeholder="branch@company.com" {...register("branchEmail")} />
+            <Input id="branchEmail" type="email" placeholder="branch@company.com" autoComplete="off" {...register("branchEmail")} />
             {errors.branchEmail && <p className="mt-1 text-xs text-danger">{errors.branchEmail.message}</p>}
             {!isEditing && emailExists && watchedEmail && (
               <p className="mt-1 text-xs text-warning flex items-center gap-1">
@@ -212,6 +212,7 @@ export function BranchForm({ branch, onDone }: Props) {
                 id="branchPassword"
                 type={showPassword ? "text" : "password"}
                 placeholder="Min 8 characters"
+                autoComplete="new-password"
                 {...register("branchPassword")}
               />
               <Button
@@ -240,6 +241,7 @@ export function BranchForm({ branch, onDone }: Props) {
                 type="email"
                 value={staffEmail ?? ""}
                 readOnly
+                autoComplete="off"
                 className="bg-ink/3"
               />
               {staffEmail && (

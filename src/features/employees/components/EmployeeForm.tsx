@@ -66,12 +66,12 @@ export function EmployeeForm({ employee, onDone }: Props) {
     <>
       <div>
         <Label htmlFor="name">Full name</Label>
-        <Input id="name" placeholder="e.g. Rosa Dimaculangan" {...register("name")} />
+        <Input id="name" placeholder="e.g. Rosa Dimaculangan" autoComplete="off" {...register("name")} />
         {errors.name && <p className="mt-1 text-xs text-danger">{errors.name.message}</p>}
       </div>
       <div>
         <Label htmlFor="phone">Phone number</Label>
-        <Input id="phone" placeholder="0917 234 5678" {...register("phone")} />
+        <Input id="phone" placeholder="0917 234 5678" autoComplete="tel" {...register("phone")} />
         {errors.phone && <p className="mt-1 text-xs text-danger">{errors.phone.message}</p>}
       </div>
       <div className="grid grid-cols-2 gap-4">

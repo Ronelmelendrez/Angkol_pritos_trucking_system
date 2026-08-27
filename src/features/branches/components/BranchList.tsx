@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/Button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { useToast } from "@/components/ui/useToast";
+import { cn } from "@/utils/cn";
 import type { Branch } from "../types";
 
 interface Props {
@@ -49,7 +50,7 @@ export function BranchList({ branches, isLoading, onEdit, onDelete }: Props) {
                 </tr>
               ) : (
                 branches.map((branch) => (
-                  <tr key={branch.id} className="border-b last:border-0 hover:bg-accent-subtle">
+                  <tr key={branch.id} className={cn("border-b last:border-0", branch.isActive ? "hover:bg-accent-subtle" : "bg-ink/2 opacity-70")}>
                     <td className="py-3 font-medium">{branch.name}</td>
                     <td className="py-3 text-ink-soft">
                       <div className="flex items-center gap-1">
