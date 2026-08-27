@@ -341,6 +341,7 @@ export function orderRowToApp(row: OrderRow, items: OrderItemRow[] = []) {
   return {
     id: row.id,
     orderNumber: row.order_number ?? "SO-000000",
+    branchId: row.branch_id ?? undefined,
     date: row.date,
     scheduledTime: row.scheduled_time ?? undefined,
     customerName: row.customer_name,
@@ -360,6 +361,7 @@ export function orderRowToApp(row: OrderRow, items: OrderItemRow[] = []) {
 
 export function orderAppToRow(input: {
   date: string;
+  branch_id?: string | null;
   customer_name: string;
   contact_number?: string;
   order_number?: string;
@@ -374,6 +376,7 @@ export function orderAppToRow(input: {
 }) {
   return {
     date: input.date,
+    branch_id: input.branch_id ?? null,
     customer_name: input.customer_name,
     contact_number: input.contact_number ?? "",
     order_number: input.order_number ?? undefined,

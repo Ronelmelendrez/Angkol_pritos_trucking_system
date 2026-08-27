@@ -1,955 +1,1184 @@
-export type Json =
+﻿export type Json =
   | string
   | number
   | boolean
   | null
   | { [key: string]: Json | undefined }
-  | Json[];
+  | Json[]
 
 export type Database = {
+  // Allows to automatically instantiate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
+  __InternalSupabase: {
+    PostgrestVersion: "14.17"
+  }
   public: {
     Tables: {
-      branches: {
-        Row: {
-          id: string;
-          name: string;
-          address: string | null;
-          phone: string | null;
-          is_active: boolean;
-          created_at: string;
-          updated_at: string;
-        };
-        Insert: {
-          id?: string;
-          name: string;
-          address?: string | null;
-          phone?: string | null;
-          is_active?: boolean;
-          created_at?: string;
-          updated_at?: string;
-        };
-        Update: {
-          id?: string;
-          name?: string;
-          address?: string | null;
-          phone?: string | null;
-          is_active?: boolean;
-          created_at?: string;
-          updated_at?: string;
-        };
-        Relationships: [];
-      };
-      employees: {
-        Row: {
-          id: string;
-          name: string;
-          phone: string | null;
-          daily_rate: number;
-          hire_date: string;
-          is_active: boolean;
-          avatar_color: string | null;
-          pay_frequency: "weekly" | "semi_monthly" | "monthly";
-          created_at: string;
-          updated_at: string;
-          branch_id: string | null;
-        };
-        Insert: {
-          id?: string;
-          name: string;
-          phone?: string | null;
-          daily_rate: number;
-          hire_date: string;
-          is_active?: boolean;
-          avatar_color?: string | null;
-          pay_frequency?: "weekly" | "semi_monthly" | "monthly";
-          created_at?: string;
-          updated_at?: string;
-          branch_id?: string | null;
-        };
-        Update: {
-          id?: string;
-          name?: string;
-          phone?: string | null;
-          daily_rate?: number;
-          hire_date?: string;
-          is_active?: boolean;
-          avatar_color?: string | null;
-          pay_frequency?: "weekly" | "semi_monthly" | "monthly";
-          created_at?: string;
-          updated_at?: string;
-          branch_id?: string | null;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "employees_branch_id_fkey";
-            columns: ["branch_id"];
-            isOneToOne: false;
-            referencedRelation: "branches";
-            referencedColumns: ["id"];
-          },
-        ];
-      };
-      profiles: {
-        Row: {
-          id: string;
-          name: string;
-          email: string;
-          role: "manager" | "staff";
-          created_at: string;
-          updated_at: string;
-          branch_id: string | null;
-        };
-        Insert: {
-          id: string;
-          name: string;
-          email: string;
-          role?: "manager" | "staff";
-          created_at?: string;
-          updated_at?: string;
-          branch_id?: string | null;
-        };
-        Update: {
-          id?: string;
-          name?: string;
-          email?: string;
-          role?: "manager" | "staff";
-          created_at?: string;
-          updated_at?: string;
-          branch_id?: string | null;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "profiles_branch_id_fkey";
-            columns: ["branch_id"];
-            isOneToOne: false;
-            referencedRelation: "branches";
-            referencedColumns: ["id"];
-          },
-        ];
-      };
-      sales: {
-        Row: {
-          id: string;
-          date: string;
-          product_id: string;
-          quantity_sold: number;
-          unit_price: number;
-          amount: number;
-          notes: string | null;
-          order_id: string | null;
-          created_at: string;
-          updated_at: string;
-          branch_id: string | null;
-        };
-        Insert: {
-          id?: string;
-          date: string;
-          product_id: string;
-          quantity_sold: number;
-          unit_price: number;
-          amount: number;
-          notes?: string | null;
-          order_id?: string | null;
-          created_at?: string;
-          updated_at?: string;
-          branch_id?: string | null;
-        };
-        Update: {
-          id?: string;
-          date?: string;
-          product_id?: string;
-          quantity_sold?: number;
-          unit_price?: number;
-          amount?: number;
-          notes?: string | null;
-          order_id?: string | null;
-          created_at?: string;
-          updated_at?: string;
-          branch_id?: string | null;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "sales_branch_id_fkey";
-            columns: ["branch_id"];
-            isOneToOne: false;
-            referencedRelation: "branches";
-            referencedColumns: ["id"];
-          },
-          {
-            foreignKeyName: "sales_product_id_fkey";
-            columns: ["product_id"];
-            isOneToOne: false;
-            referencedRelation: "products";
-            referencedColumns: ["id"];
-          },
-        ];
-      };
-      products: {
-        Row: {
-          id: string;
-          name: string;
-          default_price: number;
-          unit: string;
-          is_active: boolean;
-          reorder_threshold: number | null;
-          estimated_cost_per_unit: number | null;
-          created_at: string;
-          updated_at: string;
-        };
-        Insert: {
-          id?: string;
-          name: string;
-          default_price: number;
-          unit: string;
-          is_active?: boolean;
-          reorder_threshold?: number | null;
-          estimated_cost_per_unit?: number | null;
-          created_at?: string;
-          updated_at?: string;
-        };
-        Update: {
-          id?: string;
-          name?: string;
-          default_price?: number;
-          unit?: string;
-          is_active?: boolean;
-          reorder_threshold?: number | null;
-          estimated_cost_per_unit?: number | null;
-          created_at?: string;
-          updated_at?: string;
-        };
-        Relationships: [];
-      };
-      expenses: {
-        Row: {
-          id: string;
-          date: string;
-          category_id: string;
-          description: string | null;
-          amount: number;
-          supplier: string | null;
-          payment_method: string;
-          fund_source: string | null;
-          product_id: string | null;
-          quantity_purchased: number | null;
-          created_by: string | null;
-          created_at: string;
-          updated_at: string;
-        };
-        Insert: {
-          id?: string;
-          date: string;
-          category_id: string;
-          description?: string | null;
-          amount: number;
-          supplier?: string | null;
-          payment_method: string;
-          fund_source?: string | null;
-          product_id?: string | null;
-          quantity_purchased?: number | null;
-          created_by?: string | null;
-          created_at?: string;
-          updated_at?: string;
-        };
-        Update: {
-          id?: string;
-          date?: string;
-          category_id?: string;
-          description?: string | null;
-          amount?: number;
-          supplier?: string | null;
-          payment_method?: string;
-          fund_source?: string | null;
-          product_id?: string | null;
-          quantity_purchased?: number | null;
-          created_by?: string | null;
-          created_at?: string;
-          updated_at?: string;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "expenses_category_id_fkey";
-            columns: ["category_id"];
-            isOneToOne: false;
-            referencedRelation: "categories";
-            referencedColumns: ["id"];
-          },
-          {
-            foreignKeyName: "expenses_product_id_fkey";
-            columns: ["product_id"];
-            isOneToOne: false;
-            referencedRelation: "products";
-            referencedColumns: ["id"];
-          },
-        ];
-      };
-      categories: {
-        Row: {
-          id: string;
-          name: string;
-          type: string;
-          created_at: string;
-          updated_at: string;
-        };
-        Insert: {
-          id?: string;
-          name: string;
-          type?: string;
-          created_at?: string;
-          updated_at?: string;
-        };
-        Update: {
-          id?: string;
-          name?: string;
-          type?: string;
-          created_at?: string;
-          updated_at?: string;
-        };
-        Relationships: [];
-      };
       attendance_records: {
         Row: {
-          id: string;
-          employee_id: string;
-          date: string;
-          clock_in: string | null;
-          clock_out: string | null;
-          hours_worked: number | null;
-          shift: "full" | "half" | null;
-          status: "present" | "absent" | "closed" | null;
-          created_at: string;
-          updated_at: string;
-        };
+          clock_in: string | null
+          clock_out: string | null
+          created_at: string
+          date: string
+          employee_id: string
+          hours_worked: number | null
+          id: string
+          shift: Database["public"]["Enums"]["shift_type"] | null
+          status: Database["public"]["Enums"]["attendance_status"] | null
+          updated_at: string
+        }
         Insert: {
-          id?: string;
-          employee_id: string;
-          date: string;
-          clock_in?: string | null;
-          clock_out?: string | null;
-          hours_worked?: number | null;
-          shift?: "full" | "half" | null;
-          status?: "present" | "absent" | "closed" | null;
-          created_at?: string;
-          updated_at?: string;
-        };
+          clock_in?: string | null
+          clock_out?: string | null
+          created_at?: string
+          date: string
+          employee_id: string
+          hours_worked?: number | null
+          id?: string
+          shift?: Database["public"]["Enums"]["shift_type"] | null
+          status?: Database["public"]["Enums"]["attendance_status"] | null
+          updated_at?: string
+        }
         Update: {
-          id?: string;
-          employee_id?: string;
-          date?: string;
-          clock_in?: string | null;
-          clock_out?: string | null;
-          hours_worked?: number | null;
-          shift?: "full" | "half" | null;
-          status?: "present" | "absent" | "closed" | null;
-          created_at?: string;
-          updated_at?: string;
-        };
+          clock_in?: string | null
+          clock_out?: string | null
+          created_at?: string
+          date?: string
+          employee_id?: string
+          hours_worked?: number | null
+          id?: string
+          shift?: Database["public"]["Enums"]["shift_type"] | null
+          status?: Database["public"]["Enums"]["attendance_status"] | null
+          updated_at?: string
+        }
         Relationships: [
           {
-            foreignKeyName: "attendance_records_employee_id_fkey";
-            columns: ["employee_id"];
-            isOneToOne: false;
-            referencedRelation: "employees";
-            referencedColumns: ["id"];
+            foreignKeyName: "attendance_records_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
           },
-        ];
-      };
+        ]
+      }
+      branches: {
+        Row: {
+          address: string | null
+          created_at: string
+          id: string
+          is_active: boolean
+          name: string
+          phone: string | null
+          updated_at: string
+        }
+        Insert: {
+          address?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name: string
+          phone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          address?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          phone?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       cash_advances: {
         Row: {
-          id: string;
-          employee_id: string;
-          amount: number;
-          date: string;
-          status: "pending" | "deducted";
-          reason: string | null;
-          created_at: string;
-          updated_at: string;
-        };
+          amount: number
+          created_at: string
+          date: string
+          employee_id: string
+          id: string
+          reason: string | null
+          status: Database["public"]["Enums"]["advance_status"]
+          updated_at: string
+        }
         Insert: {
-          id?: string;
-          employee_id: string;
-          amount: number;
-          date: string;
-          status?: "pending" | "deducted";
-          reason?: string | null;
-          created_at?: string;
-          updated_at?: string;
-        };
+          amount: number
+          created_at?: string
+          date: string
+          employee_id: string
+          id?: string
+          reason?: string | null
+          status?: Database["public"]["Enums"]["advance_status"]
+          updated_at?: string
+        }
         Update: {
-          id?: string;
-          employee_id?: string;
-          amount?: number;
-          date?: string;
-          status?: "pending" | "deducted";
-          reason?: string | null;
-          created_at?: string;
-          updated_at?: string;
-        };
+          amount?: number
+          created_at?: string
+          date?: string
+          employee_id?: string
+          id?: string
+          reason?: string | null
+          status?: Database["public"]["Enums"]["advance_status"]
+          updated_at?: string
+        }
         Relationships: [
           {
-            foreignKeyName: "cash_advances_employee_id_fkey";
-            columns: ["employee_id"];
-            isOneToOne: false;
-            referencedRelation: "employees";
-            referencedColumns: ["id"];
+            foreignKeyName: "cash_advances_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
           },
-        ];
-      };
-      loans: {
-        Row: {
-          id: string;
-          employee_id: string;
-          principal: number;
-          remaining_balance: number;
-          date_issued: string;
-          status: "active" | "paid";
-          notes: string | null;
-          created_at: string;
-          updated_at: string;
-        };
-        Insert: {
-          id?: string;
-          employee_id: string;
-          principal: number;
-          remaining_balance: number;
-          date_issued: string;
-          status?: "active" | "paid";
-          notes?: string | null;
-          created_at?: string;
-          updated_at?: string;
-        };
-        Update: {
-          id?: string;
-          employee_id?: string;
-          principal?: number;
-          remaining_balance?: number;
-          date_issued?: string;
-          status?: "active" | "paid";
-          notes?: string | null;
-          created_at?: string;
-          updated_at?: string;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "loans_employee_id_fkey";
-            columns: ["employee_id"];
-            isOneToOne: false;
-            referencedRelation: "employees";
-            referencedColumns: ["id"];
-          },
-        ];
-      };
-      repayments: {
-        Row: {
-          id: string;
-          loan_id: string;
-          amount: number;
-          date: string;
-          created_at: string;
-          updated_at: string;
-        };
-        Insert: {
-          id?: string;
-          loan_id: string;
-          amount: number;
-          date: string;
-          created_at?: string;
-          updated_at?: string;
-        };
-        Update: {
-          id?: string;
-          loan_id?: string;
-          amount?: number;
-          date?: string;
-          created_at?: string;
-          updated_at?: string;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "repayments_loan_id_fkey";
-            columns: ["loan_id"];
-            isOneToOne: false;
-            referencedRelation: "loans";
-            referencedColumns: ["id"];
-          },
-        ];
-      };
-      payroll_runs: {
-        Row: {
-          id: string;
-          employee_id: string;
-          period_start: string;
-          period_end: string;
-          hours_worked: number;
-          daily_rate: number;
-          gross_pay: number;
-          advance_deductions: number;
-          loan_deductions: number;
-          adjustments: number;
-          adjustment_note: string | null;
-          net_pay: number;
-          status: string;
-          paid_at: string | null;
-          advance_ids: string[] | null;
-          loan_id: string | null;
-          created_at: string;
-          updated_at: string;
-        };
-        Insert: {
-          id?: string;
-          employee_id: string;
-          period_start: string;
-          period_end: string;
-          hours_worked: number;
-          daily_rate: number;
-          gross_pay: number;
-          advance_deductions: number;
-          loan_deductions: number;
-          adjustments: number;
-          adjustment_note?: string | null;
-          net_pay: number;
-          status?: string;
-          paid_at?: string | null;
-          advance_ids?: string[] | null;
-          loan_id?: string | null;
-          created_at?: string;
-          updated_at?: string;
-        };
-        Update: {
-          id?: string;
-          employee_id?: string;
-          period_start?: string;
-          period_end?: string;
-          hours_worked?: number;
-          daily_rate?: number;
-          gross_pay?: number;
-          advance_deductions?: number;
-          loan_deductions?: number;
-          adjustments?: number;
-          adjustment_note?: string | null;
-          net_pay?: number;
-          status?: string;
-          paid_at?: string | null;
-          advance_ids?: string[] | null;
-          loan_id?: string | null;
-          created_at?: string;
-          updated_at?: string;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "payroll_runs_employee_id_fkey";
-            columns: ["employee_id"];
-            isOneToOne: false;
-            referencedRelation: "employees";
-            referencedColumns: ["id"],
-          },
-        ];
-      };
-      pay_rule_settings: {
-        Row: {
-          id: string;
-          default_reorder_threshold: number;
-          default_opening_cash: number;
-          spoilage_rate_threshold: number;
-          standard_hours_per_day: number;
-          half_day_threshold_hours: number;
-          half_day_rate_multiplier: number;
-          late_grace_minutes: number;
-          late_deduction_per_minute: number;
-          absence_deduction_mode: "full_day" | "none";
-          rest_day_rate_multiplier: number;
-          holiday_rate_multiplier: number;
-          night_differential_percent: number;
-          round_hours_to: number;
-          payday_rules: Json | null;
-          created_at: string;
-          updated_at: string;
-        };
-        Insert: {
-          id?: string;
-          default_reorder_threshold?: number;
-          default_opening_cash?: number;
-          spoilage_rate_threshold?: number;
-          standard_hours_per_day?: number;
-          half_day_threshold_hours?: number;
-          half_day_rate_multiplier?: number;
-          late_grace_minutes?: number;
-          late_deduction_per_minute?: number;
-          absence_deduction_mode?: "full_day" | "none";
-          rest_day_rate_multiplier?: number;
-          holiday_rate_multiplier?: number;
-          night_differential_percent?: number;
-          round_hours_to?: number;
-          payday_rules?: Json | null;
-          created_at?: string;
-          updated_at?: string;
-        };
-        Update: {
-          id?: string;
-          default_reorder_threshold?: number;
-          default_opening_cash?: number;
-          spoilage_rate_threshold?: number;
-          standard_hours_per_day?: number;
-          half_day_threshold_hours?: number;
-          half_day_rate_multiplier?: number;
-          late_grace_minutes?: number;
-          late_deduction_per_minute?: number;
-          absence_deduction_mode?: "full_day" | "none";
-          rest_day_rate_multiplier?: number;
-          holiday_rate_multiplier?: number;
-          night_differential_percent?: number;
-          round_hours_to?: number;
-          payday_rules?: Json | null;
-          created_at?: string;
-          updated_at?: string;
-        };
-        Relationships: [];
-      };
-      employee_pay_overrides: {
-        Row: {
-          id: string;
-          employee_id: string;
-          half_day_rate_multiplier: number | null;
-          late_deduction_per_minute: number | null;
-          created_at: string;
-          updated_at: string;
-        };
-        Insert: {
-          id?: string;
-          employee_id: string;
-          half_day_rate_multiplier?: number | null;
-          late_deduction_per_minute?: number | null;
-          created_at?: string;
-          updated_at?: string;
-        };
-        Update: {
-          id?: string;
-          employee_id?: string;
-          half_day_rate_multiplier?: number | null;
-          late_deduction_per_minute?: number | null;
-          created_at?: string;
-          updated_at?: string;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "employee_pay_overrides_employee_id_fkey";
-            columns: ["employee_id"];
-            isOneToOne: false;
-            referencedRelation: "employees";
-            referencedColumns: ["id"];
-          },
-        ];
-      };
-      cash_openings: {
-        Row: {
-          id: string;
-          date: string;
-          opening_cash: number;
-          created_by: string | null;
-          created_at: string;
-          updated_at: string;
-        };
-        Insert: {
-          id?: string;
-          date: string;
-          opening_cash: number;
-          created_by?: string | null;
-          created_at?: string;
-          updated_at?: string;
-        };
-        Update: {
-          id?: string;
-          date?: string;
-          opening_cash?: number;
-          created_by?: string | null;
-          created_at?: string;
-          updated_at?: string;
-        };
-        Relationships: [];
-      };
+        ]
+      }
       cash_counts: {
         Row: {
-          id: string;
-          date: string;
-          expected_cash: number;
-          actual_cash: number;
-          difference: number;
-          remarks: string | null;
-          counted_by: string | null;
-          created_at: string;
-          updated_at: string;
-        };
+          actual_cash: number
+          counted_by: string | null
+          created_at: string
+          date: string
+          difference: number
+          expected_cash: number
+          id: string
+          remarks: string | null
+          updated_at: string
+        }
         Insert: {
-          id?: string;
-          date: string;
-          expected_cash: number;
-          actual_cash: number;
-          difference: number;
-          remarks?: string | null;
-          counted_by?: string | null;
-          created_at?: string;
-          updated_at?: string;
-        };
+          actual_cash: number
+          counted_by?: string | null
+          created_at?: string
+          date: string
+          difference?: number
+          expected_cash?: number
+          id?: string
+          remarks?: string | null
+          updated_at?: string
+        }
         Update: {
-          id?: string;
-          date?: string;
-          expected_cash?: number;
-          actual_cash?: number;
-          difference?: number;
-          remarks?: string | null;
-          counted_by?: string | null;
-          created_at?: string;
-          updated_at?: string;
-        };
-        Relationships: [];
-      };
-      owner_withdrawals: {
-        Row: {
-          id: string;
-          date: string;
-          amount: number;
-          reason: string | null;
-          created_by: string | null;
-          created_at: string;
-          updated_at: string;
-        };
-        Insert: {
-          id?: string;
-          date: string;
-          amount: number;
-          reason?: string | null;
-          created_by?: string | null;
-          created_at?: string;
-          updated_at?: string;
-        };
-        Update: {
-          id?: string;
-          date?: string;
-          amount?: number;
-          reason?: string | null;
-          created_by?: string | null;
-          created_at?: string;
-          updated_at?: string;
-        };
-        Relationships: [];
-      };
-      stock_adjustments: {
-        Row: {
-          id: string;
-          product_id: string;
-          date: string;
-          quantity: number;
-          note: string | null;
-          reason: string;
-          source: string;
-          created_at: string;
-          updated_at: string;
-        };
-        Insert: {
-          id?: string;
-          product_id: string;
-          date: string;
-          quantity: number;
-          note?: string | null;
-          reason?: string;
-          source?: string;
-          created_at?: string;
-          updated_at?: string;
-        };
-        Update: {
-          id?: string;
-          product_id?: string;
-          date?: string;
-          quantity?: number;
-          note?: string | null;
-          reason?: string;
-          source?: string;
-          created_at?: string;
-          updated_at?: string;
-        };
+          actual_cash?: number
+          counted_by?: string | null
+          created_at?: string
+          date?: string
+          difference?: number
+          expected_cash?: number
+          id?: string
+          remarks?: string | null
+          updated_at?: string
+        }
         Relationships: [
           {
-            foreignKeyName: "stock_adjustments_product_id_fkey";
-            columns: ["product_id"];
-            isOneToOne: false;
-            referencedRelation: "products";
-            referencedColumns: ["id"];
+            foreignKeyName: "cash_counts_counted_by_fkey"
+            columns: ["counted_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
           },
-        ];
-      };
-      orders: {
+        ]
+      }
+      cash_openings: {
         Row: {
-          id: string;
-          order_number: string;
-          date: string;
-          scheduled_time: string | null;
-          customer_name: string;
-          contact_number: string;
-          status: "scheduled" | "completed" | "cancelled";
-          total: number;
-          deposit_amount: number;
-          balance_amount: number;
-          cancel_reason: string | null;
-          notes: string | null;
-          created_by: string | null;
-          created_at: string;
-          updated_at: string;
-        };
+          created_at: string
+          created_by: string | null
+          date: string
+          id: string
+          opening_cash: number
+          updated_at: string
+        }
         Insert: {
-          id?: string;
-          order_number?: string;
-          date: string;
-          scheduled_time?: string | null;
-          customer_name: string;
-          contact_number?: string;
-          status?: "scheduled" | "completed" | "cancelled";
-          total?: number;
-          deposit_amount?: number;
-          balance_amount?: number;
-          cancel_reason?: string | null;
-          notes?: string | null;
-          created_by?: string | null;
-          created_at?: string;
-          updated_at?: string;
-        };
+          created_at?: string
+          created_by?: string | null
+          date: string
+          id?: string
+          opening_cash: number
+          updated_at?: string
+        }
         Update: {
-          id?: string;
-          order_number?: string;
-          date?: string;
-          scheduled_time?: string | null;
-          customer_name?: string;
-          contact_number?: string;
-          status?: "scheduled" | "completed" | "cancelled";
-          total?: number;
-          deposit_amount?: number;
-          balance_amount?: number;
-          cancel_reason?: string | null;
-          notes?: string | null;
-          created_by?: string | null;
-          created_at?: string;
-          updated_at?: string;
-        };
-        Relationships: [];
-      };
+          created_at?: string
+          created_by?: string | null
+          date?: string
+          id?: string
+          opening_cash?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cash_openings_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      categories: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          type: Database["public"]["Enums"]["category_type"]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          type: Database["public"]["Enums"]["category_type"]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          type?: Database["public"]["Enums"]["category_type"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      employee_pay_overrides: {
+        Row: {
+          created_at: string
+          employee_id: string
+          half_day_rate_multiplier: number | null
+          id: string
+          late_deduction_per_minute: number | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          employee_id: string
+          half_day_rate_multiplier?: number | null
+          id?: string
+          late_deduction_per_minute?: number | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          employee_id?: string
+          half_day_rate_multiplier?: number | null
+          id?: string
+          late_deduction_per_minute?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "employee_pay_overrides_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: true
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      employees: {
+        Row: {
+          avatar_color: string | null
+          branch_id: string | null
+          created_at: string
+          daily_rate: number
+          hire_date: string
+          id: string
+          is_active: boolean
+          name: string
+          pay_frequency: Database["public"]["Enums"]["pay_frequency"]
+          phone: string | null
+          updated_at: string
+        }
+        Insert: {
+          avatar_color?: string | null
+          branch_id?: string | null
+          created_at?: string
+          daily_rate: number
+          hire_date: string
+          id?: string
+          is_active?: boolean
+          name: string
+          pay_frequency?: Database["public"]["Enums"]["pay_frequency"]
+          phone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          avatar_color?: string | null
+          branch_id?: string | null
+          created_at?: string
+          daily_rate?: number
+          hire_date?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          pay_frequency?: Database["public"]["Enums"]["pay_frequency"]
+          phone?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "employees_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      expenses: {
+        Row: {
+          amount: number
+          category_id: string
+          created_at: string
+          created_by: string | null
+          date: string
+          description: string | null
+          fund_source: Database["public"]["Enums"]["expense_fund_source"] | null
+          id: string
+          payment_method: Database["public"]["Enums"]["payment_method"]
+          product_id: string | null
+          quantity_purchased: number | null
+          supplier: string | null
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          category_id: string
+          created_at?: string
+          created_by?: string | null
+          date: string
+          description?: string | null
+          fund_source?:
+            | Database["public"]["Enums"]["expense_fund_source"]
+            | null
+          id?: string
+          payment_method: Database["public"]["Enums"]["payment_method"]
+          product_id?: string | null
+          quantity_purchased?: number | null
+          supplier?: string | null
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          category_id?: string
+          created_at?: string
+          created_by?: string | null
+          date?: string
+          description?: string | null
+          fund_source?:
+            | Database["public"]["Enums"]["expense_fund_source"]
+            | null
+          id?: string
+          payment_method?: Database["public"]["Enums"]["payment_method"]
+          product_id?: string | null
+          quantity_purchased?: number | null
+          supplier?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "expenses_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "expenses_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      loans: {
+        Row: {
+          created_at: string
+          date_issued: string
+          employee_id: string
+          id: string
+          notes: string | null
+          principal: number
+          remaining_balance: number
+          status: Database["public"]["Enums"]["loan_status"]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          date_issued: string
+          employee_id: string
+          id?: string
+          notes?: string | null
+          principal: number
+          remaining_balance: number
+          status?: Database["public"]["Enums"]["loan_status"]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          date_issued?: string
+          employee_id?: string
+          id?: string
+          notes?: string | null
+          principal?: number
+          remaining_balance?: number
+          status?: Database["public"]["Enums"]["loan_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "loans_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       order_items: {
         Row: {
-          id: string;
-          order_id: string;
-          product_id: string;
-          quantity: number;
-          unit_price: number;
-          amount: number;
-        };
+          amount: number
+          created_at: string
+          id: string
+          order_id: string
+          product_id: string
+          quantity: number
+          unit_price: number
+        }
         Insert: {
-          id?: string;
-          order_id: string;
-          product_id: string;
-          quantity: number;
-          unit_price: number;
-          amount: number;
-        };
+          amount: number
+          created_at?: string
+          id?: string
+          order_id: string
+          product_id: string
+          quantity: number
+          unit_price: number
+        }
         Update: {
-          id?: string;
-          order_id?: string;
-          product_id?: string;
-          quantity?: number;
-          unit_price?: number;
-          amount?: number;
-        };
+          amount?: number
+          created_at?: string
+          id?: string
+          order_id?: string
+          product_id?: string
+          quantity?: number
+          unit_price?: number
+        }
         Relationships: [
           {
-            foreignKeyName: "order_items_order_id_fkey";
-            columns: ["order_id"];
-            isOneToOne: false;
-            referencedRelation: "orders";
-            referencedColumns: ["id"],
+            foreignKeyName: "order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "order_items_product_id_fkey";
-            columns: ["product_id"];
-            isOneToOne: false;
-            referencedRelation: "products";
-            referencedColumns: ["id"],
+            foreignKeyName: "order_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
           },
-        ];
-      };
+        ]
+      }
+      orders: {
+        Row: {
+          balance_amount: number
+          branch_id: string | null
+          cancel_reason: string | null
+          contact_number: string
+          created_at: string
+          created_by: string | null
+          customer_name: string
+          date: string
+          deposit_amount: number
+          id: string
+          notes: string | null
+          order_number: string | null
+          scheduled_time: string | null
+          status: Database["public"]["Enums"]["order_status"]
+          total: number
+          updated_at: string
+        }
+        Insert: {
+          balance_amount?: number
+          branch_id?: string | null
+          cancel_reason?: string | null
+          contact_number?: string
+          created_at?: string
+          created_by?: string | null
+          customer_name: string
+          date: string
+          deposit_amount?: number
+          id?: string
+          notes?: string | null
+          order_number?: string | null
+          scheduled_time?: string | null
+          status?: Database["public"]["Enums"]["order_status"]
+          total?: number
+          updated_at?: string
+        }
+        Update: {
+          balance_amount?: number
+          branch_id?: string | null
+          cancel_reason?: string | null
+          contact_number?: string
+          created_at?: string
+          created_by?: string | null
+          customer_name?: string
+          date?: string
+          deposit_amount?: number
+          id?: string
+          notes?: string | null
+          order_number?: string | null
+          scheduled_time?: string | null
+          status?: Database["public"]["Enums"]["order_status"]
+          total?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      owner_withdrawals: {
+        Row: {
+          amount: number
+          created_at: string
+          created_by: string | null
+          date: string
+          id: string
+          reason: string | null
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          created_by?: string | null
+          date: string
+          id?: string
+          reason?: string | null
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          created_by?: string | null
+          date?: string
+          id?: string
+          reason?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "owner_withdrawals_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pay_rule_settings: {
+        Row: {
+          absence_deduction_mode: Database["public"]["Enums"]["absence_deduction_mode"]
+          created_at: string
+          default_opening_cash: number
+          default_reorder_threshold: number
+          half_day_rate_multiplier: number
+          half_day_threshold_hours: number
+          holiday_rate_multiplier: number
+          id: string
+          late_deduction_per_minute: number
+          late_grace_minutes: number
+          night_differential_percent: number
+          payday_rules: Json
+          rest_day_rate_multiplier: number
+          round_hours_to: number
+          spoilage_rate_threshold: number
+          standard_hours_per_day: number
+          updated_at: string
+        }
+        Insert: {
+          absence_deduction_mode?: Database["public"]["Enums"]["absence_deduction_mode"]
+          created_at?: string
+          default_opening_cash?: number
+          default_reorder_threshold?: number
+          half_day_rate_multiplier?: number
+          half_day_threshold_hours?: number
+          holiday_rate_multiplier?: number
+          id?: string
+          late_deduction_per_minute?: number
+          late_grace_minutes?: number
+          night_differential_percent?: number
+          payday_rules?: Json
+          rest_day_rate_multiplier?: number
+          round_hours_to?: number
+          spoilage_rate_threshold?: number
+          standard_hours_per_day?: number
+          updated_at?: string
+        }
+        Update: {
+          absence_deduction_mode?: Database["public"]["Enums"]["absence_deduction_mode"]
+          created_at?: string
+          default_opening_cash?: number
+          default_reorder_threshold?: number
+          half_day_rate_multiplier?: number
+          half_day_threshold_hours?: number
+          holiday_rate_multiplier?: number
+          id?: string
+          late_deduction_per_minute?: number
+          late_grace_minutes?: number
+          night_differential_percent?: number
+          payday_rules?: Json
+          rest_day_rate_multiplier?: number
+          round_hours_to?: number
+          spoilage_rate_threshold?: number
+          standard_hours_per_day?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      payroll_runs: {
+        Row: {
+          adjustment_note: string | null
+          adjustments: number
+          advance_deductions: number
+          advance_ids: Json
+          created_at: string
+          daily_rate: number
+          employee_id: string
+          gross_pay: number
+          hours_worked: number
+          id: string
+          loan_deductions: number
+          loan_id: string | null
+          net_pay: number
+          paid_at: string | null
+          period_end: string
+          period_start: string
+          status: Database["public"]["Enums"]["payroll_status"]
+          updated_at: string
+        }
+        Insert: {
+          adjustment_note?: string | null
+          adjustments?: number
+          advance_deductions?: number
+          advance_ids?: Json
+          created_at?: string
+          daily_rate: number
+          employee_id: string
+          gross_pay: number
+          hours_worked: number
+          id?: string
+          loan_deductions?: number
+          loan_id?: string | null
+          net_pay: number
+          paid_at?: string | null
+          period_end: string
+          period_start: string
+          status?: Database["public"]["Enums"]["payroll_status"]
+          updated_at?: string
+        }
+        Update: {
+          adjustment_note?: string | null
+          adjustments?: number
+          advance_deductions?: number
+          advance_ids?: Json
+          created_at?: string
+          daily_rate?: number
+          employee_id?: string
+          gross_pay?: number
+          hours_worked?: number
+          id?: string
+          loan_deductions?: number
+          loan_id?: string | null
+          net_pay?: number
+          paid_at?: string | null
+          period_end?: string
+          period_start?: string
+          status?: Database["public"]["Enums"]["payroll_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payroll_runs_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payroll_runs_loan_id_fkey"
+            columns: ["loan_id"]
+            isOneToOne: false
+            referencedRelation: "loans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      products: {
+        Row: {
+          created_at: string
+          default_price: number
+          estimated_cost_per_unit: number | null
+          id: string
+          is_active: boolean
+          name: string
+          reorder_threshold: number | null
+          unit: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          default_price: number
+          estimated_cost_per_unit?: number | null
+          id?: string
+          is_active?: boolean
+          name: string
+          reorder_threshold?: number | null
+          unit: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          default_price?: number
+          estimated_cost_per_unit?: number | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          reorder_threshold?: number | null
+          unit?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          branch_id: string | null
+          created_at: string
+          email: string
+          id: string
+          name: string
+          role: Database["public"]["Enums"]["user_role"]
+          updated_at: string
+        }
+        Insert: {
+          branch_id?: string | null
+          created_at?: string
+          email: string
+          id: string
+          name: string
+          role?: Database["public"]["Enums"]["user_role"]
+          updated_at?: string
+        }
+        Update: {
+          branch_id?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          name?: string
+          role?: Database["public"]["Enums"]["user_role"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profiles_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      repayments: {
+        Row: {
+          amount: number
+          created_at: string
+          date: string
+          id: string
+          loan_id: string
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          date: string
+          id?: string
+          loan_id: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          date?: string
+          id?: string
+          loan_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "repayments_loan_id_fkey"
+            columns: ["loan_id"]
+            isOneToOne: false
+            referencedRelation: "loans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sales: {
+        Row: {
+          amount: number
+          branch_id: string | null
+          created_at: string
+          date: string
+          id: string
+          notes: string | null
+          order_id: string | null
+          product_id: string
+          quantity_sold: number
+          unit_price: number
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          branch_id?: string | null
+          created_at?: string
+          date: string
+          id?: string
+          notes?: string | null
+          order_id?: string | null
+          product_id: string
+          quantity_sold: number
+          unit_price: number
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          branch_id?: string | null
+          created_at?: string
+          date?: string
+          id?: string
+          notes?: string | null
+          order_id?: string | null
+          product_id?: string
+          quantity_sold?: number
+          unit_price?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sales_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sales_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sales_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       scheduled_order_payments: {
         Row: {
-          id: string;
-          order_id: string;
-          payment_type: string;
-          amount: number;
-          payment_date: string;
-          notes: string | null;
-          created_by: string | null;
-          created_at: string;
-          updated_at: string;
-        };
+          amount: number
+          created_at: string
+          created_by: string | null
+          id: string
+          notes: string | null
+          order_id: string
+          payment_date: string
+          payment_type: Database["public"]["Enums"]["order_payment_type"]
+        }
         Insert: {
-          id?: string;
-          order_id: string;
-          payment_type: string;
-          amount: number;
-          payment_date: string;
-          notes?: string | null;
-          created_by?: string | null;
-          created_at?: string;
-          updated_at?: string;
-        };
+          amount: number
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          notes?: string | null
+          order_id: string
+          payment_date: string
+          payment_type: Database["public"]["Enums"]["order_payment_type"]
+        }
         Update: {
-          id?: string;
-          order_id?: string;
-          payment_type?: string;
-          amount?: number;
-          payment_date?: string;
-          notes?: string | null;
-          created_by?: string | null;
-          created_at?: string;
-          updated_at?: string;
-        };
+          amount?: number
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          notes?: string | null
+          order_id?: string
+          payment_date?: string
+          payment_type?: Database["public"]["Enums"]["order_payment_type"]
+        }
         Relationships: [
           {
-            foreignKeyName: "scheduled_order_payments_order_id_fkey";
-            columns: ["order_id"];
-            isOneToOne: false;
-            referencedRelation: "orders";
-            referencedColumns: ["id"],
+            foreignKeyName: "scheduled_order_payments_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
           },
-        ];
-      };
-    };
+        ]
+      }
+      stock_adjustments: {
+        Row: {
+          created_at: string
+          date: string
+          id: string
+          note: string
+          product_id: string
+          quantity: number
+          reason: string
+          source: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          date: string
+          id?: string
+          note: string
+          product_id: string
+          quantity: number
+          reason?: string
+          source?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          id?: string
+          note?: string
+          product_id?: string
+          quantity?: number
+          reason?: string
+          source?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stock_adjustments_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+    }
     Views: {
-      [_ in never]: never;
-    };
+      [_ in never]: never
+    }
     Functions: {
-      pay_payroll_run: {
-        Args: {
-          p_employee_id: string;
-          p_period_start: string;
-          p_period_end: string;
-          p_hours_worked: number;
-          p_daily_rate: number;
-          p_gross_pay: number;
-          p_advance_ids: string[];
-          p_advance_deductions: number;
-          p_loan_id: string;
-          p_loan_deduction: number;
-          p_adjustments: number;
-          p_adjustment_note: string;
-          p_net_pay: number;
-          p_paid_at: string;
-          p_salaries_category_id: string;
-          p_ready_run_id?: string;
-        };
-        Returns: void;
-      };
-    };
+      pay_payroll_run:
+        | {
+            Args: {
+              p_adjustment_note: string
+              p_adjustments: number
+              p_advance_deductions: number
+              p_advance_ids: string[]
+              p_daily_rate: number
+              p_employee_id: string
+              p_gross_pay: number
+              p_hours_worked: number
+              p_loan_deduction: number
+              p_loan_id: string
+              p_net_pay: number
+              p_paid_at: string
+              p_period_end: string
+              p_period_start: string
+              p_salaries_category_id: string
+            }
+            Returns: string
+          }
+        | {
+            Args: {
+              p_adjustment_note: string
+              p_adjustments: number
+              p_advance_deductions: number
+              p_advance_ids: string[]
+              p_daily_rate: number
+              p_employee_id: string
+              p_gross_pay: number
+              p_hours_worked: number
+              p_loan_deduction: number
+              p_loan_id: string
+              p_net_pay: number
+              p_paid_at: string
+              p_period_end: string
+              p_period_start: string
+              p_ready_run_id?: string
+              p_salaries_category_id: string
+            }
+            Returns: string
+          }
+    }
     Enums: {
-      pay_frequency: "weekly" | "semi_monthly" | "monthly";
-      payment_method: "cash" | "gcash" | "bank_transfer" | "credit";
-    };
+      absence_deduction_mode: "full_day" | "none"
+      advance_status: "pending" | "deducted"
+      attendance_status: "present" | "absent" | "closed"
+      category_type: "expense" | "stock"
+      expense_fund_source: "cash_drawer" | "separate"
+      loan_status: "active" | "paid"
+      order_payment_type: "deposit" | "final" | "extra"
+      order_status: "scheduled" | "completed" | "cancelled"
+      pay_frequency: "weekly" | "semi_monthly" | "monthly"
+      payment_method: "cash" | "gcash" | "bank_transfer" | "credit"
+      payroll_status: "upcoming" | "ready" | "paid"
+      shift_type: "full" | "half"
+      user_role: "manager" | "staff"
+      weekend_adjustment: "none" | "move_earlier" | "move_later"
+    }
     CompositeTypes: {
-      [_ in never]: never;
-    };
-  };
-};
+      [_ in never]: never
+    }
+  }
+}
+
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
+
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
+
+export type Tables<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+      Row: infer R
+    }
+    ? R
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
+        Row: infer R
+      }
+      ? R
+      : never
+    : never
+
+export type TablesInsert<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Insert: infer I
+    }
+    ? I
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Insert: infer I
+      }
+      ? I
+      : never
+    : never
+
+export type TablesUpdate<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Update: infer U
+    }
+    ? U
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Update: infer U
+      }
+      ? U
+      : never
+    : never
+
+export type Enums<
+  DefaultSchemaEnumNameOrOptions extends
+    | keyof DefaultSchema["Enums"]
+    | { schema: keyof DatabaseWithoutInternals },
+  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+    : never = never,
+> = DefaultSchemaEnumNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
+    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
+    : never
+
+export type CompositeTypes<
+  PublicCompositeTypeNameOrOptions extends
+    | keyof DefaultSchema["CompositeTypes"]
+    | { schema: keyof DatabaseWithoutInternals },
+  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    : never = never,
+> = PublicCompositeTypeNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
+    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
+    : never
+
+export const Constants = {
+  public: {
+    Enums: {
+      absence_deduction_mode: ["full_day", "none"],
+      advance_status: ["pending", "deducted"],
+      attendance_status: ["present", "absent", "closed"],
+      category_type: ["expense", "stock"],
+      expense_fund_source: ["cash_drawer", "separate"],
+      loan_status: ["active", "paid"],
+      order_payment_type: ["deposit", "final", "extra"],
+      order_status: ["scheduled", "completed", "cancelled"],
+      pay_frequency: ["weekly", "semi_monthly", "monthly"],
+      payment_method: ["cash", "gcash", "bank_transfer", "credit"],
+      payroll_status: ["upcoming", "ready", "paid"],
+      shift_type: ["full", "half"],
+      user_role: ["manager", "staff"],
+      weekend_adjustment: ["none", "move_earlier", "move_later"],
+    },
+  },
+} as const

@@ -1,7 +1,8 @@
-import { BarChart2 } from "lucide-react";
+import { BarChart2, CalendarClock } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/Card";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { useBranchSalesComparison } from "@/features/sales/hooks/useBranchSales";
+import { useUpcomingOrdersByBranch } from "@/features/orders/hooks/useOrders";
 import { formatCurrency } from "@/utils/currency";
 import { cn } from "@/utils/cn";
 
@@ -20,6 +21,7 @@ const BAR_COLORS = [
 
 export function BranchSalesDashboard({ className }: Props) {
   const { data: branchSales = [], isLoading } = useBranchSalesComparison("month");
+  const { data: upcomingOrders = [], isLoading: upcomingLoading } = useUpcomingOrdersByBranch();
 
   const maxSales = branchSales[0]?.totalSales ?? 0;
 
@@ -94,6 +96,40 @@ export function BranchSalesDashboard({ className }: Props) {
               </div>
             );
           })}
+        </div>
+
+        <div className="mt-5 border-t border-line pt-4">
+          <div className="mb-3 flex items-center gap-2">
+            <CalendarClock className="h-4 w-4 text-primary-dark" />
+            <p className="text-xs font-semibold uppercase tracking-wide text-ink-soft">
+              Upcoming orders
+            </p>
+          </div>
+
+          {upcomingLoading ? (
+            <div className="space-y-2">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <Skeleton key={i} className="h-6 w-full" />
+              ))}
+            </div>
+          ) : upcomingOrders.length === 0 ? (
+            <p className="text-xs text-ink-faint">No upcoming orders scheduled.</p>
+          ) : (
+            <div className="space-y-2.5">
+              {upcomingOrders.map((item) => (
+                <div key={item.branchId} className="flex items-center justify-between text-sm">
+                  <span className="truncate font-medium text-ink">
+                    {item.branchName}
+                  </span>
+                  <span className="shrink-0 text-xs text-ink-soft">
+                    {item.count} {item.count === 1 ? "order" : "orders"}
+                    <span className="mx-1 text-ink-faint">·</span>
+                    <span className="tabular-nums text-ink">{formatCurrency(item.totalValue)}</span>
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>

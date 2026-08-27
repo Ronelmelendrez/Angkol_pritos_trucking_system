@@ -14,6 +14,7 @@ export {
   useDeleteOrder,
   useCompleteOrder,
   useCancelOrder,
+  useUpcomingOrdersByBranch,
 } from "./hooks/useOrders";
 export {
   useOrderPayments,
@@ -22,3 +23,4 @@ export {
   useDeleteOrderPayment,
 } from "./hooks/useOrderPayments";
 export type { Order, NewOrder, UpdateOrder, OrderItem, OrderPayment, NewOrderPayment, PaymentType } from "./types";
+export type { UpcomingOrdersByBranch } from "./hooks/useOrders";

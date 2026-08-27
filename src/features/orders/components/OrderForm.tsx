@@ -124,6 +124,7 @@ export function OrderForm({ onDone }: Props) {
         balanceAmount: balance,
         notes: values.notes,
         createdBy: user?.id,
+        branchId: user?.branchId,
         items: orderItems,
       });
 

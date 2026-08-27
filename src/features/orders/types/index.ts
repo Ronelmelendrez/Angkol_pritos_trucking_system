@@ -12,6 +12,7 @@ export interface OrderItem {
 
 export interface Order extends BaseRecord {
   orderNumber: string;
+  branchId?: string;
   date: string;
   scheduledTime?: string;
   customerName: string;

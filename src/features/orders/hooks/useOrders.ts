@@ -1,15 +1,18 @@
+import { useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabaseClient";
 import { orderRowToApp, orderAppToRow, orderItemAppToRow } from "@/lib/supabaseMappers";
 import { todayISO } from "@/utils/date";
 import { salesKeys } from "@/features/sales/hooks/useSales";
 import { useAuth } from "@/features/auth/hooks/useAuth";
+import { useBranches } from "@/features/branches/hooks/useBranches";
 import type { Database } from "@/types/database.types";
 import type { Order, NewOrder, UpdateOrder } from "../types";
 
 const ORDERS_KEY = ["orders"] as const;
 export const ordersKeys = {
   all: ORDERS_KEY,
+  byBranch: (branchId: string) => ["orders", "branch", branchId] as const,
 };
 
 async function generateOrderNumber(): Promise<string> {
@@ -34,13 +37,21 @@ async function generateOrderNumber(): Promise<string> {
 }
 
 export function useOrders() {
+  const { user } = useAuth();
+
   return useQuery({
-    queryKey: ORDERS_KEY,
+    queryKey: user?.role === "manager" ? ORDERS_KEY : ordersKeys.byBranch(user?.branchId ?? ""),
     queryFn: async () => {
-      const { data: orderRows, error } = await supabase
+      let query = supabase
         .from("orders")
         .select("*")
         .order("date", { ascending: false });
+
+      if (user?.role === "staff" && user?.branchId) {
+        query = query.eq("branch_id", user.branchId);
+      }
+
+      const { data: orderRows, error } = await query;
       if (error) throw error;
 
       const { data: itemRows } = await supabase
@@ -58,6 +69,7 @@ export function useOrders() {
         orderRowToApp(row, itemsByOrder.get(row.id) ?? []),
       );
     },
+    enabled: !(user?.role === "staff" && !user?.branchId),
   });
 }
 
@@ -71,6 +83,7 @@ export function useAddOrder() {
         .from("orders")
         .insert(orderAppToRow({
           date: input.date,
+          branch_id: input.branchId ?? null,
           customer_name: input.customerName,
           contact_number: input.contactNumber,
           order_number: orderNumber,
@@ -126,6 +139,7 @@ export function useAddOrder() {
       const optimistic: Order = {
         id: tempId,
         orderNumber: input.orderNumber || "SO-000000",
+        branchId: input.branchId,
         date: input.date,
         scheduledTime: input.scheduledTime,
         customerName: input.customerName,
@@ -164,6 +178,7 @@ export function useUpdateOrder() {
     mutationFn: async ({ id, ...patch }: UpdateOrder) => {
       const row: Database["public"]["Tables"]["orders"]["Update"] = {};
       if (patch.orderNumber !== undefined) row.order_number = patch.orderNumber;
+      if (patch.branchId !== undefined) row.branch_id = patch.branchId ?? null;
       if (patch.date !== undefined) row.date = patch.date;
       if (patch.scheduledTime !== undefined) row.scheduled_time = patch.scheduledTime ?? null;
       if (patch.customerName !== undefined) row.customer_name = patch.customerName;
@@ -313,4 +328,46 @@ export function useCancelOrder() {
     },
     onSettled: () => queryClient.invalidateQueries({ queryKey: ORDERS_KEY }),
   });
+}
+
+export interface UpcomingOrdersByBranch {
+  branchId: string;
+  branchName: string;
+  count: number;
+  totalValue: number;
+}
+
+export function useUpcomingOrdersByBranch() {
+  const { data: orders = [], isLoading } = useOrders();
+  const { data: branches = [] } = useBranches();
+
+  const branchMap = useMemo(
+    () => Object.fromEntries(branches.map((b) => [b.id, b.name])),
+    [branches],
+  );
+
+  const data = useMemo(() => {
+    const today = todayISO();
+    const map = new Map<string, UpcomingOrdersByBranch>();
+
+    for (const order of orders) {
+      if (order.status !== "scheduled") continue;
+      if (order.date < today) continue;
+
+      const branchId = order.branchId ?? "unassigned";
+      const entry = map.get(branchId) ?? {
+        branchId,
+        branchName: branchId === "unassigned" ? "Unassigned" : branchMap[branchId] ?? "Unknown",
+        count: 0,
+        totalValue: 0,
+      };
+      entry.count += 1;
+      entry.totalValue += order.total;
+      map.set(branchId, entry);
+    }
+
+    return Array.from(map.values()).sort((a, b) => b.count - a.count);
+  }, [orders, branchMap]);
+
+  return { data, isLoading };
 }
