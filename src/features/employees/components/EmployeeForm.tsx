@@ -125,6 +125,11 @@ export function EmployeeForm({ employee, onDone }: Props) {
             </Select>
           )}
         />
+        {isEditing && (
+          <p className="mt-1 text-xs text-ink-faint">
+            Note: Pay frequency can't be changed after saving. To adjust it, delete this employee and re-add them with the new pay frequency.
+          </p>
+        )}
         {errors.payFrequency && <p className="mt-1 text-xs text-danger">{errors.payFrequency.message}</p>}
       </div>
       <Controller
