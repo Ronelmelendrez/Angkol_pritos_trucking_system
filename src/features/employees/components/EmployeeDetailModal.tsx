@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { Phone, Wallet, Calendar, Clock, CircleDollarSign, Landmark, History, Pencil, Building2 } from "lucide-react";
+import { Phone, Wallet, Calendar, Clock, CircleDollarSign, Landmark, History, Pencil, Building2, Repeat } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/Dialog";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
@@ -75,6 +75,14 @@ export function EmployeeDetailModal({ employee, open, onOpenChange, onEdit }: Pr
 
   const branchName = branchMap?.[employee?.branchId ?? ""];
 
+  function payFrequencyLabel(frequency: string) {
+    switch (frequency) {
+      case "weekly": return "Weekly (Mon-Sun)";
+      case "monthly": return "Monthly";
+      case "semi_monthly": default: return "Semi-monthly (1st-15th / 16th-end)";
+    }
+  }
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-xl max-h-[90vh] overflow-y-auto">
@@ -126,6 +134,13 @@ export function EmployeeDetailModal({ employee, open, onOpenChange, onEdit }: Pr
                   Hired
                 </div>
                 <p className="text-sm font-medium text-ink">{formatDate(employee.hireDate)}</p>
+              </Card>
+              <Card className="p-3.5">
+                <div className="flex items-center gap-1.5 text-xs text-ink-soft mb-1">
+                  <Repeat className="h-3.5 w-3.5" />
+                  Pay frequency
+                </div>
+                <p className="text-sm font-medium text-ink">{payFrequencyLabel(employee.payFrequency)}</p>
               </Card>
               {branchName && (
                 <Card className="p-3.5 sm:col-span-3">
