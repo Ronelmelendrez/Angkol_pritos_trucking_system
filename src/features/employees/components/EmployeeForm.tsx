@@ -107,31 +107,28 @@ export function EmployeeForm({ employee, onDone }: Props) {
         />
         {errors.branchId && <p className="mt-1 text-xs text-danger">{errors.branchId.message}</p>}
       </div>
-      <div>
-        <Label htmlFor="payFrequency">Pay frequency</Label>
-        <Controller
-          control={control}
-          name="payFrequency"
-          render={({ field }) => (
-            <Select value={field.value} onValueChange={field.onChange}>
-              <SelectTrigger id="payFrequency">
-                <SelectValue placeholder="Select frequency" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="semi_monthly">Semi-monthly (1st-15th / 16th-end)</SelectItem>
-                <SelectItem value="weekly">Weekly (Mon-Sun)</SelectItem>
-                <SelectItem value="monthly">Monthly</SelectItem>
-              </SelectContent>
-            </Select>
-          )}
-        />
-        {isEditing && (
-          <p className="mt-1 text-xs text-ink-faint">
-            Note: Pay frequency can't be changed after saving. To adjust it, delete this employee and re-add them with the new pay frequency.
-          </p>
-        )}
-        {errors.payFrequency && <p className="mt-1 text-xs text-danger">{errors.payFrequency.message}</p>}
-      </div>
+      {!isEditing && (
+        <div>
+          <Label htmlFor="payFrequency">Pay frequency</Label>
+          <Controller
+            control={control}
+            name="payFrequency"
+            render={({ field }) => (
+              <Select value={field.value} onValueChange={field.onChange}>
+                <SelectTrigger id="payFrequency">
+                  <SelectValue placeholder="Select frequency" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="semi_monthly">Semi-monthly (1st-15th / 16th-end)</SelectItem>
+                  <SelectItem value="weekly">Weekly (Mon-Sun)</SelectItem>
+                  <SelectItem value="monthly">Monthly</SelectItem>
+                </SelectContent>
+              </Select>
+            )}
+          />
+          {errors.payFrequency && <p className="mt-1 text-xs text-danger">{errors.payFrequency.message}</p>}
+        </div>
+      )}
       <Controller
         control={control}
         name="isActive"
