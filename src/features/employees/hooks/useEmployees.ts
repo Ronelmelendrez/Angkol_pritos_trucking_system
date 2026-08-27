@@ -74,7 +74,7 @@ export function useBranchEmployeeCount(branchId: string | null) {
       const { count, error } = await supabase
         .from("employees")
         .select("id", { count: "exact", head: true })
-        .eq("branch_id", branchId);
+        .eq("branch_id", branchId ?? "");
       if (error) throw error;
       return count ?? 0;
     },

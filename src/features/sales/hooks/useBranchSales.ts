@@ -104,11 +104,11 @@ export function useBranchSalesOverTime(dateFrom: string, dateTo: string) {
       const { data, error } = await query;
       if (error) throw error;
 
-      const branchNames = [...new Set(data.map(s => branchMap[s.branch_id] ?? "Unknown"))];
+      const branchNames = [...new Set(data.map(s => branchMap[s.branch_id ?? ""] ?? "Unknown"))];
       const dateMap = new Map<string, Record<string, number>>();
 
       for (const sale of data) {
-        const branchName = branchMap[sale.branch_id] ?? "Unknown";
+        const branchName = branchMap[sale.branch_id ?? ""] ?? "Unknown";
         const label = sale.date;
         if (!dateMap.has(label)) {
           dateMap.set(label, {});

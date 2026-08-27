@@ -30,7 +30,7 @@ async function generateOrderNumber(): Promise<string> {
     return `${prefix}000001`;
   }
 
-  const last = data[0].order_number;
+  const last = data[0].order_number ?? "";
   const match = last.match(/(\d+)$/);
   const nextNum = match ? parseInt(match[1], 10) + 1 : 1;
   return `${prefix}${String(nextNum).padStart(6, "0")}`;
