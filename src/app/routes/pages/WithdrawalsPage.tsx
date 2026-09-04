@@ -6,10 +6,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { WithdrawalForm } from "@/features/withdrawals/components/WithdrawalForm";
 import { WithdrawalsList } from "@/features/withdrawals/components/WithdrawalsList";
 import { useOwnerWithdrawals } from "@/features/withdrawals/hooks/useWithdrawals";
+import { useAuth } from "@/features/auth/hooks/useAuth";
 import { formatCurrency } from "@/utils/currency";
 
 export function WithdrawalsPage() {
-  const { data: withdrawals = [], isLoading } = useOwnerWithdrawals();
+  const { user } = useAuth();
+  const { data: withdrawals = [], isLoading } = useOwnerWithdrawals(user?.branchId);
   const [dialogOpen, setDialogOpen] = useState(false);
 
   const total = withdrawals.reduce((s, w) => s + w.amount, 0);
@@ -33,7 +35,7 @@ export function WithdrawalsPage() {
             <DialogHeader>
               <DialogTitle>Record owner withdrawal</DialogTitle>
             </DialogHeader>
-            <WithdrawalForm onDone={() => setDialogOpen(false)} />
+            <WithdrawalForm branchId={user?.branchId} onDone={() => setDialogOpen(false)} />
           </DialogContent>
         </Dialog>
       </CardHeader>
