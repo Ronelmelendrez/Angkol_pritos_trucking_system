@@ -108,8 +108,8 @@ function MovementRow({ item, index, isLast }: { item: CashMovementItem; index: n
   );
 }
 
-export function DailyCashReport({ date }: { date: string }) {
-  const { data, isLoading } = useDailyCash(date);
+export function DailyCashReport({ date, branchId }: { date: string; branchId?: string }) {
+  const { data, isLoading } = useDailyCash(date, branchId);
   const { user } = useAuth();
 
   if (isLoading) {
