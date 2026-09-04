@@ -10,14 +10,20 @@ export const expensesKeys = {
   all: EXPENSES_KEY,
 };
 
-export function useExpenses() {
+export function useExpenses(branchId?: string) {
   return useQuery({
-    queryKey: EXPENSES_KEY,
+    queryKey: branchId ? [...EXPENSES_KEY, branchId] : EXPENSES_KEY,
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from("expenses")
         .select("*")
         .order("date", { ascending: false });
+
+      if (branchId) {
+        query = query.eq("branch_id", branchId);
+      }
+
+      const { data, error } = await query;
       if (error) throw error;
       return Promise.all(data.map(async (row) => {
         const categoryName = await getCategoryNameById(row.category_id);
@@ -37,6 +43,7 @@ export function useAddExpense() {
         category_id: categoryId,
         description: input.description,
         amount: input.amount,
+        branch_id: input.branchId ?? null,
         supplier: input.supplier,
         paymentMethod: input.paymentMethod,
         fundSource: input.fundSource ?? null,
