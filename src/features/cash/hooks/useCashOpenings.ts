@@ -4,22 +4,32 @@ import { cashOpeningRowToApp, cashOpeningAppToRow } from "@/lib/supabaseMappers"
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import type { CashOpening, NewCashOpening } from "../types";
 
-const OPENINGS_KEY = ["cash_openings"] as const;
 export const cashOpeningsKeys = {
-  all: OPENINGS_KEY,
+  all: ["cash_openings"] as const,
+  byBranch: (branchId: string) => ["cash_openings", branchId] as const,
 };
 
-export function useCashOpenings() {
+export function useCashOpenings(branchId?: string) {
+  const { user } = useAuth();
+  const resolvedBranchId = branchId ?? user?.branchId ?? "";
+
   return useQuery({
-    queryKey: OPENINGS_KEY,
+    queryKey: resolvedBranchId ? cashOpeningsKeys.byBranch(resolvedBranchId) : cashOpeningsKeys.all,
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from("cash_openings")
         .select("*")
         .order("date", { ascending: false });
+
+      if (resolvedBranchId) {
+        query = query.eq("branch_id", resolvedBranchId);
+      }
+
+      const { data, error } = await query;
       if (error) throw error;
       return data.map(cashOpeningRowToApp);
     },
+    enabled: !!resolvedBranchId,
   });
 }
 
@@ -31,17 +41,18 @@ export function useUpsertCashOpening() {
       const payload = cashOpeningAppToRow({
         date: input.date,
         openingCash: input.openingCash,
+        branchId: input.branchId,
         createdBy: user?.id,
       });
       const { data, error } = await supabase
         .from("cash_openings")
-        .upsert(payload, { onConflict: "date" })
+        .upsert(payload, { onConflict: "date,branch_id" })
         .select()
         .single();
       if (error) throw error;
       return cashOpeningRowToApp(data);
     },
-    onSettled: () => queryClient.invalidateQueries({ queryKey: OPENINGS_KEY }),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: cashOpeningsKeys.all }),
   });
 }
 
