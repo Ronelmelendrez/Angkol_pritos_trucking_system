@@ -135,6 +135,7 @@ export type Database = {
       cash_counts: {
         Row: {
           actual_cash: number
+          branch_id: string
           counted_by: string | null
           created_at: string
           date: string
@@ -146,6 +147,7 @@ export type Database = {
         }
         Insert: {
           actual_cash: number
+          branch_id: string
           counted_by?: string | null
           created_at?: string
           date: string
@@ -157,6 +159,7 @@ export type Database = {
         }
         Update: {
           actual_cash?: number
+          branch_id?: string
           counted_by?: string | null
           created_at?: string
           date?: string
@@ -178,6 +181,7 @@ export type Database = {
       }
       cash_openings: {
         Row: {
+          branch_id: string
           created_at: string
           created_by: string | null
           date: string
@@ -186,6 +190,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          branch_id: string
           created_at?: string
           created_by?: string | null
           date: string
@@ -194,6 +199,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          branch_id?: string
           created_at?: string
           created_by?: string | null
           date?: string
@@ -323,6 +329,7 @@ export type Database = {
       expenses: {
         Row: {
           amount: number
+          branch_id: string
           category_id: string
           created_at: string
           created_by: string | null
@@ -338,6 +345,7 @@ export type Database = {
         }
         Insert: {
           amount: number
+          branch_id: string
           category_id: string
           created_at?: string
           created_by?: string | null
@@ -355,6 +363,7 @@ export type Database = {
         }
         Update: {
           amount?: number
+          branch_id?: string
           category_id?: string
           created_at?: string
           created_by?: string | null
@@ -544,6 +553,7 @@ export type Database = {
       owner_withdrawals: {
         Row: {
           amount: number
+          branch_id: string
           created_at: string
           created_by: string | null
           date: string
@@ -553,6 +563,7 @@ export type Database = {
         }
         Insert: {
           amount: number
+          branch_id: string
           created_at?: string
           created_by?: string | null
           date: string
@@ -562,6 +573,7 @@ export type Database = {
         }
         Update: {
           amount?: number
+          branch_id?: string
           created_at?: string
           created_by?: string | null
           date?: string

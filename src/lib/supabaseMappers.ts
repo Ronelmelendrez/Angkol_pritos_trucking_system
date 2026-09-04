@@ -41,6 +41,7 @@ export function expenseRowToApp(row: ExpenseRow & { categories?: { name: string 
     category: (row.categories?.name ?? "") as ExpenseCategory,
     description: row.description ?? "",
     amount: Number(row.amount),
+    branchId: row.branch_id ?? undefined,
     supplier: row.supplier ?? undefined,
     paymentMethod: (PM_DB_TO_APP[row.payment_method] ?? "Cash") as PaymentMethod,
     fundSource: (row.fund_source as ExpenseFundSource) ?? undefined,
@@ -57,6 +58,7 @@ export function expenseAppToRow(input: {
   category_id: string;
   description?: string;
   amount: number;
+  branch_id?: string | null;
   supplier?: string;
   paymentMethod: string;
   fundSource?: ExpenseFundSource | null;
@@ -69,6 +71,7 @@ export function expenseAppToRow(input: {
     category_id: input.category_id,
     description: input.description || null,
     amount: input.amount,
+    branch_id: input.branch_id ?? null,
     supplier: input.supplier || null,
     payment_method: (PM_APP_TO_DB[input.paymentMethod] ?? "cash") as ExpenseRow["payment_method"],
     fund_source: input.fundSource ?? null,
@@ -466,6 +469,7 @@ export function cashOpeningRowToApp(row: CashOpeningRow) {
     id: row.id,
     date: row.date,
     openingCash: Number(row.opening_cash),
+    branchId: row.branch_id,
     createdBy: row.created_by ?? undefined,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
@@ -475,11 +479,13 @@ export function cashOpeningRowToApp(row: CashOpeningRow) {
 export function cashOpeningAppToRow(input: {
   date: string;
   openingCash: number;
+  branchId: string;
   createdBy?: string;
 }) {
   return {
     date: input.date,
     opening_cash: input.openingCash,
+    branch_id: input.branchId,
     created_by: input.createdBy ?? null,
   };
 }
@@ -492,6 +498,7 @@ export function cashCountRowToApp(row: CashCountRow) {
     expectedCash: Number(row.expected_cash),
     actualCash: Number(row.actual_cash),
     difference: Number(row.difference),
+    branchId: row.branch_id,
     remarks: row.remarks ?? undefined,
     countedBy: row.counted_by ?? undefined,
     createdAt: row.created_at,
@@ -504,6 +511,7 @@ export function cashCountAppToRow(input: {
   expectedCash: number;
   actualCash: number;
   difference: number;
+  branchId: string;
   remarks?: string;
   countedBy?: string;
 }) {
@@ -512,6 +520,7 @@ export function cashCountAppToRow(input: {
     expected_cash: input.expectedCash,
     actual_cash: input.actualCash,
     difference: input.difference,
+    branch_id: input.branchId,
     remarks: input.remarks ?? null,
     counted_by: input.countedBy ?? null,
   };
@@ -523,6 +532,7 @@ export function ownerWithdrawalRowToApp(row: OwnerWithdrawalRow) {
     id: row.id,
     date: row.date,
     amount: Number(row.amount),
+    branchId: row.branch_id ?? undefined,
     reason: row.reason ?? undefined,
     createdBy: row.created_by ?? undefined,
     createdAt: row.created_at,
@@ -533,12 +543,14 @@ export function ownerWithdrawalRowToApp(row: OwnerWithdrawalRow) {
 export function ownerWithdrawalAppToRow(input: {
   date: string;
   amount: number;
+  branch_id?: string | null;
   reason?: string;
   createdBy?: string;
 }) {
   return {
     date: input.date,
     amount: input.amount,
+    branch_id: input.branch_id ?? null,
     reason: input.reason ?? null,
     created_by: input.createdBy ?? null,
   };
