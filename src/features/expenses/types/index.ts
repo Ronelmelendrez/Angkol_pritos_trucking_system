@@ -11,6 +11,7 @@ export interface Expense extends BaseRecord {
   category: ExpenseCategory;
   description: string;
   amount: number;
+  branchId?: string;
   supplier?: string;
   paymentMethod: PaymentMethod;
   fundSource?: ExpenseFundSource;
