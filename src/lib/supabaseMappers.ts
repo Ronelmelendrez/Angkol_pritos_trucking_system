@@ -58,7 +58,7 @@ export function expenseAppToRow(input: {
   category_id: string;
   description?: string;
   amount: number;
-  branch_id?: string | null;
+  branch_id?: string;
   supplier?: string;
   paymentMethod: string;
   fundSource?: ExpenseFundSource | null;
@@ -66,12 +66,15 @@ export function expenseAppToRow(input: {
   quantity_purchased?: number | null;
   created_by?: string | null;
 }) {
+  if (!input.branch_id) {
+    throw new Error("branch_id is required when creating an expense");
+  }
   return {
     date: input.date,
     category_id: input.category_id,
     description: input.description || null,
     amount: input.amount,
-    branch_id: input.branch_id ?? null,
+    branch_id: input.branch_id,
     supplier: input.supplier || null,
     payment_method: (PM_APP_TO_DB[input.paymentMethod] ?? "cash") as ExpenseRow["payment_method"],
     fund_source: input.fundSource ?? null,
@@ -543,14 +546,17 @@ export function ownerWithdrawalRowToApp(row: OwnerWithdrawalRow) {
 export function ownerWithdrawalAppToRow(input: {
   date: string;
   amount: number;
-  branch_id?: string | null;
+  branch_id?: string;
   reason?: string;
   createdBy?: string;
 }) {
+  if (!input.branch_id) {
+    throw new Error("branch_id is required when creating an owner withdrawal");
+  }
   return {
     date: input.date,
     amount: input.amount,
-    branch_id: input.branch_id ?? null,
+    branch_id: input.branch_id,
     reason: input.reason ?? null,
     created_by: input.createdBy ?? null,
   };

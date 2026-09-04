@@ -37,7 +37,7 @@ export function useAddOwnerWithdrawal() {
       const payload = ownerWithdrawalAppToRow({
         date: input.date,
         amount: input.amount,
-        branch_id: input.branchId ?? null,
+        branch_id: input.branchId,
         reason: input.reason,
         createdBy: user?.id,
       });

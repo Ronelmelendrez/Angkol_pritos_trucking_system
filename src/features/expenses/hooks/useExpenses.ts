@@ -43,7 +43,7 @@ export function useAddExpense() {
         category_id: categoryId,
         description: input.description,
         amount: input.amount,
-        branch_id: input.branchId ?? null,
+        branch_id: input.branchId,
         supplier: input.supplier,
         paymentMethod: input.paymentMethod,
         fundSource: input.fundSource ?? null,
