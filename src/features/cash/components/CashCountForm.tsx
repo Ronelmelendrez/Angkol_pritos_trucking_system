@@ -20,15 +20,17 @@ const schema = z.object({
 
 export function CashCountForm({
   date,
+  branchId,
   expectedCash,
   onDone,
 }: {
   date: string;
+  branchId: string;
   expectedCash: number;
   onDone?: () => void;
 }) {
   const { toast } = useToast();
-  const { data: counts = [] } = useCashCounts();
+  const { data: counts = [] } = useCashCounts(branchId);
   const upsertCount = useUpsertCashCount();
 
   const existing = counts.find((c) => c.date === date) ?? null;
@@ -60,6 +62,7 @@ export function CashCountForm({
     try {
       await upsertCount.mutateAsync({
         date,
+        branchId,
         expectedCash,
         actualCash: values.actualCash,
         difference,
