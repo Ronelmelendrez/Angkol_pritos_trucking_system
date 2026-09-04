@@ -353,8 +353,9 @@ export function useUpcomingOrdersByBranch() {
     for (const order of orders) {
       if (order.status !== "scheduled") continue;
       if (order.date < today) continue;
+      if (!order.branchId) continue;
 
-      const branchId = order.branchId ?? "unassigned";
+      const branchId = order.branchId;
       const entry = map.get(branchId) ?? {
         branchId,
         branchName: branchId === "unassigned" ? "Unassigned" : branchMap[branchId] ?? "Unknown",
