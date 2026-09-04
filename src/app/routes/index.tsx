@@ -49,7 +49,7 @@ export const router = createBrowserRouter([
       { path: "attendance", element: <AttendancePage /> },
       { path: "advances", element: <AdvancesPage /> },
       { path: "loans", element: <LoansPage /> },
-      { path: "cash", element: <CashDrawerPage /> },
+      { path: "cash/:branchId?", element: <CashDrawerPage /> },
       { path: "withdrawals", element: <WithdrawalsPage /> },
       { path: "payroll", element: <PayrollPage /> },
       { path: "reports", element: <ReportsPage /> },
