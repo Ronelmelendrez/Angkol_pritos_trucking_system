@@ -3,6 +3,7 @@ import type { BaseRecord } from "@/types";
 export interface CashOpening extends BaseRecord {
   date: string; // YYYY-MM-DD
   openingCash: number;
+  branchId: string;
   createdBy?: string;
 }
 
@@ -13,6 +14,7 @@ export interface CashCount extends BaseRecord {
   expectedCash: number;
   actualCash: number;
   difference: number;
+  branchId: string;
   remarks?: string;
   countedBy?: string;
 }
