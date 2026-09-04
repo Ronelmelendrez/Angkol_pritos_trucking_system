@@ -130,7 +130,7 @@ export function ExpenseForm({ onDone }: { onDone?: () => void }) {
     }
 
     try {
-      await addExpense.mutateAsync({ ...values, createdBy: user?.id });
+      await addExpense.mutateAsync({ ...values, createdBy: user?.id, branchId: user?.branchId });
       toast({
         title: "Expense recorded",
         description: `${values.description} — added.`,
