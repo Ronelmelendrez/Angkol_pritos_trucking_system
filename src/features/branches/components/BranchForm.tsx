@@ -2,7 +2,7 @@ import { useForm, useWatch, Controller, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, Eye, EyeOff, RotateCcw, AlertCircle } from "lucide-react";
 import { z } from "zod";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Label } from "@/components/ui/Label";
@@ -45,6 +45,7 @@ export function BranchForm({ branch, onDone }: Props) {
     register,
     handleSubmit,
     control,
+    setValue,
     formState: { errors },
   } = useForm<BranchFormValues>({
     resolver: zodResolver(branchSchema) as unknown as Resolver<BranchFormValues>,
@@ -57,6 +58,12 @@ export function BranchForm({ branch, onDone }: Props) {
       branchPassword: "",
     },
   });
+
+  useEffect(() => {
+    if (isEditing && staffEmail) {
+      setValue("branchEmail", staffEmail);
+    }
+  }, [staffEmail, isEditing, setValue]);
 
   const watchedEmail = useWatch({ control, name: "branchEmail" });
   const emailExists = useCheckEmailExists(!isEditing ? watchedEmail : "").data;
