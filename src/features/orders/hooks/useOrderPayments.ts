@@ -1,7 +1,10 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabaseClient";
 import { orderPaymentRowToApp, orderPaymentAppToRow } from "@/lib/supabaseMappers";
+import type { Database } from "@/types/database.types";
 import type { OrderPayment, NewOrderPayment } from "../types";
+
+type OrderPaymentRow = Database["public"]["Tables"]["scheduled_order_payments"]["Row"];
 
 const ORDER_PAYMENTS_KEY = ["order-payments"] as const;
 const ALL_ORDER_PAYMENTS_KEY = ["order-payments", "all"] as const;
@@ -10,10 +13,21 @@ function byOrderKey(orderId: string) {
   return [...ORDER_PAYMENTS_KEY, orderId] as const;
 }
 
-export function useAllOrderPayments() {
+export function useAllOrderPayments(branchId?: string) {
   return useQuery({
-    queryKey: ALL_ORDER_PAYMENTS_KEY,
+    queryKey: branchId ? [...ALL_ORDER_PAYMENTS_KEY, branchId] : ALL_ORDER_PAYMENTS_KEY,
     queryFn: async () => {
+      if (branchId) {
+        // Join with orders to filter by branch
+        const { data, error } = await supabase
+          .from("scheduled_order_payments")
+          .select("*, orders!inner(branch_id)")
+          .eq("orders.branch_id", branchId)
+          .order("payment_date", { ascending: false });
+        if (error) throw error;
+        return data.map((row) => orderPaymentRowToApp(row as OrderPaymentRow));
+      }
+
       const { data, error } = await supabase
         .from("scheduled_order_payments")
         .select("*")
