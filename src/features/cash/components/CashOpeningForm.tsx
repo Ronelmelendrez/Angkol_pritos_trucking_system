@@ -16,10 +16,10 @@ const schema = z.object({
   openingCash: z.coerce.number().min(0, "Cannot be negative"),
 });
 
-export function CashOpeningForm({ date, onDone }: { date: string; onDone?: () => void }) {
+export function CashOpeningForm({ date, branchId, onDone }: { date: string; branchId: string; onDone?: () => void }) {
   const { toast } = useToast();
   const { data: settings } = usePayRuleSettings();
-  const { data: openings = [] } = useCashOpenings();
+  const { data: openings = [] } = useCashOpenings(branchId);
   const upsertOpening = useUpsertCashOpening();
 
   const existing = openings.find((o) => o.date === date) ?? null;
@@ -44,7 +44,7 @@ export function CashOpeningForm({ date, onDone }: { date: string; onDone?: () =>
 
   async function onSubmit(values: CashOpeningFormValues) {
     try {
-      await upsertOpening.mutateAsync({ date, openingCash: values.openingCash });
+      await upsertOpening.mutateAsync({ date, openingCash: values.openingCash, branchId });
       toast({
         title: existing ? "Opening cash updated" : "Opening cash saved",
         variant: "success",
