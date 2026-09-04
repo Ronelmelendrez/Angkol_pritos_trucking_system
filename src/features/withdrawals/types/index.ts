@@ -3,6 +3,7 @@ import type { BaseRecord } from "@/types";
 export interface OwnerWithdrawal extends BaseRecord {
   date: string; // YYYY-MM-DD
   amount: number;
+  branchId?: string;
   reason?: string;
   createdBy?: string;
 }
