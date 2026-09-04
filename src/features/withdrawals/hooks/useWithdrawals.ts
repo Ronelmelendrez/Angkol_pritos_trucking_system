@@ -4,19 +4,25 @@ import { ownerWithdrawalRowToApp, ownerWithdrawalAppToRow } from "@/lib/supabase
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import type { NewOwnerWithdrawal } from "../types";
 
-const WITHDRAWALS_KEY = ["owner_withdrawals"] as const;
 export const withdrawalsKeys = {
-  all: WITHDRAWALS_KEY,
+  all: ["owner_withdrawals"] as const,
+  byBranch: (branchId: string) => ["owner_withdrawals", branchId] as const,
 };
 
-export function useOwnerWithdrawals() {
+export function useOwnerWithdrawals(branchId?: string) {
   return useQuery({
-    queryKey: WITHDRAWALS_KEY,
+    queryKey: branchId ? withdrawalsKeys.byBranch(branchId) : withdrawalsKeys.all,
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from("owner_withdrawals")
         .select("*")
         .order("date", { ascending: false });
+
+      if (branchId) {
+        query = query.eq("branch_id", branchId);
+      }
+
+      const { data, error } = await query;
       if (error) throw error;
       return data.map(ownerWithdrawalRowToApp);
     },
@@ -31,6 +37,7 @@ export function useAddOwnerWithdrawal() {
       const payload = ownerWithdrawalAppToRow({
         date: input.date,
         amount: input.amount,
+        branch_id: input.branchId ?? null,
         reason: input.reason,
         createdBy: user?.id,
       });
@@ -42,7 +49,7 @@ export function useAddOwnerWithdrawal() {
       if (error) throw error;
       return ownerWithdrawalRowToApp(data);
     },
-    onSettled: () => queryClient.invalidateQueries({ queryKey: WITHDRAWALS_KEY }),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: withdrawalsKeys.all }),
   });
 }
 
@@ -53,6 +60,6 @@ export function useDeleteOwnerWithdrawal() {
       const { error } = await supabase.from("owner_withdrawals").delete().eq("id", id);
       if (error) throw error;
     },
-    onSettled: () => queryClient.invalidateQueries({ queryKey: WITHDRAWALS_KEY }),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: withdrawalsKeys.all }),
   });
 }
