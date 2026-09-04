@@ -9,7 +9,7 @@ import { useAddOwnerWithdrawal } from "../hooks/useWithdrawals";
 import { useToast } from "@/components/ui/useToast";
 import { todayISO } from "@/utils/date";
 
-export function WithdrawalForm({ onDone }: { onDone?: () => void }) {
+export function WithdrawalForm({ branchId, onDone }: { branchId?: string; onDone?: () => void }) {
   const { toast } = useToast();
   const addWithdrawal = useAddOwnerWithdrawal();
 
@@ -25,7 +25,7 @@ export function WithdrawalForm({ onDone }: { onDone?: () => void }) {
 
   async function onSubmit(values: WithdrawalFormValues) {
     try {
-      await addWithdrawal.mutateAsync(values);
+      await addWithdrawal.mutateAsync({ ...values, branchId });
       toast({ title: "Withdrawal recorded", description: "Owner cash-out saved.", variant: "success" });
       reset({ amount: 0, date: todayISO(), reason: "" });
       onDone?.();
