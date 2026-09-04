@@ -7,17 +7,19 @@ import { useCashOpenings } from "./useCashOpenings";
 import { useCashCounts } from "./useCashCounts";
 import { useProducts } from "@/features/products/hooks/useProducts";
 import { useAllOrderPayments } from "@/features/orders/hooks/useOrderPayments";
+import { useEmployees } from "@/features/employees/hooks/useEmployees";
 import type { CashMovementItem, DailyCashData } from "../types";
 
-export function useDailyCash(date: string) {
+export function useDailyCash(date: string, branchId?: string) {
   const { data: sales = [], isLoading: salesLoading } = useSales();
-  const { data: expenses = [], isLoading: expensesLoading } = useExpenses();
+  const { data: expenses = [], isLoading: expensesLoading } = useExpenses(branchId);
   const { data: advances = [], isLoading: advancesLoading } = useAdvances();
-  const { data: withdrawals = [], isLoading: withdrawalsLoading } = useOwnerWithdrawals();
-  const { data: openings = [], isLoading: openingsLoading } = useCashOpenings();
-  const { data: counts = [], isLoading: countsLoading } = useCashCounts();
+  const { data: withdrawals = [], isLoading: withdrawalsLoading } = useOwnerWithdrawals(branchId);
+  const { data: openings = [], isLoading: openingsLoading } = useCashOpenings(branchId);
+  const { data: counts = [], isLoading: countsLoading } = useCashCounts(branchId);
   const { data: products = [], isLoading: productsLoading } = useProducts();
-  const { data: orderPayments = [], isLoading: paymentsLoading } = useAllOrderPayments();
+  const { data: orderPayments = [], isLoading: paymentsLoading } = useAllOrderPayments(branchId);
+  const { data: employees = [] } = useEmployees();
 
   const isLoading =
     salesLoading || expensesLoading || advancesLoading || withdrawalsLoading ||
@@ -26,12 +28,21 @@ export function useDailyCash(date: string) {
   const data = useMemo<DailyCashData>(() => {
     const productNames = new Map(products.map((p) => [p.id, p.name]));
 
+    const employeeBranchMap = new Map(employees.map((e) => [e.id, e.branchId]));
+
+    // Filter sales by branch (sales already has branchId from DB)
+    const branchSales = branchId
+      ? sales.filter((s) => s.branchId === branchId)
+      : sales;
+
     // Walk-in sales only. Sale rows linked to a scheduled order are excluded:
     // that order's cash is already captured as deposit/balance payments on the
     // days they were actually received.
-    const daySales = sales
+    const daySales = branchSales
       .filter((s) => s.date === date && !s.orderId)
       .sort((a, b) => (a.createdAt ?? "").localeCompare(b.createdAt ?? ""));
+
+    // Filter expenses by branch (expenses now has branchId from DB)
     const dayExpenses = expenses
       .filter(
         (e) =>
@@ -40,9 +51,16 @@ export function useDailyCash(date: string) {
           e.fundSource !== "separate",
       )
       .sort((a, b) => (a.createdAt ?? "").localeCompare(b.createdAt ?? ""));
-    const dayAdvances = advances
+
+    // Filter advances by branch via employee's branch
+    const branchAdvances = branchId
+      ? advances.filter((a) => employeeBranchMap.get(a.employeeId) === branchId)
+      : advances;
+    const dayAdvances = branchAdvances
       .filter((a) => a.date === date)
       .sort((a, b) => (a.createdAt ?? "").localeCompare(b.createdAt ?? ""));
+
+    // Filter withdrawals by branch (owner_withdrawals now has branchId from DB)
     const dayWithdrawals = withdrawals
       .filter((w) => w.date === date)
       .sort((a, b) => (a.createdAt ?? "").localeCompare(b.createdAt ?? ""));
@@ -50,6 +68,7 @@ export function useDailyCash(date: string) {
     // All order payments received this day are real cash movements.
     // Deposits are shown separately from balance/final payments so deposits
     // are never double-counted as sales.
+    // Order payments are already filtered by branch via the useAllOrderPayments hook.
     const dayOrderPayments = orderPayments
       .filter((p) => p.paymentDate === date)
       .sort((a, b) => (a.createdAt ?? "").localeCompare(b.createdAt ?? ""));
@@ -163,7 +182,7 @@ export function useDailyCash(date: string) {
       difference: cashCount?.difference ?? null,
       movements,
     };
-  }, [date, sales, expenses, advances, withdrawals, openings, counts, products, orderPayments]);
+  }, [date, branchId, sales, expenses, advances, withdrawals, openings, counts, products, orderPayments, employees]);
 
   return { data, isLoading };
 }
