@@ -6,6 +6,9 @@ import { ProfitLineChart } from "@/features/reports/components/profitLineChart";
 import { SalesByProductPieChart } from "@/features/reports/components/SalesByProductPieChart";
 import { PayrollSummary } from "@/features/reports/components/PayrollSummary";
 import { DailyCashReport } from "@/features/cash/components/DailyCashReport";
+import { useBranches } from "@/features/branches";
+import { useAuth } from "@/features/auth/hooks/useAuth";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/Select";
 import { TrendingUp, Receipt, Percent, CalendarDays, Wallet, Building2, Trophy, Target } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card";
 import { Skeleton } from "@/components/ui/Skeleton";
@@ -102,11 +105,19 @@ function RevenueByProductCard({ sales }: { sales: Sale[] }) {
 function ReportsContent() {
   const today = useMemo(() => new Date(), []);
   const todayStr = format(today, "yyyy-MM-dd");
+  const { user } = useAuth();
+  const { data: branches = [] } = useBranches();
+  const isManager = user?.role === "manager";
 
+  const activeBranches = branches.filter((b) => b.isActive);
   const [preset, setPreset] = useState<DatePreset>("this-month");
   const [customFrom, setCustomFrom] = useState(todayStr);
   const [customTo, setCustomTo] = useState(todayStr);
   const [cashDate, setCashDate] = useState(todayStr);
+  const [cashBranchId, setCashBranchId] = useState(() => {
+    if (!isManager) return user?.branchId ?? "";
+    return activeBranches[0]?.id ?? "";
+  });
 
   const labelCount = useChartLabelCount();
 
@@ -408,12 +419,29 @@ function ReportsContent() {
                 <p className="text-sm font-semibold text-ink">Daily cash reconciliation</p>
                 <p className="text-xs text-ink-faint">Opening + cash in − cash out vs. actual drawer count</p>
               </div>
-              <div className="w-full max-w-52">
-                <p className="mb-1 text-xs font-medium text-ink-soft">Report date</p>
-                <Input type="date" value={cashDate} onChange={(e) => setCashDate(e.target.value)} />
+              <div className="flex items-end gap-3">
+                <div className="w-full max-w-52">
+                  <p className="mb-1 text-xs font-medium text-ink-soft">Report date</p>
+                  <Input type="date" value={cashDate} onChange={(e) => setCashDate(e.target.value)} />
+                </div>
+                {isManager && activeBranches.length > 1 && (
+                  <div className="w-full max-w-52">
+                    <p className="mb-1 text-xs font-medium text-ink-soft">Branch</p>
+                    <Select value={cashBranchId} onValueChange={setCashBranchId}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select branch" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {activeBranches.map((b) => (
+                          <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
               </div>
             </div>
-            <DailyCashReport date={cashDate} />
+            {cashBranchId && <DailyCashReport date={cashDate} branchId={cashBranchId} />}
           </div>
         </TabsContent>
 
