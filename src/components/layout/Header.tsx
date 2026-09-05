@@ -6,6 +6,7 @@ import { useAuth } from "@/features/auth/hooks/useAuth";
 import { CommandSearch } from "@/components/layout/CommandSearch";
 import { NotificationPanel } from "@/components/layout/NotificationPanel";
 import { useNotifications } from "@/components/layout/useNotifications";
+import { useBranchMap } from "@/features/branches/hooks/useBranches";
 import { ROLE_LABELS } from "@/lib/constants";
 import {
   DropdownMenu,
@@ -25,6 +26,16 @@ export function Header({ title }: { title: string }) {
   const [notifOpen, setNotifOpen] = useState(false);
   const notifications = useNotifications();
   const unreadCount = notifications.filter((n) => !n.read).length;
+  const { data: branchMap } = useBranchMap();
+  const branchName = user?.branchId ? branchMap?.[user.branchId] : undefined;
+  const avatar =
+    user?.role === "manager" || !branchName
+      ? (user?.name?.charAt(0).toUpperCase() ?? "?")
+      : branchName
+          .split(/\s+/)
+          .map((w) => w.charAt(0).toUpperCase())
+          .slice(0, 2)
+          .join("");
 
   useEffect(() => {
     function handleKey(e: KeyboardEvent) {
@@ -93,7 +104,7 @@ export function Header({ title }: { title: string }) {
           <DropdownMenu>
             <DropdownMenuTrigger className="outline-none">
               <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-xs font-bold text-white cursor-pointer transition-transform hover:scale-105">
-                AP
+                {avatar}
               </div>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-52">
