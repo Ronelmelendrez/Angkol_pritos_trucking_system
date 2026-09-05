@@ -287,7 +287,7 @@ export function EmployeeDashboardPage() {
           <Card>
             <CardHeader>
               <div>
-                <CardTitle>My attendance</CardTitle>
+                <CardTitle>Branch attendance</CardTitle>
                 <CardDescription>This month</CardDescription>
               </div>
             </CardHeader>
