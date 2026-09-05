@@ -39,7 +39,7 @@ export function CashDrawerPage() {
     return (
       <div className="space-y-5">
         <Card>
-          <CardHeader>
+          <CardHeader className="flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <CardTitle>Opening cash</CardTitle>
               <CardDescription>Set the starting cash for today's shift.</CardDescription>
@@ -59,35 +59,35 @@ export function CashDrawerPage() {
 
   return (
     <div className="space-y-5">
-      <Card>
-        <CardHeader>
-          <div>
-            <CardTitle>Cash drawer</CardTitle>
-            <CardDescription>
-              Record the day's opening cash at the start of your shift and submit the closing cash count at the end.
-            </CardDescription>
-          </div>
-          <div className="flex items-end gap-3">
-            <div className="w-full max-w-52">
-              <Label htmlFor="cash-date">Business day</Label>
-              <Input id="cash-date" type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+        <Card>
+          <CardHeader className="flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <CardTitle>Cash drawer</CardTitle>
+              <CardDescription>
+                Record the day's opening cash at the start of your shift and submit the closing cash count at the end.
+              </CardDescription>
             </div>
-            <div className="w-full max-w-52">
-              <Label>Branch</Label>
-              <Select value={resolvedBranchId} onValueChange={handleBranchChange}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select branch" />
-                </SelectTrigger>
-                <SelectContent>
-                  {activeBranches.map((b) => (
-                    <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+            <div className="flex flex-wrap items-end gap-3">
+              <div className="w-full max-w-52">
+                <Label htmlFor="cash-date">Business day</Label>
+                <Input id="cash-date" type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+              </div>
+              <div className="w-full max-w-52">
+                <Label>Branch</Label>
+                <Select value={resolvedBranchId} onValueChange={handleBranchChange}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select branch" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {activeBranches.map((b) => (
+                      <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
-          </div>
-        </CardHeader>
-      </Card>
+          </CardHeader>
+        </Card>
 
       {isLoading ? (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-7">
