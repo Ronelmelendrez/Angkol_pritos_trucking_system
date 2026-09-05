@@ -24,8 +24,8 @@ export function AdjustmentReasonDonut({ data }: Props) {
           Cost data unavailable — set a product cost or link purchase history to price losses.
         </p>
       ) : (
-        <div className="flex items-center gap-2">
-          <div className="relative h-40 w-40 shrink-0">
+        <div className="flex flex-col items-center gap-3 pb-2 sm:flex-row sm:items-center sm:gap-4">
+          <div className="relative mx-auto h-40 w-40 shrink-0 sm:mx-0">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
@@ -54,7 +54,7 @@ export function AdjustmentReasonDonut({ data }: Props) {
               <p className="text-[10px] text-ink-faint">total lost</p>
             </div>
           </div>
-          <ul className="min-w-0 flex-1 space-y-1.5">
+          <ul className="w-full min-w-0 flex-1 space-y-1.5">
             {data.map((row) => {
               const share = totalCost > 0 ? (row.cost / totalCost) * 100 : 0;
               return (
