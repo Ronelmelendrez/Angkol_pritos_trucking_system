@@ -13,7 +13,10 @@ import { OrderGridCard } from "@/features/orders/components/OrderGridCard";
 import { OrderForm } from "@/features/orders/components/OrderForm";
 import { OrderFiltersBar } from "@/features/orders/components/OrderFilters";
 import { OrderStats } from "@/features/orders/components/OrderStats";
+import { OrderCompletionDialog } from "@/features/orders/components/OrderCompletionDialog";
+import { OrderCancellationDialog } from "@/features/orders/components/OrderCancellationDialog";
 import { useOrders } from "@/features/orders/hooks/useOrders";
+import type { Order } from "@/features/orders/types";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { ORDER_STATUS_LABELS, type OrderStatus } from "@/lib/constants";
 import { formatCurrency } from "@/utils/currency";
@@ -28,6 +31,8 @@ export function EmployeeOrdersPage() {
   const { data: orders = [] } = useOrders();
   const { user } = useAuth();
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [completeTarget, setCompleteTarget] = useState<Order | null>(null);
+  const [cancelTarget, setCancelTarget] = useState<Order | null>(null);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<OrderStatus | "all">("all");
   const [datePreset, setDatePreset] = useState<DatePreset>("this-month");
@@ -84,7 +89,11 @@ export function EmployeeOrdersPage() {
 
   return (
     <div className="space-y-5">
-      <OrderStats orders={myOrders} />
+      <OrderStats
+        orders={myOrders}
+        onComplete={(o) => setCompleteTarget(o)}
+        onCancel={(o) => setCancelTarget(o)}
+      />
 
       <Card>
         <CardHeader>
@@ -143,6 +152,17 @@ export function EmployeeOrdersPage() {
           }
         />
       </Card>
+
+      <OrderCompletionDialog
+        order={completeTarget}
+        onClose={() => setCompleteTarget(null)}
+      />
+
+      <OrderCancellationDialog
+        orderId={cancelTarget?.id ?? null}
+        orderNumber={cancelTarget?.orderNumber}
+        onClose={() => setCancelTarget(null)}
+      />
     </div>
   );
 }
