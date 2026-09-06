@@ -36,52 +36,148 @@ function OrderTable({ orders, onView, emptyMessage }: OrderTableProps) {
   }
 
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full text-sm">
-        <thead>
-          <tr className="border-b border-line bg-ink/[0.02]">
-            <th className="px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wide text-ink-faint sm:px-5">
-              Order #
-            </th>
-            <th className="px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wide text-ink-faint sm:px-5">
-              Customer
-            </th>
-            <th className="hidden px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wide text-ink-faint sm:table-cell sm:px-5">
-              Contact
-            </th>
-            <th className="hidden px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wide text-ink-faint sm:table-cell sm:px-5">
-              Time
-            </th>
-            <th className="px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wide text-ink-faint sm:px-5">
-              Status
-            </th>
-            <th className="hidden px-4 py-2.5 text-right text-xs font-medium uppercase tracking-wide text-ink-faint md:table-cell sm:px-5">
-              Items
-            </th>
-            <th className="px-4 py-2.5 text-right text-xs font-medium uppercase tracking-wide text-ink-faint sm:px-5">
-              Total
-            </th>
-            <th className="hidden px-4 py-2.5 text-right text-xs font-medium uppercase tracking-wide text-ink-faint lg:table-cell sm:px-5">
-              Deposit
-            </th>
-            <th className="hidden px-4 py-2.5 text-right text-xs font-medium uppercase tracking-wide text-ink-faint lg:table-cell sm:px-5">
-              Balance
-            </th>
-            <th className="px-4 py-2.5 text-center text-xs font-medium uppercase tracking-wide text-ink-faint sm:px-5">
-              Action
-            </th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-dashed divide-line">
-          {orders.map((order) => {
-            const urgency = order.status === "scheduled" ? getTimeUrgency(order.scheduledTime ?? "") : null;
-            return (
-              <tr key={order.id} className="hover:bg-primary/[0.02] transition-colors">
-                <td className="whitespace-nowrap px-4 py-2.5 font-medium text-ink sm:px-5">
-                  {order.orderNumber}
-                </td>
-                <td className="px-4 py-2.5 font-medium text-ink sm:px-5">
-                  <div className="flex min-w-0 items-center gap-2">
+    <>
+      {/* ── Table (desktop: lg+) ───────────────── */}
+      <div className="hidden overflow-x-auto lg:block">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="border-b border-line bg-ink/[0.02]">
+              <th className="px-5 py-2.5 text-left text-xs font-medium uppercase tracking-wide text-ink-faint">
+                Order #
+              </th>
+              <th className="px-5 py-2.5 text-left text-xs font-medium uppercase tracking-wide text-ink-faint">
+                Customer
+              </th>
+              <th className="px-5 py-2.5 text-left text-xs font-medium uppercase tracking-wide text-ink-faint">
+                Contact
+              </th>
+              <th className="px-5 py-2.5 text-left text-xs font-medium uppercase tracking-wide text-ink-faint">
+                Time
+              </th>
+              <th className="px-5 py-2.5 text-left text-xs font-medium uppercase tracking-wide text-ink-faint">
+                Status
+              </th>
+              <th className="px-5 py-2.5 text-right text-xs font-medium uppercase tracking-wide text-ink-faint">
+                Items
+              </th>
+              <th className="px-5 py-2.5 text-right text-xs font-medium uppercase tracking-wide text-ink-faint">
+                Total
+              </th>
+              <th className="px-5 py-2.5 text-right text-xs font-medium uppercase tracking-wide text-ink-faint">
+                Deposit
+              </th>
+              <th className="px-5 py-2.5 text-right text-xs font-medium uppercase tracking-wide text-ink-faint">
+                Balance
+              </th>
+              <th className="px-5 py-2.5 text-center text-xs font-medium uppercase tracking-wide text-ink-faint">
+                Action
+              </th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-dashed divide-line">
+            {orders.map((order) => {
+              const urgency = order.status === "scheduled" ? getTimeUrgency(order.scheduledTime ?? "") : null;
+              return (
+                <tr key={order.id} className="hover:bg-primary/[0.02] transition-colors">
+                  <td className="whitespace-nowrap px-5 py-2.5 font-medium text-ink">
+                    {order.orderNumber}
+                  </td>
+                  <td className="px-5 py-2.5 font-medium text-ink">
+                    <div className="flex min-w-0 items-center gap-2">
+                      {urgency && (
+                        <span
+                          className={`h-2 w-2 shrink-0 rounded-full ${URGENCY_DOT[urgency]}`}
+                          title={
+                            urgency === "overdue"
+                              ? "Past scheduled time"
+                              : urgency === "soon"
+                                ? "Due within 1 hour"
+                                : ""
+                          }
+                        />
+                      )}
+                      <span className="truncate">{order.customerName}</span>
+                    </div>
+                  </td>
+                  <td className="whitespace-nowrap px-5 py-2.5 text-ink-soft">
+                    {order.contactNumber || "—"}
+                  </td>
+                  <td className="whitespace-nowrap px-5 py-2.5">
+                    {order.scheduledTime ? (
+                      <span
+                        className={`inline-block whitespace-nowrap rounded-md px-1.5 py-0.5 text-xs font-medium ${
+                          urgency === "overdue"
+                            ? "bg-red-50 text-red-700"
+                            : urgency === "soon"
+                              ? "bg-amber-50 text-amber-700"
+                              : "bg-primary/10 text-primary-dark"
+                        }`}
+                      >
+                        {formatTime12h(order.scheduledTime)}
+                      </span>
+                    ) : (
+                      <span className="text-xs text-ink-faint">—</span>
+                    )}
+                  </td>
+                  <td className="whitespace-nowrap px-5 py-2.5">
+                    <Badge className={`text-[10px] ${STATUS_BADGE[order.status]}`}>
+                      {ORDER_STATUS_LABELS[order.status]}
+                    </Badge>
+                  </td>
+                  <td className="whitespace-nowrap px-5 py-2.5 text-right text-ink-soft">
+                    {order.items.length}
+                  </td>
+                  <td className="whitespace-nowrap px-5 py-2.5 text-right font-semibold text-ink">
+                    {formatCurrency(order.total)}
+                  </td>
+                  <td className="whitespace-nowrap px-5 py-2.5 text-right text-blue-600">
+                    {order.depositAmount > 0 ? formatCurrency(order.depositAmount) : "—"}
+                  </td>
+                  <td className="whitespace-nowrap px-5 py-2.5 text-right">
+                    {order.balanceAmount > 0 && order.balanceAmount !== order.total ? (
+                      <span className="font-medium text-ink">{formatCurrency(order.balanceAmount)}</span>
+                    ) : (
+                      <span className="text-ink-faint">—</span>
+                    )}
+                  </td>
+                  <td className="whitespace-nowrap px-5 py-2.5 text-center">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="gap-1.5"
+                      onClick={() => onView(order)}
+                    >
+                      <Eye className="h-3.5 w-3.5" />
+                      View
+                    </Button>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+          <tfoot>
+            <tr className="border-t border-line bg-ink/[0.02]">
+              <td colSpan={6} className="px-5 py-2.5 text-right text-xs font-medium uppercase tracking-wide text-ink-faint">
+                Total
+              </td>
+              <td className="whitespace-nowrap px-5 py-2.5 text-right text-sm font-bold text-ink">
+                {formatCurrency(orders.reduce((sum, o) => sum + o.total, 0))}
+              </td>
+              <td colSpan={3} className="px-5 py-2.5 text-center" />
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      {/* ── Cards (mobile & tablet: < lg) ──────── */}
+      <div className="divide-y divide-dashed divide-line lg:hidden">
+        {orders.map((order) => {
+          const urgency = order.status === "scheduled" ? getTimeUrgency(order.scheduledTime ?? "") : null;
+          return (
+            <div key={order.id} className="px-4 py-3 sm:px-5">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2">
                     {urgency && (
                       <span
                         className={`h-2 w-2 shrink-0 rounded-full ${URGENCY_DOT[urgency]}`}
@@ -94,16 +190,18 @@ function OrderTable({ orders, onView, emptyMessage }: OrderTableProps) {
                         }
                       />
                     )}
-                    <span className="truncate">{order.customerName}</span>
+                    <Badge className={`text-[10px] ${STATUS_BADGE[order.status]}`}>
+                      {ORDER_STATUS_LABELS[order.status]}
+                    </Badge>
                   </div>
-                </td>
-                <td className="hidden whitespace-nowrap px-4 py-2.5 text-ink-soft sm:table-cell sm:px-5">
-                  {order.contactNumber || "—"}
-                </td>
-                <td className="hidden whitespace-nowrap px-4 py-2.5 sm:table-cell sm:px-5">
-                  {order.scheduledTime ? (
+                  <p className="mt-1 truncate text-sm font-semibold text-ink">{order.customerName}</p>
+                  <p className="text-xs text-ink-faint">{order.orderNumber}</p>
+                </div>
+                <div className="shrink-0 text-right">
+                  <p className="text-sm font-bold text-ink">{formatCurrency(order.total)}</p>
+                  {order.scheduledTime && (
                     <span
-                      className={`inline-block whitespace-nowrap rounded-md px-1.5 py-0.5 text-xs font-medium ${
+                      className={`mt-1 inline-block whitespace-nowrap rounded-md px-1.5 py-0.5 text-[11px] font-medium ${
                         urgency === "overdue"
                           ? "bg-red-50 text-red-700"
                           : urgency === "soon"
@@ -113,59 +211,47 @@ function OrderTable({ orders, onView, emptyMessage }: OrderTableProps) {
                     >
                       {formatTime12h(order.scheduledTime)}
                     </span>
-                  ) : (
-                    <span className="text-xs text-ink-faint">—</span>
                   )}
-                </td>
-                <td className="px-4 py-2.5 sm:px-5">
-                  <Badge className={`text-[10px] ${STATUS_BADGE[order.status]}`}>
-                    {ORDER_STATUS_LABELS[order.status]}
-                  </Badge>
-                </td>
-                <td className="hidden whitespace-nowrap px-4 py-2.5 text-right text-ink-soft md:table-cell sm:px-5">
-                  {order.items.length}
-                </td>
-                <td className="whitespace-nowrap px-4 py-2.5 text-right font-semibold text-ink sm:px-5">
-                  {formatCurrency(order.total)}
-                </td>
-                <td className="hidden whitespace-nowrap px-4 py-2.5 text-right text-blue-600 lg:table-cell sm:px-5">
-                  {order.depositAmount > 0 ? formatCurrency(order.depositAmount) : "—"}
-                </td>
-                <td className="hidden whitespace-nowrap px-4 py-2.5 text-right lg:table-cell sm:px-5">
-                  {order.balanceAmount > 0 && order.balanceAmount !== order.total ? (
-                    <span className="font-medium text-ink">{formatCurrency(order.balanceAmount)}</span>
-                  ) : (
-                    <span className="text-ink-faint">—</span>
-                  )}
-                </td>
-                <td className="whitespace-nowrap px-4 py-2.5 text-center sm:px-5">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="gap-1.5"
-                    onClick={() => onView(order)}
-                  >
-                    <Eye className="h-3.5 w-3.5" />
-                    View
-                  </Button>
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-        <tfoot>
-          <tr className="border-t border-line bg-ink/[0.02]">
-            <td colSpan={6} className="px-4 py-2.5 text-right text-xs font-medium uppercase tracking-wide text-ink-faint sm:px-5">
-              Total
-            </td>
-            <td className="whitespace-nowrap px-4 py-2.5 text-right text-sm font-bold text-ink sm:px-5">
-              {formatCurrency(orders.reduce((sum, o) => sum + o.total, 0))}
-            </td>
-            <td colSpan={3} className="px-4 py-2.5 text-center sm:px-5" />
-          </tr>
-        </tfoot>
-      </table>
-    </div>
+                </div>
+              </div>
+
+              <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-ink-soft">
+                <span>Items: <span className="font-medium text-ink">{order.items.length}</span></span>
+                {order.depositAmount > 0 && (
+                  <span>
+                    Deposit: <span className="font-medium text-blue-600">{formatCurrency(order.depositAmount)}</span>
+                  </span>
+                )}
+                {order.balanceAmount > 0 && order.balanceAmount !== order.total && (
+                  <span>
+                    Balance: <span className="font-medium text-ink">{formatCurrency(order.balanceAmount)}</span>
+                  </span>
+                )}
+              </div>
+
+              <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
+                {order.contactNumber && (
+                  <span className="truncate text-xs text-ink-soft">{order.contactNumber}</span>
+                )}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="gap-1.5"
+                  onClick={() => onView(order)}
+                >
+                  <Eye className="h-3.5 w-3.5" />
+                  View details
+                </Button>
+              </div>
+            </div>
+          );
+        })}
+        <div className="flex items-center justify-between bg-ink/[0.02] px-4 py-2.5 text-sm sm:px-5">
+          <span className="text-xs font-medium uppercase tracking-wide text-ink-faint">Total</span>
+          <span className="font-bold text-ink">{formatCurrency(orders.reduce((sum, o) => sum + o.total, 0))}</span>
+        </div>
+      </div>
+    </>
   );
 }
 
