@@ -128,15 +128,15 @@ export function OrderDetailDialog({ order, onOpenChange, onComplete, onCancel }:
   return (
     <>
       <Dialog open={!!order} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-md max-h-[85vh] overflow-y-auto">
+        <DialogContent className="max-w-md p-5 sm:p-6">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              {order.customerName}
-              <Badge className={`text-[10px] ${STATUS_BADGE[order.status]}`}>
+            <DialogTitle className="flex items-start gap-2 pr-6">
+              <span className="min-w-0">{order.customerName}</span>
+              <Badge className={`mt-0.5 shrink-0 text-[10px] ${STATUS_BADGE[order.status]}`}>
                 {ORDER_STATUS_LABELS[order.status]}
               </Badge>
             </DialogTitle>
-            <DialogDescription>
+            <DialogDescription className="break-words">
               {order.orderNumber} · {formatDate(order.date)}
               {order.scheduledTime && ` · ${formatTime12h(order.scheduledTime)}`}
             </DialogDescription>
@@ -144,11 +144,11 @@ export function OrderDetailDialog({ order, onOpenChange, onComplete, onCancel }:
 
           <div className="space-y-3">
             <div className="grid grid-cols-2 gap-2 text-sm">
-              <div>
+              <div className="min-w-0">
                 <p className="text-xs text-ink-faint">Contact</p>
-                <p className="font-medium text-ink">{order.contactNumber || "—"}</p>
+                <p className="break-words font-medium text-ink">{order.contactNumber || "—"}</p>
               </div>
-              <div>
+              <div className="min-w-0">
                 <p className="text-xs text-ink-faint">Created</p>
                 <p className="font-medium text-ink">{formatDate(order.createdAt)}</p>
               </div>
@@ -257,8 +257,8 @@ export function OrderDetailDialog({ order, onOpenChange, onComplete, onCancel }:
             )}
           </div>
 
-          <div className="flex gap-2 pt-2">
-            <Button variant="outline" className="flex-1 gap-1.5" onClick={handlePrint}>
+          <div className="flex flex-wrap gap-2 pt-2">
+            <Button variant="outline" className="min-w-[calc(50%-0.25rem)] flex-1 gap-1.5" onClick={handlePrint}>
               <Printer className="h-4 w-4" />
               Print
             </Button>
@@ -266,7 +266,7 @@ export function OrderDetailDialog({ order, onOpenChange, onComplete, onCancel }:
               <>
                 <Button
                   variant="outline"
-                  className="flex-1 gap-1.5"
+                  className="min-w-[calc(50%-0.25rem)] flex-1 gap-1.5"
                   onClick={() => setShowRecordPayment(true)}
                 >
                   <DollarSign className="h-4 w-4" />
@@ -274,13 +274,13 @@ export function OrderDetailDialog({ order, onOpenChange, onComplete, onCancel }:
                 </Button>
                 <Button
                   variant="destructive"
-                  className="flex-1"
+                  className="min-w-[calc(50%-0.25rem)] flex-1"
                   onClick={() => { onOpenChange(false); onCancel?.(order); }}
                 >
                   Cancel
                 </Button>
                 <Button
-                  className="flex-1"
+                  className="min-w-[calc(50%-0.25rem)] flex-1"
                   onClick={() => { onOpenChange(false); onComplete?.(order); }}
                 >
                   Complete
@@ -300,7 +300,7 @@ export function OrderDetailDialog({ order, onOpenChange, onComplete, onCancel }:
           <div className="space-y-3">
             <div>
               <Label>Payment type</Label>
-              <div className="mt-1 flex gap-2">
+              <div className="mt-1 grid grid-cols-1 gap-2 sm:grid-cols-3">
                 {(["deposit", "final", "extra"] as PaymentType[]).map((t) => (
                   <button
                     key={t}
