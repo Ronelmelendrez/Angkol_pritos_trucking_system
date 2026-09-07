@@ -39,12 +39,12 @@ export function CashDrawerPage() {
     return (
       <div className="space-y-5">
         <Card>
-          <CardHeader className="flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-            <div>
+          <CardHeader className="flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="min-w-0 flex-1">
               <CardTitle>Opening cash</CardTitle>
               <CardDescription>Set the starting cash for today's shift.</CardDescription>
             </div>
-            <div className="w-full max-w-52">
+            <div className="w-full shrink-0 sm:w-auto sm:max-w-52">
               <Label htmlFor="cash-date">Business day</Label>
               <Input id="cash-date" type="date" value={date} onChange={(e) => setDate(e.target.value)} />
             </div>
@@ -60,19 +60,19 @@ export function CashDrawerPage() {
   return (
     <div className="space-y-5">
         <Card>
-          <CardHeader className="flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-            <div>
+          <CardHeader className="flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="min-w-0 flex-1">
               <CardTitle>Cash drawer</CardTitle>
-              <CardDescription>
+              <CardDescription className="max-w-xl">
                 Record the day's opening cash at the start of your shift and submit the closing cash count at the end.
               </CardDescription>
             </div>
-            <div className="flex flex-wrap items-end gap-3">
-              <div className="w-full max-w-52">
+            <div className="flex shrink-0 flex-wrap items-end gap-3">
+              <div className="w-full max-w-52 sm:w-52">
                 <Label htmlFor="cash-date">Business day</Label>
                 <Input id="cash-date" type="date" value={date} onChange={(e) => setDate(e.target.value)} />
               </div>
-              <div className="w-full max-w-52">
+              <div className="w-full max-w-52 sm:w-52">
                 <Label>Branch</Label>
                 <Select value={resolvedBranchId} onValueChange={handleBranchChange}>
                   <SelectTrigger>
