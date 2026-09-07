@@ -67,12 +67,12 @@ export function CashDrawerPage() {
                 Record the day's opening cash at the start of your shift and submit the closing cash count at the end.
               </CardDescription>
             </div>
-            <div className="flex shrink-0 flex-wrap items-end gap-3">
-              <div className="w-full max-w-52 sm:w-52">
+            <div className="grid shrink-0 grid-cols-2 gap-3">
+              <div className="min-w-0">
                 <Label htmlFor="cash-date">Business day</Label>
                 <Input id="cash-date" type="date" value={date} onChange={(e) => setDate(e.target.value)} />
               </div>
-              <div className="w-full max-w-52 sm:w-52">
+              <div className="min-w-0">
                 <Label>Branch</Label>
                 <Select value={resolvedBranchId} onValueChange={handleBranchChange}>
                   <SelectTrigger>
