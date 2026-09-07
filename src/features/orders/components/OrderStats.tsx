@@ -27,6 +27,8 @@ interface OrderTableProps {
 }
 
 function OrderTable({ orders, onView, emptyMessage }: OrderTableProps) {
+  const total = orders.reduce((sum, o) => sum + o.total, 0);
+
   if (orders.length === 0) {
     return (
       <div className="px-4 py-8 text-center text-sm text-ink-faint sm:px-5">
@@ -41,48 +43,28 @@ function OrderTable({ orders, onView, emptyMessage }: OrderTableProps) {
       <div className="hidden overflow-x-auto lg:block">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-line bg-ink/[0.02]">
-              <th className="px-5 py-2.5 text-left text-xs font-medium uppercase tracking-wide text-ink-faint">
-                Order #
-              </th>
-              <th className="px-5 py-2.5 text-left text-xs font-medium uppercase tracking-wide text-ink-faint">
-                Customer
-              </th>
-              <th className="px-5 py-2.5 text-left text-xs font-medium uppercase tracking-wide text-ink-faint">
-                Contact
-              </th>
-              <th className="px-5 py-2.5 text-left text-xs font-medium uppercase tracking-wide text-ink-faint">
-                Time
-              </th>
-              <th className="px-5 py-2.5 text-left text-xs font-medium uppercase tracking-wide text-ink-faint">
-                Status
-              </th>
-              <th className="px-5 py-2.5 text-right text-xs font-medium uppercase tracking-wide text-ink-faint">
-                Items
-              </th>
-              <th className="px-5 py-2.5 text-right text-xs font-medium uppercase tracking-wide text-ink-faint">
-                Total
-              </th>
-              <th className="px-5 py-2.5 text-right text-xs font-medium uppercase tracking-wide text-ink-faint">
-                Deposit
-              </th>
-              <th className="px-5 py-2.5 text-right text-xs font-medium uppercase tracking-wide text-ink-faint">
-                Balance
-              </th>
-              <th className="px-5 py-2.5 text-center text-xs font-medium uppercase tracking-wide text-ink-faint">
-                Action
-              </th>
+            <tr className="border-b border-line bg-surface/50 text-left text-xs font-medium uppercase tracking-wide text-ink-faint">
+              <th className="px-5 py-3">Order #</th>
+              <th className="px-3 py-3">Customer</th>
+              <th className="px-3 py-3">Contact</th>
+              <th className="px-3 py-3">Time</th>
+              <th className="px-3 py-3">Status</th>
+              <th className="px-3 py-3 text-right">Items</th>
+              <th className="px-3 py-3 text-right">Total</th>
+              <th className="px-3 py-3 text-right">Deposit</th>
+              <th className="px-3 py-3 text-right">Balance</th>
+              <th className="px-5 py-3 text-center">Action</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-dashed divide-line">
+          <tbody className="divide-y divide-line">
             {orders.map((order) => {
               const urgency = order.status === "scheduled" ? getTimeUrgency(order.scheduledTime ?? "") : null;
               return (
-                <tr key={order.id} className="hover:bg-primary/[0.02] transition-colors">
-                  <td className="whitespace-nowrap px-5 py-2.5 font-medium text-ink">
+                <tr key={order.id} className="transition-colors hover:bg-primary/[0.02]">
+                  <td className="whitespace-nowrap px-5 py-3 align-middle font-medium text-ink">
                     {order.orderNumber}
                   </td>
-                  <td className="px-5 py-2.5 font-medium text-ink">
+                  <td className="px-3 py-3 align-middle">
                     <div className="flex min-w-0 items-center gap-2">
                       {urgency && (
                         <span
@@ -96,13 +78,13 @@ function OrderTable({ orders, onView, emptyMessage }: OrderTableProps) {
                           }
                         />
                       )}
-                      <span className="truncate">{order.customerName}</span>
+                      <span className="truncate font-medium text-ink">{order.customerName}</span>
                     </div>
                   </td>
-                  <td className="whitespace-nowrap px-5 py-2.5 text-ink-soft">
+                  <td className="whitespace-nowrap px-3 py-3 align-middle text-ink-soft">
                     {order.contactNumber || "—"}
                   </td>
-                  <td className="whitespace-nowrap px-5 py-2.5">
+                  <td className="whitespace-nowrap px-3 py-3 align-middle">
                     {order.scheduledTime ? (
                       <span
                         className={`inline-block whitespace-nowrap rounded-md px-1.5 py-0.5 text-xs font-medium ${
@@ -116,35 +98,35 @@ function OrderTable({ orders, onView, emptyMessage }: OrderTableProps) {
                         {formatTime12h(order.scheduledTime)}
                       </span>
                     ) : (
-                      <span className="text-xs text-ink-faint">—</span>
+                      <span className="text-ink-faint">—</span>
                     )}
                   </td>
-                  <td className="whitespace-nowrap px-5 py-2.5">
+                  <td className="whitespace-nowrap px-3 py-3 align-middle">
                     <Badge className={`text-[10px] ${STATUS_BADGE[order.status]}`}>
                       {ORDER_STATUS_LABELS[order.status]}
                     </Badge>
                   </td>
-                  <td className="whitespace-nowrap px-5 py-2.5 text-right text-ink-soft">
+                  <td className="whitespace-nowrap px-3 py-3 text-right align-middle text-ink-soft">
                     {order.items.length}
                   </td>
-                  <td className="whitespace-nowrap px-5 py-2.5 text-right font-semibold text-ink">
+                  <td className="whitespace-nowrap px-3 py-3 text-right align-middle font-semibold text-ink">
                     {formatCurrency(order.total)}
                   </td>
-                  <td className="whitespace-nowrap px-5 py-2.5 text-right text-blue-600">
+                  <td className="whitespace-nowrap px-3 py-3 text-right align-middle text-blue-600">
                     {order.depositAmount > 0 ? formatCurrency(order.depositAmount) : "—"}
                   </td>
-                  <td className="whitespace-nowrap px-5 py-2.5 text-right">
+                  <td className="whitespace-nowrap px-3 py-3 text-right align-middle">
                     {order.balanceAmount > 0 && order.balanceAmount !== order.total ? (
                       <span className="font-medium text-ink">{formatCurrency(order.balanceAmount)}</span>
                     ) : (
                       <span className="text-ink-faint">—</span>
                     )}
                   </td>
-                  <td className="whitespace-nowrap px-5 py-2.5 text-center">
+                  <td className="whitespace-nowrap px-5 py-3 text-center align-middle">
                     <Button
                       variant="outline"
                       size="sm"
-                      className="gap-1.5"
+                      className="gap-1.5 px-3"
                       onClick={() => onView(order)}
                     >
                       <Eye className="h-3.5 w-3.5" />
@@ -156,21 +138,19 @@ function OrderTable({ orders, onView, emptyMessage }: OrderTableProps) {
             })}
           </tbody>
           <tfoot>
-            <tr className="border-t border-line bg-ink/[0.02]">
-              <td colSpan={6} className="px-5 py-2.5 text-right text-xs font-medium uppercase tracking-wide text-ink-faint">
-                Total
+            <tr className="border-t border-line bg-ink/[0.02] text-right text-xs font-medium uppercase tracking-wide text-ink-faint">
+              <td colSpan={6} className="px-5 py-3">Date Total</td>
+              <td className="whitespace-nowrap px-3 py-3 text-sm font-bold text-ink">
+                {formatCurrency(total)}
               </td>
-              <td className="whitespace-nowrap px-5 py-2.5 text-right text-sm font-bold text-ink">
-                {formatCurrency(orders.reduce((sum, o) => sum + o.total, 0))}
-              </td>
-              <td colSpan={3} className="px-5 py-2.5 text-center" />
+              <td colSpan={3} className="px-3 py-3" />
             </tr>
           </tfoot>
         </table>
       </div>
 
       {/* ── Cards (mobile & tablet: < lg) ──────── */}
-      <div className="divide-y divide-dashed divide-line lg:hidden">
+      <div className="divide-y divide-line lg:hidden">
         {orders.map((order) => {
           const urgency = order.status === "scheduled" ? getTimeUrgency(order.scheduledTime ?? "") : null;
           return (
@@ -246,9 +226,9 @@ function OrderTable({ orders, onView, emptyMessage }: OrderTableProps) {
             </div>
           );
         })}
-        <div className="flex items-center justify-between bg-ink/[0.02] px-4 py-2.5 text-sm sm:px-5">
-          <span className="text-xs font-medium uppercase tracking-wide text-ink-faint">Total</span>
-          <span className="font-bold text-ink">{formatCurrency(orders.reduce((sum, o) => sum + o.total, 0))}</span>
+        <div className="flex items-center justify-between px-4 py-3 text-sm sm:px-5">
+          <span className="text-xs font-medium uppercase tracking-wide text-ink-faint">Date Total</span>
+          <span className="font-bold text-ink">{formatCurrency(total)}</span>
         </div>
       </div>
     </>
@@ -305,38 +285,38 @@ export function OrderStats({ orders, onComplete, onCancel }: Props) {
         {/* ── Stats Cards ────────────────────────── */}
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           <div className="flex items-center gap-3 rounded-xl border border-line bg-surface px-3 py-3 sm:px-4">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-accent/20 text-accent-dark">
-              <ShoppingBag className="h-4 w-4" />
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent/15 text-accent-dark">
+              <ShoppingBag className="h-4.5 w-4.5" />
             </div>
             <div className="min-w-0">
-              <p className="text-[11px] text-ink-faint">Today's Orders</p>
+              <p className="truncate text-[11px] text-ink-faint">Today's Orders</p>
               <p className="text-xl font-bold text-ink sm:text-2xl">{stats.today.length}</p>
             </div>
           </div>
           <div className="flex items-center gap-3 rounded-xl border border-line bg-surface px-3 py-3 sm:px-4">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-100 text-blue-700">
-              <Clock className="h-4 w-4" />
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-amber-500/15 text-amber-600">
+              <Clock className="h-4.5 w-4.5" />
             </div>
             <div className="min-w-0">
-              <p className="text-[11px] text-ink-faint">Pending</p>
+              <p className="truncate text-[11px] text-ink-faint">Pending</p>
               <p className="text-xl font-bold text-ink sm:text-2xl">{stats.today.length - stats.completed.length}</p>
             </div>
           </div>
           <div className="flex items-center gap-3 rounded-xl border border-line bg-surface px-3 py-3 sm:px-4">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-green-100 text-green-700">
-              <CheckCircle className="h-4 w-4" />
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-green-500/15 text-green-600">
+              <CheckCircle className="h-4.5 w-4.5" />
             </div>
             <div className="min-w-0">
-              <p className="text-[11px] text-ink-faint">Completed</p>
+              <p className="truncate text-[11px] text-ink-faint">Completed</p>
               <p className="text-xl font-bold text-ink sm:text-2xl">{stats.completed.length}</p>
             </div>
           </div>
           <div className="flex items-center gap-3 rounded-xl border border-line bg-surface px-3 py-3 sm:px-4">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary-dark">
-              <AlertCircle className="h-4 w-4" />
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary-dark">
+              <AlertCircle className="h-4.5 w-4.5" />
             </div>
             <div className="min-w-0">
-              <p className="text-[11px] text-ink-faint">Today's Total</p>
+              <p className="truncate text-[11px] text-ink-faint">Today's Total</p>
               <p className="text-xl font-bold text-ink sm:text-2xl">{formatCurrency(stats.total)}</p>
             </div>
           </div>
@@ -344,14 +324,15 @@ export function OrderStats({ orders, onComplete, onCancel }: Props) {
 
         {/* ── Pending / Not Completed Table ────────── */}
         <div className="overflow-hidden rounded-xl border border-line bg-surface">
-          <div className="flex flex-wrap items-center justify-between gap-3 bg-amber-50/60 px-4 py-3 sm:px-5">
-            <div className="flex flex-wrap items-center gap-3">
-              <span className="text-base font-semibold text-amber-800">Pending</span>
-              <span className="text-sm text-ink-soft">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line bg-ink/[0.02] px-4 py-3 sm:px-5">
+            <div className="flex items-center gap-2">
+              <Clock className="h-4 w-4 text-amber-600" />
+              <span className="text-sm font-semibold text-ink">Pending</span>
+              <span className="text-xs text-ink-faint">
                 {pendingOrders.length} order{pendingOrders.length === 1 ? "" : "s"}
               </span>
             </div>
-            <span className="font-semibold text-ink">{formatCurrency(pendingTotal)}</span>
+            <span className="text-sm font-semibold text-ink">{formatCurrency(pendingTotal)}</span>
           </div>
           <OrderTable
             orders={pendingOrders}
@@ -362,14 +343,15 @@ export function OrderStats({ orders, onComplete, onCancel }: Props) {
 
         {/* ── Completed Table ──────────────────────── */}
         <div className="overflow-hidden rounded-xl border border-line bg-surface">
-          <div className="flex flex-wrap items-center justify-between gap-3 bg-green-50/60 px-4 py-3 sm:px-5">
-            <div className="flex flex-wrap items-center gap-3">
-              <span className="text-base font-semibold text-green-700">Completed</span>
-              <span className="text-sm text-ink-soft">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line bg-ink/[0.02] px-4 py-3 sm:px-5">
+            <div className="flex items-center gap-2">
+              <CheckCircle className="h-4 w-4 text-green-600" />
+              <span className="text-sm font-semibold text-ink">Completed</span>
+              <span className="text-xs text-ink-faint">
                 {completedOrders.length} order{completedOrders.length === 1 ? "" : "s"}
               </span>
             </div>
-            <span className="font-semibold text-ink">{formatCurrency(completedTotal)}</span>
+            <span className="text-sm font-semibold text-ink">{formatCurrency(completedTotal)}</span>
           </div>
           <OrderTable
             orders={completedOrders}
