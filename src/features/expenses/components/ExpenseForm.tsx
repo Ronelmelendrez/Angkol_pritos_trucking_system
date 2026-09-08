@@ -27,6 +27,7 @@ export function ExpenseForm({ onDone }: { onDone?: () => void }) {
   const addExpense = useAddExpense();
   const { data: activeBranches = [] } = useActiveBranches();
   const defaultBranchId = activeBranches[0]?.id ?? "";
+  const isManager = user?.role === "manager";
   const [trackStock, setTrackStock] = useState(false);
 
   const { data: products = [] } = useProducts();
@@ -209,101 +210,104 @@ export function ExpenseForm({ onDone }: { onDone?: () => void }) {
         {errors.description && <p className="mt-1 text-xs text-danger">{errors.description.message}</p>}
       </div>
 
-      {/* Stock tracking toggle */}
-      {!trackStock ? (
-        <button
-          type="button"
-          onClick={toggleStock}
-          className="w-full flex items-center gap-3 rounded-lg border border-dashed border-primary/30 bg-primary/5 px-4 py-3 text-sm font-medium text-primary-dark hover:border-primary/40 hover:bg-primary/10 transition-colors"
-        >
-          <span className="flex h-8 w-8 items-center justify-center rounded-md bg-primary/15 text-primary-dark">
-            <PackagePlus className="h-4 w-4" />
-          </span>
-          <span className="flex flex-col items-start">
-            <span className="leading-tight">Track stock for this expense</span>
-            <span className="text-xs font-normal text-primary-dark/70">Link purchased items to your inventory</span>
-          </span>
-        </button>
-      ) : (
-        <div className="rounded-lg border border-primary/20 bg-primary/5 px-4 py-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-sm font-medium text-primary-dark">
-              <Package className="h-4 w-4" />
-              Tracking stock
-            </div>
+      {/* Stock tracking — admin only */}
+      {isManager && (
+        <>
+          {!trackStock ? (
             <button
               type="button"
               onClick={toggleStock}
-              className="text-xs text-ink-faint hover:text-danger transition-colors"
+              className="w-full flex items-center gap-3 rounded-lg border border-dashed border-primary/30 bg-primary/5 px-4 py-3 text-sm font-medium text-primary-dark hover:border-primary/40 hover:bg-primary/10 transition-colors"
             >
-              Remove
+              <span className="flex h-8 w-8 items-center justify-center rounded-md bg-primary/15 text-primary-dark">
+                <PackagePlus className="h-4 w-4" />
+              </span>
+              <span className="flex flex-col items-start">
+                <span className="leading-tight">Track stock for this expense</span>
+                <span className="text-xs font-normal text-primary-dark/70">Link purchased items to your inventory</span>
+              </span>
             </button>
-          </div>
-        </div>
-      )}
-
-      {/* Stock product rows */}
-      {trackStock && (
-        <div className="rounded-lg border border-primary/20 bg-primary/5 p-4 space-y-3">
-          <div className="flex items-center justify-between">
-            <p className="text-xs font-semibold uppercase tracking-wide text-primary-dark">
-              Stock items
-            </p>
-            <Button type="button" variant="outline" size="sm" onClick={addItem} className="gap-1.5">
-              <Plus className="h-3.5 w-3.5" /> Add product
-            </Button>
-          </div>
-
-          {items.length === 0 && (
-            <p className="text-xs text-primary-dark">Click "Add product" to start tracking stock.</p>
+          ) : (
+            <div className="rounded-lg border border-primary/20 bg-primary/5 px-4 py-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-sm font-medium text-primary-dark">
+                  <Package className="h-4 w-4" />
+                  Tracking stock
+                </div>
+                <button
+                  type="button"
+                  onClick={toggleStock}
+                  className="text-xs text-ink-faint hover:text-danger transition-colors"
+                >
+                  Remove
+                </button>
+              </div>
+            </div>
           )}
 
-          {items.map((item, index) => (
-              <div
-                key={index}
-                className="flex flex-col gap-2 rounded-lg border border-line bg-surface p-3 sm:flex-row sm:items-end sm:gap-2"
-              >
-                <div className="min-w-0 flex-1">
-                  <Label className="text-xs">Product</Label>
-                  <Select value={item.productId} onValueChange={(v) => updateItem(index, "productId", v)}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Choose product" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {activeProducts.map((p) => (
-                        <SelectItem key={p.id} value={p.id}>
-                          {p.name} — {formatCurrency(p.defaultPrice)}/{p.unit}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="flex items-end gap-2">
-                  <div className="flex-1 sm:w-24 sm:flex-none">
-                    <Label className="text-xs">Qty</Label>
-                    <Input
-                      type="text"
-                      inputMode="decimal"
-                      pattern="[0-9]*\.?[0-9]*"
-                      value={item._raw ?? (item.quantityPurchased || "")}
-                      onChange={(e) => updateItem(index, "quantityPurchased", e.target.value)}
-                      placeholder="0"
-                    />
-                  </div>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="h-9 w-9 shrink-0 text-ink-faint hover:text-danger"
-                    onClick={() => removeItem(index)}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
+          {trackStock && (
+            <div className="rounded-lg border border-primary/20 bg-primary/5 p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <p className="text-xs font-semibold uppercase tracking-wide text-primary-dark">
+                  Stock items
+                </p>
+                <Button type="button" variant="outline" size="sm" onClick={addItem} className="gap-1.5">
+                  <Plus className="h-3.5 w-3.5" /> Add product
+                </Button>
               </div>
-            ))}
-          {errors.items && <p className="text-xs text-danger">{errors.items.message}</p>}
-        </div>
+
+              {items.length === 0 && (
+                <p className="text-xs text-primary-dark">Click "Add product" to start tracking stock.</p>
+              )}
+
+              {items.map((item, index) => (
+                  <div
+                    key={index}
+                    className="flex flex-col gap-2 rounded-lg border border-line bg-surface p-3 sm:flex-row sm:items-end sm:gap-2"
+                  >
+                    <div className="min-w-0 flex-1">
+                      <Label className="text-xs">Product</Label>
+                      <Select value={item.productId} onValueChange={(v) => updateItem(index, "productId", v)}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Choose product" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {activeProducts.map((p) => (
+                            <SelectItem key={p.id} value={p.id}>
+                              {p.name} — {formatCurrency(p.defaultPrice)}/{p.unit}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="flex items-end gap-2">
+                      <div className="flex-1 sm:w-24 sm:flex-none">
+                        <Label className="text-xs">Qty</Label>
+                        <Input
+                          type="text"
+                          inputMode="decimal"
+                          pattern="[0-9]*\.?[0-9]*"
+                          value={item._raw ?? (item.quantityPurchased || "")}
+                          onChange={(e) => updateItem(index, "quantityPurchased", e.target.value)}
+                          placeholder="0"
+                        />
+                      </div>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="h-9 w-9 shrink-0 text-ink-faint hover:text-danger"
+                        onClick={() => removeItem(index)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              {errors.items && <p className="text-xs text-danger">{errors.items.message}</p>}
+            </div>
+          )}
+        </>
       )}
 
       {/* Amount + Payment method */}
