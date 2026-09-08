@@ -78,7 +78,7 @@ export function ExpensesPage() {
     [isEmployee],
   );
 
-  // Employee: only show the add expense form
+  // Employee: just the add form — the expense list lives on the admin dashboard
   if (isEmployee) {
     return (
       <div className="space-y-5">

@@ -10,6 +10,7 @@ import {
   FUND_SOURCE_LABELS,
 } from "@/lib/constants";
 import { useProducts } from "@/features/products/hooks/useProducts";
+import { useActiveBranches } from "@/features/branches";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Label } from "@/components/ui/Label";
@@ -24,6 +25,8 @@ export function ExpenseForm({ onDone }: { onDone?: () => void }) {
   const { toast } = useToast();
   const { user } = useAuth();
   const addExpense = useAddExpense();
+  const { data: activeBranches = [] } = useActiveBranches();
+  const defaultBranchId = activeBranches[0]?.id ?? "";
   const [trackStock, setTrackStock] = useState(false);
 
   const { data: products = [] } = useProducts();
@@ -129,8 +132,18 @@ export function ExpenseForm({ onDone }: { onDone?: () => void }) {
       values.fundSource = undefined;
     }
 
+    const branchId = user?.branchId ?? defaultBranchId;
+    if (!branchId) {
+      toast({
+        title: "No branch available",
+        description: "Create a branch before logging expenses.",
+        variant: "error",
+      });
+      return;
+    }
+
     try {
-      await addExpense.mutateAsync({ ...values, createdBy: user?.id, branchId: user?.branchId });
+      await addExpense.mutateAsync({ ...values, createdBy: user?.id, branchId });
       toast({
         title: "Expense recorded",
         description: `${values.description} — added.`,
