@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Trash2, ShoppingCart } from "lucide-react";
+import { Trash2, ShoppingCart, Eye } from "lucide-react";
 import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/components/ui/AlertDialog";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
@@ -15,9 +15,10 @@ const PAGE_SIZE = 10;
 
 interface Props {
   sales: Sale[];
+  onView?: (sale: Sale) => void;
 }
 
-export function SalesList({ sales }: Props) {
+export function SalesList({ sales, onView }: Props) {
   const [page, setPage] = useState(1);
   const [deleteTarget, setDeleteTarget] = useState<Sale | null>(null);
   const { data: products = [] } = useProducts();
@@ -106,6 +107,17 @@ export function SalesList({ sales }: Props) {
                         )}
                       </div>
                       <span className="shrink-0 font-semibold text-ink">{formatCurrency(sale.amount)}</span>
+                      {onView && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-7 w-7 shrink-0 text-ink-faint hover:text-primary-dark"
+                          onClick={() => onView(sale)}
+                          aria-label="View sale"
+                        >
+                          <Eye className="h-3.5 w-3.5" />
+                        </Button>
+                      )}
                       <Button
                         variant="ghost"
                         size="icon"

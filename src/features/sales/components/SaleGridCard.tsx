@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Trash2 } from "lucide-react";
+import { Trash2, Eye } from "lucide-react";
 import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/components/ui/AlertDialog";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
@@ -12,9 +12,10 @@ import type { Sale } from "../types";
 
 interface Props {
   sale: Sale;
+  onView?: (sale: Sale) => void;
 }
 
-export function SaleGridCard({ sale }: Props) {
+export function SaleGridCard({ sale, onView }: Props) {
   const [deleteTarget, setDeleteTarget] = useState<Sale | null>(null);
   const deleteSale = useDeleteSale();
   const { data: products = [] } = useProducts();
@@ -43,15 +44,28 @@ export function SaleGridCard({ sale }: Props) {
         <Badge variant="neutral" className="shrink-0">
           {productName}
         </Badge>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-7 w-7 shrink-0 text-ink-faint hover:text-danger"
-          onClick={() => setDeleteTarget(sale)}
-          aria-label="Delete sale"
-        >
-          <Trash2 className="h-3.5 w-3.5" />
-        </Button>
+        <div className="flex items-center gap-1">
+          {onView && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7 shrink-0 text-ink-faint hover:text-primary-dark"
+              onClick={() => onView(sale)}
+              aria-label="View sale"
+            >
+              <Eye className="h-3.5 w-3.5" />
+            </Button>
+          )}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-7 w-7 shrink-0 text-ink-faint hover:text-danger"
+            onClick={() => setDeleteTarget(sale)}
+            aria-label="Delete sale"
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+          </Button>
+        </div>
       </div>
 
       <p className="text-lg font-bold text-ink">{formatCurrency(sale.amount)}</p>

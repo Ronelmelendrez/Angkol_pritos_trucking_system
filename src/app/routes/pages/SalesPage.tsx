@@ -8,6 +8,7 @@ import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/Ca
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/Dialog";
 import { SalesList } from "@/features/sales/components/SalesList";
 import { SaleGridCard } from "@/features/sales/components/SaleGridCard";
+import { SaleDetailDialog } from "@/features/sales/components/SaleDetailDialog";
 import { SaleForm } from "@/features/sales/components/SaleForm";
 import { SalesFiltersBar } from "@/features/sales/components/SalesFilters";
 import { DatePresets, type DatePreset } from "@/components/ui/DatePresets";
@@ -27,6 +28,7 @@ export function SalesPage() {
   const { data: sales = [] } = useSales();
   const { data: products = [] } = useProducts();
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [viewTarget, setViewTarget] = useState<Sale | null>(null);
   const [search, setSearch] = useState("");
   const [productFilter, setProductFilter] = useState("All");
   const [datePreset, setDatePreset] = useState<DatePreset>("this-month");
@@ -82,12 +84,12 @@ export function SalesPage() {
   }, [products]);
 
   const renderTable = useCallback(
-    (data: Sale[]) => <SalesList sales={data} />,
+    (data: Sale[]) => <SalesList sales={data} onView={setViewTarget} />,
     [],
   );
 
   const renderGridCard = useCallback(
-    (sale: Sale) => <SaleGridCard sale={sale} />,
+    (sale: Sale) => <SaleGridCard sale={sale} onView={setViewTarget} />,
     [],
   );
 
@@ -151,6 +153,8 @@ export function SalesPage() {
           }
         />
       </Card>
+
+      <SaleDetailDialog sale={viewTarget} onClose={() => setViewTarget(null)} />
     </div>
   );
 }
