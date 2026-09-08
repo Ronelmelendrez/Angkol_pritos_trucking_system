@@ -48,6 +48,7 @@ export function expenseRowToApp(row: ExpenseRow & { categories?: { name: string 
     productId: row.product_id ?? undefined,
     quantityPurchased: row.quantity_purchased ?? undefined,
     createdBy: row.created_by ?? undefined,
+    trackingStock: row.tracking_stock ?? false,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
@@ -65,6 +66,7 @@ export function expenseAppToRow(input: {
   product_id?: string | null;
   quantity_purchased?: number | null;
   created_by?: string | null;
+  tracking_stock?: boolean;
 }) {
   if (!input.branch_id) {
     throw new Error("branch_id is required when creating an expense");
@@ -81,6 +83,7 @@ export function expenseAppToRow(input: {
     product_id: input.product_id || null,
     quantity_purchased: input.quantity_purchased ?? null,
     created_by: input.created_by ?? null,
+    tracking_stock: input.tracking_stock ?? false,
   };
 }
 

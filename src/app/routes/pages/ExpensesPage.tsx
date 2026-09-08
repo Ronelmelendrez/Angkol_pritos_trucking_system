@@ -8,6 +8,8 @@ import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/Ca
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/Dialog";
 import { useExpenses } from "@/features/expenses/hooks/useExpenses";
 import { ExpenseForm } from "@/features/expenses/components/ExpenseForm";
+import { ExpenseDetailDialog } from "@/features/expenses/components/ExpenseDetailDialog";
+import { useBranches } from "@/features/branches";
 import { ExpenseFiltersBar } from "@/features/expenses/components/ExpenseFilters";
 import { DatePresets, type DatePreset } from "@/components/ui/DatePresets";
 import type { Expense } from "@/features/expenses/types";
@@ -23,11 +25,13 @@ export function ExpensesPage() {
   const { user } = useAuth();
   const isEmployee = user?.role === "staff";
   const { data: expenses = [], isLoading } = useExpenses();
+  const { data: branches = [] } = useBranches();
   const [filters, setFilters] = useState<ExpenseFiltersType>({});
   const [datePreset, setDatePreset] = useState<DatePreset>("this-month");
   const [customFrom, setCustomFrom] = useState(format(new Date(), "yyyy-MM-dd"));
   const [customTo, setCustomTo] = useState(format(new Date(), "yyyy-MM-dd"));
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [viewTarget, setViewTarget] = useState<Expense | null>(null);
 
   const effectiveDateFrom = useMemo(() => {
     const now = new Date();
@@ -69,12 +73,16 @@ export function ExpensesPage() {
   const dailyTotal = filtered.reduce((sum, e) => sum + e.amount, 0);
 
   const renderTable = useCallback(
-    (data: Expense[]) => <ExpenseList expenses={data} isLoading={isLoading} hideDelete={isEmployee} />,
+    (data: Expense[]) => (
+      <ExpenseList expenses={data} isLoading={isLoading} hideDelete={isEmployee} onView={setViewTarget} />
+    ),
     [isLoading, isEmployee],
   );
 
   const renderGridCard = useCallback(
-    (expense: Expense) => <ExpenseGridCard expense={expense} hideDelete={isEmployee} />,
+    (expense: Expense) => (
+      <ExpenseGridCard expense={expense} hideDelete={isEmployee} onView={setViewTarget} />
+    ),
     [isEmployee],
   );
 
@@ -150,6 +158,12 @@ export function ExpensesPage() {
           }
         />
       </Card>
+
+      <ExpenseDetailDialog
+        expense={viewTarget}
+        onClose={() => setViewTarget(null)}
+        branches={branches}
+      />
     </div>
   );
 }

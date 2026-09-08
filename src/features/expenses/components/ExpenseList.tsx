@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Trash2, Receipt } from "lucide-react";
+import { Trash2, Receipt, Eye } from "lucide-react";
 import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/components/ui/AlertDialog";
 import { Badge } from "@/components/ui/Badge";
 import { Skeleton } from "@/components/ui/Skeleton";
@@ -19,9 +19,10 @@ interface Props {
   expenses: Expense[];
   isLoading: boolean;
   hideDelete?: boolean;
+  onView?: (expense: Expense) => void;
 }
 
-export function ExpenseList({ expenses, isLoading, hideDelete }: Props) {
+export function ExpenseList({ expenses, isLoading, hideDelete, onView }: Props) {
   const [page, setPage] = useState(1);
   const [deleteTarget, setDeleteTarget] = useState<Expense | null>(null);
   const deleteExpense = useDeleteExpense();
@@ -132,6 +133,17 @@ export function ExpenseList({ expenses, isLoading, hideDelete }: Props) {
                       )}
                     </div>
                     <span className="shrink-0 font-semibold text-ink">{formatCurrency(exp.amount)}</span>
+                    {onView && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7 shrink-0 text-ink-faint hover:text-primary-dark"
+                        onClick={() => onView(exp)}
+                        aria-label={`View ${exp.description}`}
+                      >
+                        <Eye className="h-3.5 w-3.5" />
+                      </Button>
+                    )}
                     {!hideDelete && (
                       <Button
                         variant="ghost"

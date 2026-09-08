@@ -19,6 +19,7 @@ export interface Expense extends BaseRecord {
   quantityPurchased?: number;
   items?: ExpenseItem[];
   createdBy?: string;
+  trackingStock?: boolean;
 }
 
 export type NewExpense = Omit<Expense, "id" | "createdAt" | "updatedAt">;

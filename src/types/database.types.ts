@@ -341,6 +341,7 @@ export type Database = {
           product_id: string | null
           quantity_purchased: number | null
           supplier: string | null
+          tracking_stock: boolean
           updated_at: string
         }
         Insert: {
@@ -359,6 +360,7 @@ export type Database = {
           product_id?: string | null
           quantity_purchased?: number | null
           supplier?: string | null
+          tracking_stock?: boolean
           updated_at?: string
         }
         Update: {
@@ -377,6 +379,7 @@ export type Database = {
           product_id?: string | null
           quantity_purchased?: number | null
           supplier?: string | null
+          tracking_stock?: boolean
           updated_at?: string
         }
         Relationships: [

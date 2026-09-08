@@ -125,6 +125,9 @@ export function ExpenseForm({ onDone }: { onDone?: () => void }) {
         return;
       }
       values.items = validItems;
+      const [first] = validItems;
+      values.productId = first.productId;
+      values.quantityPurchased = first.quantityPurchased;
     } else {
       values.items = [];
     }
@@ -144,7 +147,12 @@ export function ExpenseForm({ onDone }: { onDone?: () => void }) {
     }
 
     try {
-      await addExpense.mutateAsync({ ...values, createdBy: user?.id, branchId });
+      await addExpense.mutateAsync({
+        ...values,
+        createdBy: user?.id,
+        branchId,
+        trackingStock: trackStock,
+      });
       toast({
         title: "Expense recorded",
         description: `${values.description} — added.`,
@@ -163,10 +171,11 @@ export function ExpenseForm({ onDone }: { onDone?: () => void }) {
       });
       setTrackStock(false);
       onDone?.();
-    } catch {
+    } catch (err) {
+      console.error("Add expense error:", err);
       toast({
         title: "Couldn't save expense",
-        description: "Please try again.",
+        description: err instanceof Error ? err.message : "Please try again.",
         variant: "error",
       });
     }

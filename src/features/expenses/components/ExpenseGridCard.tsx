@@ -1,4 +1,4 @@
-import { Trash2 } from "lucide-react";
+import { Trash2, Eye } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { formatCurrency } from "@/utils/currency";
@@ -11,9 +11,10 @@ import type { Expense } from "../types";
 interface Props {
   expense: Expense;
   hideDelete?: boolean;
+  onView?: (expense: Expense) => void;
 }
 
-export function ExpenseGridCard({ expense, hideDelete }: Props) {
+export function ExpenseGridCard({ expense, hideDelete, onView }: Props) {
   const deleteExpense = useDeleteExpense();
   const { toast } = useToast();
 
@@ -38,17 +39,30 @@ export function ExpenseGridCard({ expense, hideDelete }: Props) {
         >
           {expense.category}
         </Badge>
-        {!hideDelete && (
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-7 w-7 shrink-0 text-ink-faint hover:text-danger"
-            onClick={handleDelete}
-            aria-label={`Delete ${expense.description}`}
-          >
-            <Trash2 className="h-3.5 w-3.5" />
-          </Button>
-        )}
+        <div className="flex items-center gap-1">
+          {onView && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7 shrink-0 text-ink-faint hover:text-primary-dark"
+              onClick={() => onView(expense)}
+              aria-label={`View ${expense.description}`}
+            >
+              <Eye className="h-3.5 w-3.5" />
+            </Button>
+          )}
+          {!hideDelete && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7 shrink-0 text-ink-faint hover:text-danger"
+              onClick={handleDelete}
+              aria-label={`Delete ${expense.description}`}
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+            </Button>
+          )}
+        </div>
       </div>
 
       <p className="text-lg font-bold text-ink">{formatCurrency(expense.amount)}</p>
