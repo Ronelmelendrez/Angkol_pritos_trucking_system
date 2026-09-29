@@ -36,6 +36,14 @@ const DialogContent = React.forwardRef<
         "ticket max-h-[85vh] overflow-y-auto p-6",
         className
       )}
+      // Dialogs are closed with the X (or by the form itself) only. Tapping the
+      // overlay, pressing Escape, or a stray focus change must not throw away a
+      // half-filled form, so all of Radix's implicit dismissals are cancelled.
+      // These sit before {...props} so a dialog can opt back in.
+      onPointerDownOutside={(event) => event.preventDefault()}
+      onInteractOutside={(event) => event.preventDefault()}
+      onFocusOutside={(event) => event.preventDefault()}
+      onEscapeKeyDown={(event) => event.preventDefault()}
       {...props}
     >
       {children}

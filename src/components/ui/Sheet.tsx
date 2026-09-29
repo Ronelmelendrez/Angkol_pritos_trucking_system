@@ -60,6 +60,11 @@ function SheetContent({
             "inset-x-0 top-0 h-auto border-b border-line data-[state=closed]:animate-out data-[state=closed]:slide-out-to-top data-[state=open]:animate-in data-[state=open]:slide-in-from-top",
           className
         )}
+        // Same rule as Dialog: the X closes it, never the overlay.
+        onPointerDownOutside={(event) => event.preventDefault()}
+        onInteractOutside={(event) => event.preventDefault()}
+        onFocusOutside={(event) => event.preventDefault()}
+        onEscapeKeyDown={(event) => event.preventDefault()}
         {...props}
       >
         {children}
