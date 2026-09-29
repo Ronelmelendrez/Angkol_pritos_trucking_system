@@ -22,8 +22,8 @@ const PRESETS = [1, 5, 10, 25, 50, 100];
 
 export function ConversionOverview() {
   const { data: conversions = [], isLoading } = useChickenPartConversions(false);
-  // Missing entry means "not touched yet" and counts as 1, so a fresh page
-  // still shows meaningful totals.
+  // Every row starts at 0 heads: nothing is counted until it is entered, so a
+  // fresh page shows 0 instead of guessing.
   const [quantities, setQuantities] = useState<Record<string, number>>({});
 
   function setQty(id: string, value: number) {
@@ -40,7 +40,7 @@ export function ConversionOverview() {
   const rows = useMemo(
     () =>
       conversions.map((conversion) => {
-        const quantity = quantities[conversion.id] ?? 1;
+        const quantity = quantities[conversion.id] ?? 0;
         return { conversion, quantity, result: calculateBreakdown(conversion, quantity) };
       }),
     [conversions, quantities],
@@ -91,6 +91,13 @@ export function ConversionOverview() {
           Clear
         </Button>
       </div>
+
+      {totals.quantity === 0 && (
+        <p className="text-xs text-ink-faint">
+          Every conversion starts at 0 heads. Enter how many of each size you
+          have to see the totals and the parts breakdown.
+        </p>
+      )}
 
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <StatChip label="Total heads" value={formatQty(totals.quantity)} icon={ShoppingBasket} tone="primary" />
@@ -241,7 +248,10 @@ function QuantityInput({
         min="0"
         step="0.001"
         inputMode="decimal"
-        value={value}
+        // Left blank until a number is typed, so the field never shows a
+        // pre-filled 0; the value itself is still 0 for the totals.
+        value={value > 0 ? value : ""}
+        placeholder="0"
         onChange={(e) => onChange(parseFloat(e.target.value))}
         className="h-8 w-20 text-center tabular-nums"
         aria-label={label}
