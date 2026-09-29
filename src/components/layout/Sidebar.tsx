@@ -18,6 +18,7 @@ import {
   PanelLeftOpen,
   ShoppingBag,
   Building2,
+  Drumstick,
 } from "lucide-react";
 import { cn } from "@/utils/cn";
 import { useUiStore } from "@/app/store/useUiStore";
@@ -28,6 +29,7 @@ const MANAGER_NAV_ITEMS = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard, end: true },
   { to: "/dashboard/sales", label: "Sales", icon: ShoppingCart },
   { to: "/dashboard/products", label: "Products", icon: Package },
+  { to: "/dashboard/chicken-parts", label: "Chicken Parts", icon: Drumstick },
   { to: "/dashboard/expenses", label: "Expenses", icon: Receipt },
   { to: "/dashboard/inventory", label: "Inventory", icon: ClipboardList },
   { to: "/dashboard/employees", label: "Employees", icon: Users },

@@ -91,6 +91,71 @@ export type Database = {
         }
         Relationships: []
       }
+      chicken_part_conversion_items: {
+        Row: {
+          conversion_id: string
+          created_at: string
+          id: string
+          part_name: string
+          price_per_piece: number
+          quantity_per_base: number
+          updated_at: string
+        }
+        Insert: {
+          conversion_id: string
+          created_at?: string
+          id?: string
+          part_name: string
+          price_per_piece?: number
+          quantity_per_base?: number
+          updated_at?: string
+        }
+        Update: {
+          conversion_id?: string
+          created_at?: string
+          id?: string
+          part_name?: string
+          price_per_piece?: number
+          quantity_per_base?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chicken_part_conversion_items_conversion_id_fkey"
+            columns: ["conversion_id"]
+            isOneToOne: false
+            referencedRelation: "chicken_part_conversions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      chicken_part_conversions: {
+        Row: {
+          base_weight_kg: number
+          created_at: string
+          id: string
+          is_active: boolean
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          base_weight_kg: number
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          base_weight_kg?: number
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       cash_advances: {
         Row: {
           amount: number

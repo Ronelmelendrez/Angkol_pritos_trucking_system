@@ -9,6 +9,7 @@ const MANAGER_NAV_ITEMS = [
   { path: "/dashboard", label: "Dashboard" },
   { path: "/dashboard/sales", label: "Sales" },
   { path: "/dashboard/products", label: "Products" },
+  { path: "/dashboard/chicken-parts", label: "Chicken Parts" },
   { path: "/dashboard/expenses", label: "Expenses" },
   { path: "/dashboard/inventory", label: "Inventory" },
   { path: "/dashboard/employees", label: "Employees" },

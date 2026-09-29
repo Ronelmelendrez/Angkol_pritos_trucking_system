@@ -95,6 +95,39 @@ export const orderItemSchema = z.object({
   quantity: z.number().positive("Qty must be greater than 0"),
 });
 
+export const chickenPartItemSchema = z.object({
+  partName: z.string().trim().min(1, "Name the part"),
+  quantityPerBase: z.coerce.number().min(0, "Qty must be 0 or more"),
+  pricePerPiece: z.coerce.number().min(0, "Price must be 0 or more"),
+});
+
+export const chickenPartConversionSchema = z
+  .object({
+    name: z.string().trim().min(2, "Name the conversion"),
+    baseWeightKg: z.coerce.number().positive("Base weight must be greater than 0"),
+    isActive: z.boolean(),
+    items: z.array(chickenPartItemSchema).min(1, "Add at least one part"),
+  })
+  .superRefine((val, ctx) => {
+    // The DB enforces a unique (conversion_id, lower(part_name)) index, so
+    // catch the collision here to show it on the row instead of as a 409.
+    const seen = new Set<string>();
+    val.items.forEach((item, i) => {
+      const key = item.partName.trim().toLowerCase();
+      if (seen.has(key)) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["items", i, "partName"],
+          message: "Duplicate part",
+        });
+      }
+      seen.add(key);
+    });
+  });
+export type ChickenPartConversionFormValues = z.infer<
+  typeof chickenPartConversionSchema
+>;
+
 export const orderSchema = z.object({
   orderNumber: z.string().optional(),
   date: z.string().min(1, "Date is required"),

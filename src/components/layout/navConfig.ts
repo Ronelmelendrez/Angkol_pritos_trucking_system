@@ -13,6 +13,7 @@ import {
   Settings,
   PiggyBank,
   HandCoins,
+  Drumstick,
   type LucideIcon,
 } from "lucide-react"
 
@@ -26,6 +27,7 @@ export const NAV_ITEMS: NavItem[] = [
   { path: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { path: "/dashboard/sales", label: "Sales", icon: ShoppingCart },
   { path: "/dashboard/products", label: "Products", icon: Package },
+  { path: "/dashboard/chicken-parts", label: "Chicken Parts", icon: Drumstick },
   { path: "/dashboard/expenses", label: "Expenses", icon: Receipt },
   { path: "/dashboard/inventory", label: "Inventory", icon: ClipboardList },
   { path: "/dashboard/employees", label: "Employees", icon: Users },
