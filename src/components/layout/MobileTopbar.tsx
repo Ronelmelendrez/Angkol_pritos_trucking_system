@@ -16,6 +16,7 @@ import {
   Settings,
   X,
   ShoppingBag,
+  Building2,
 } from "lucide-react";
 import { cn } from "@/utils/cn";
 import { useUiStore } from "@/app/store/useUiStore";
@@ -28,6 +29,7 @@ const MANAGER_NAV_ITEMS = [
   { to: "/dashboard/expenses", label: "Expenses", icon: Receipt },
   { to: "/dashboard/inventory", label: "Inventory", icon: ClipboardList },
   { to: "/dashboard/employees", label: "Employees", icon: Users },
+  { to: "/dashboard/branches", label: "Branches", icon: Building2 },
   { to: "/dashboard/attendance", label: "Attendance", icon: CalendarClock },
   { to: "/dashboard/advances", label: "Cash Advances", icon: HandCoins },
   { to: "/dashboard/loans", label: "Loans (Utang)", icon: Landmark },
